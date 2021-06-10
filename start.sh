@@ -1,0 +1,1 @@
+venv/Scripts/python3 start.py
