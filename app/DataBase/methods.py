@@ -46,12 +46,12 @@ def createCustom(Creator_Username, Player_Username):
 
 # Change custom / roles
 # -----------------------------------------
-def changeRoles(Custom_ID, NewRoles):
-    C = Custom.select().where(Custom.ID == Custom_ID)
-    if C.exists():
-        C = C[0]
-        C.Roles = NewRoles
-        C.save()
+def changeRoles(Player_ID, NewRoles):
+    P = Player_ID.select().where(Player.ID == Player_ID)
+    if P.exists():
+        P = P[0]
+        P.Roles = NewRoles
+        P.save()
         return True
     else:
         return False
@@ -118,6 +118,16 @@ def getProfileID(Profile_Username):
     else:
         return None
 
+
+def getRoles(Player_ID):
+    P = Player.select().where(Player.ID == Player_ID)
+    if P.exists():
+        P = P[0]
+        return [i for i in P.Roles]
+    else:
+        return []
+
+
 # print(getCustoms_byPlayer(1))
 # print(changeRoles(1, "TD"))
 # print(searchPlayer(""))
@@ -125,7 +135,7 @@ def getProfileID(Profile_Username):
 # print(changeCustomSR_Heal(1, 3000))
 # print(changeCustomSR_Dps(1, 3200))
 # print(createCustom("Ivar", "Ivaryss"))
-# print(createPlayer("Ivarys#256", "Ivaryss"))
+# print(createPlayer("Ivarys#2564", "Ivarys"))
 # print(checkProfile("Ivar", "Ivar"))
 # print(createProfile("Ivar", "Ivar"))
 # createDB()
