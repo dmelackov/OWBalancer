@@ -51,6 +51,10 @@ class Custom(Model):
     DSR = IntegerField(default=0)
     HSR = IntegerField(default=0)
 
+    def getJsonInfo(self):
+        data = self.Player.getJsonInfo()
+        data['CustomID'] = self.ID
+        return data
     class Meta:
         database = db
 
