@@ -206,6 +206,9 @@ td tr {
 .player_inner_container>p {
     margin: 0;
     width: max-content;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    width: 90%;
 }
 
 .cursor {

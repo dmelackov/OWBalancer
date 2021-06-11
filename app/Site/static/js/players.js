@@ -27,7 +27,7 @@ playersTable.addEventListener("click", (e) => {
     var lineRect = target.getBoundingClientRect()
     var customerRect = customSelect.getBoundingClientRect()
     var totalHeight = lineRect.y;
-    if (lineRect.y + customerRect.height > document.documentElement.clientHeight - 20) totalHeight -= br.y + customerRect.height - document.documentElement.clientHeight + 20
+    if (lineRect.y + customerRect.height > document.documentElement.clientHeight - 20) totalHeight -= lineRect.y + customerRect.height - document.documentElement.clientHeight + 20
     customSelect.style.top = totalHeight + "px"
     customSelect.style.left = lineRect.x + lineRect.width + 10 + "px"
     lastActive = target
@@ -50,9 +50,7 @@ async function updatePlayers() {
     var pattern_data = await pattern.text()
     data.forEach(element => {
         var tr = document.createElement("tr")
-        var username = element.Username
-        if (username.length > 25) username = username.slice(0, 25) + "..."
-        tr.innerHTML = Mustache.render(pattern_data, { "id": element.id, "Username": username })
+        tr.innerHTML = Mustache.render(pattern_data, { "id": element.id, "Username": element.Username })
         playersTable.appendChild(tr)
     });
 
@@ -67,9 +65,7 @@ async function updateLobby() {
     var pattern_data = await pattern.text()
     data.forEach(element => {
         var tr = document.createElement("tr")
-        var username = element.Username
-        if (username.length > 25) username = username.slice(0, 25) + "..."
-        tr.innerHTML = Mustache.render(pattern_data, { "id": element.id, "Username": username })
+        tr.innerHTML = Mustache.render(pattern_data, { "id": element.id, "Username": element.Username })
         lobbyTable.appendChild(tr)
     });
 }
