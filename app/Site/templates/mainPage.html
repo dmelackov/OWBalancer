@@ -1,0 +1,35 @@
+{% extends 'base.html' %} {% block content %}
+<header>
+    <nav class="menu">
+        <a href="/">Главная страница</a>
+        <a href="/players">Игроки</a>
+        <a href="/profile">Профиль</a>
+        <div class="menu-right">
+            <a href="/logout">{{current_user.Username}}</a>
+        </div>
+    </nav>
+</header>
+<div class="content">
+    <div class="players">
+        <p class="title">
+            Игроки
+        </p>
+        <input type="text" id="PlayersSearch" placeholder="Поиск">
+        <hr>
+        <div class="player_list">
+            <table id="players_list"></table>
+        </div>
+    </div>
+    <div class="lobby">
+        <p class="title">
+            Лобби
+        </p>
+        <hr>
+        <div class="lobby_list">
+            <table id="lobby_list"></table>
+        </div>
+    </div>
+    <script src="static/js/players.js"></script>
+</div>
+
+{% endblock content %}

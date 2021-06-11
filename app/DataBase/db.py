@@ -1,12 +1,12 @@
 from peewee import *
 from app.params import DB_NAME
 from werkzeug.security import check_password_hash, generate_password_hash
-
+from flask_login import UserMixin
 
 db = SqliteDatabase(DB_NAME)
 
 
-class Profile(Model):
+class Profile(Model, UserMixin):
     ID = PrimaryKeyField()
     Username = TextField()
     Password = TextField(null=True)
@@ -35,6 +35,10 @@ class Player(Model):
     DLose = IntegerField(default=0)
     HLose = IntegerField(default=0)
 
+    def getJsonInfo(self):
+        return {"id": self.ID,
+                "Username": self.Username,
+                "BattleTag": self.BattleTag}
     class Meta:
         database = db
 
