@@ -95,7 +95,7 @@ input.error {
 /* */
 
 .content {
-    height: 100%;
+    height: 92vh;
     display: inline-block;
 }
 
@@ -111,7 +111,7 @@ input.error {
     padding: 16px 16px;
     width: 15vw;
     background-color: #11161d;
-    height: 80%;
+    height: 90%;
 }
 
 .lobby>.title {
@@ -124,7 +124,7 @@ input.error {
 /* */
 
 .players>#PlayersSearch {
-    width: 15vw;
+    width: 95%;
 }
 
 .players {
@@ -133,9 +133,9 @@ input.error {
     border: solid 1px #444444;
     margin: 20px;
     padding: 16px 16px;
-    width: max-content;
+    width: 15vw;
     background-color: #11161d;
-    height: 80%;
+    height: 90%;
 }
 
 .players>.title {
@@ -151,6 +151,7 @@ input.error {
 
 #players_list {
     width: 100%;
+    table-layout: fixed;
 }
 
 hr {
@@ -158,14 +159,17 @@ hr {
     border-radius: 1px;
 }
 
+td tr {
+    width: 100%;
+}
+
 .player_inner_container {
+    display: block;
     position: relative;
     background-color: #171e27;
     border-radius: 12px;
     border: solid 1px #444444;
     padding: 12px 24px;
-    width: 75%;
-    max-width: 75%;
 }
 
 .player_inner_container>.right {
