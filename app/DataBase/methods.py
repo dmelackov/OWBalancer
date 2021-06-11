@@ -27,7 +27,7 @@ def checkProfile(Username, Password):
 
 def createPlayer(BattleTag, Username):  # можно что-то одно (тоже работает)
     if BattleTag or Username:
-        if not Player.select().where((Player.BattleTag == BattleTag) | (Player.Username == Username)).exists():
+        if not Player.select().where(((Player.BattleTag == BattleTag) & (BattleTag != "")) | (Player.Username == Username)).exists():
             Player.create(BattleTag=BattleTag, Username=Username)
             return True
     return False
@@ -37,17 +37,18 @@ def createCustom(Creator_Username, Player_Username):
     P = Player.select().where(Player.Username == Player_Username)
     User = Profile.select().where(Profile.Username == Creator_Username)
     if P.exists() and User.exists():
-        Custom.create(Creator=User[0], Player=P[0])
-        return True
-    else:
-        return False
+        C = Custom.select().where(Custom.Creator == User, Custom.Player == P)
+        if not C.exists():
+            Custom.create(Creator=User[0], Player=P[0])
+            return True
+    return False
 # -----------------------------------------
 
 
 # Change custom / roles
 # -----------------------------------------
 def changeRoles(Player_ID, NewRoles):
-    P = Player_ID.select().where(Player.ID == Player_ID)
+    P = Player.select().where(Player.ID == Player_ID)
     if P.exists():
         P = P[0]
         P.Roles = NewRoles
@@ -91,6 +92,17 @@ def changeCustomSR_Heal(Custom_ID, New_SR):
 # -----------------------------------------
 
 
+# get SR
+# -----------------------------------------
+def getCustomSR(Custom_ID):
+    C = Custom.select().where(Custom.ID == Custom_ID)
+    if C.exists():
+        C = C[0]
+        return [C.TSR, C.DSR, C.HSR]
+    return False
+# -----------------------------------------
+
+
 # get some things
 # -----------------------------------------
 def getCustoms_byPlayer(Player_ID):
@@ -129,13 +141,22 @@ def getRoles(Player_ID):
 
 
 # print(getCustoms_byPlayer(1))
-# print(changeRoles(1, "TD"))
-# print(searchPlayer(""))
+# print(changeRoles(2, "TH"))
+# print()
 # print(changeCustomSR_Tank(1, 3200))
 # print(changeCustomSR_Heal(1, 3000))
 # print(changeCustomSR_Dps(1, 3200))
-# print(createCustom("Ivar", "Ivaryss"))
+# print(createCustom("Ivar", "Ivarys"))
 # print(createPlayer("Ivarys#2564", "Ivarys"))
 # print(checkProfile("Ivar", "Ivar"))
-# print(createProfile("Ivar", "Ivar"))
+# print(createProfile("Ivarys", "123"))
+# print(getRoles(1))
 # createDB()
+
+# name = "Artmagic"
+# print(createPlayer("", name))
+# print(createCustom("Ivarys", name))
+# print(changeCustomSR_Tank(searchPlayer(name)[0].ID, 2900))
+# print(changeCustomSR_Dps(searchPlayer(name)[0].ID, 3100))
+# print(changeCustomSR_Heal(searchPlayer(name)[0].ID, 2600))
+# print(changeRoles(searchPlayer(name)[0].ID, "TD"))

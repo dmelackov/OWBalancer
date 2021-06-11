@@ -52,3 +52,7 @@ def ClearLobby(Profile_ID):
         User.save()
         return True
     return False
+
+
+# for i in range(1, 13):
+#     AddToLobby(1, i)

@@ -27,7 +27,7 @@ class Player(Model):
     BattleTag = TextField(null=True)
     Username = TextField(null=True)
     Roles = TextField(null=True, default="")
-    PlayedGamesData = TextField(default="{}")
+    PlayedGamesData = TextField(default="{'Win': {'T': {}, 'D': {}, 'H': {}}, 'Lose': {'T': {}, 'D': {}, 'H': {}}}")
     TWin = IntegerField(default=0)
     DWin = IntegerField(default=0)
     HWin = IntegerField(default=0)
