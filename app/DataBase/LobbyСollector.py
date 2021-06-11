@@ -7,7 +7,7 @@ def GetLobby(Profile_ID):
         CMass = User[0].Customers.split(".")
         if "" in CMass:
             CMass.remove("")
-        return CMass
+        return [int(i) for i in CMass]
 
 
 def AddToLobby(Profile_ID, Custom_ID):
@@ -54,5 +54,6 @@ def ClearLobby(Profile_ID):
     return False
 
 
-# for i in range(1, 13):
-#     AddToLobby(1, i)
+# print(DeleteFromLobby(1, 5))
+# AddToLobby(1, 5)
+# print(GetLobby(1))

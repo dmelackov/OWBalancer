@@ -105,6 +105,14 @@ def getCustomSR(Custom_ID):
 
 # get some things
 # -----------------------------------------
+def getCustomID(Profile_ID, Player_ID):
+    C = Custom.select().where(Custom.Player.ID == Player_ID, Custom.Creator.ID == Profile_ID)
+    if C.exists():
+        return C.ID
+    else:
+        return False
+
+
 def getCustoms_byPlayer(Player_ID):
     P = Player.select().where(Player.ID == Player_ID)
     if P.exists():
