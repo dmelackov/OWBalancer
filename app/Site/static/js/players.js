@@ -16,11 +16,13 @@ customSelect.style.display = 'none'
 
 lobbyTable.addEventListener("click", (e) => {
     let target = e.target.closest("td");
+    if (!target) return;
     console.log(target.dataset.playerId)
 })
 
 playersTable.addEventListener("click", async(e) => {
     let target = e.target.closest("nav");
+    if (!target) return;
     const res = await fetch('/api/getCustoms/' + target.dataset.playerId)
     var data = await res.json()
     if (data.type == 'custom') {

@@ -31,6 +31,7 @@ def getLobby():
 def getCustoms(id):
     print("Custom", current_user.ID, id)
     custom = DataBaseMethods.getCustomID(current_user.ID, id)
+    print(custom)
     if custom:
         data = MainDB.Custom.get(MainDB.Custom.ID == custom).getJsonInfo()
         data = {'data': data}
