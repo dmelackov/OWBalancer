@@ -19,20 +19,35 @@ lobbyTable.addEventListener("click", (e) => {
     console.log(target.dataset.playerId)
 })
 
-playersTable.addEventListener("click", (e) => {
+playersTable.addEventListener("click", async(e) => {
     let target = e.target.closest("nav");
-    if (lastActive) lastActive.classList.remove("active")
-    console.log(target.dataset.playerId)
-    customSelect.style.display = 'block'
-    var lineRect = target.getBoundingClientRect()
-    var customerRect = customSelect.getBoundingClientRect()
-    var totalHeight = lineRect.y;
-    if (lineRect.y + customerRect.height > document.documentElement.clientHeight - 20) totalHeight -= lineRect.y + customerRect.height - document.documentElement.clientHeight + 20
-    customSelect.style.top = totalHeight + "px"
-    customSelect.style.left = lineRect.x + lineRect.width + 10 + "px"
-    lastActive = target
-    target.classList.add("active")
-    console.log(lineRect)
+    const res = await fetch('/api/getCustoms/' + target.dataset.playerId)
+    var data = await res.json()
+    switch (data.type) {
+        case 'list':
+            if (lastActive) lastActive.classList.remove("active")
+            console.log(target.dataset.playerId)
+            customSelect.style.display = 'block'
+            var lineRect = target.getBoundingClientRect()
+            var customerRect = customSelect.getBoundingClientRect()
+            var totalHeight = lineRect.y;
+            if (lineRect.y + customerRect.height > document.documentElement.clientHeight - 20) totalHeight -= lineRect.y + customerRect.height - document.documentElement.clientHeight + 20
+            customSelect.style.top = totalHeight + "px"
+            customSelect.style.left = lineRect.x + lineRect.width + 10 + "px"
+            lastActive = target
+            target.classList.add("active")
+            console.log(lineRect)
+            break;
+
+        case 'custom':
+            sendPOST('/api/addToLobby', { 'id': data.data.CustomID })
+            updateLobby()
+            break;
+        case 'none':
+
+            break;
+    }
+
 })
 
 searchField.addEventListener('input', updatePlayers)
@@ -44,7 +59,6 @@ var lastActive = null;
 async function updatePlayers() {
     const res = await fetch('/api/getPlayers/' + searchField.value)
     var data = await res.json()
-    console.log(data)
     playersTable.innerHTML = "";
     var pattern = await fetch('static/html/player_pattern.html')
     var pattern_data = await pattern.text()
@@ -59,7 +73,6 @@ async function updatePlayers() {
 async function updateLobby() {
     const res = await fetch('/api/getLobby')
     var data = await res.json()
-    console.log(data)
     lobbyTable.innerHTML = "";
     var pattern = await fetch('static/html/lobby_pattern.html')
     var pattern_data = await pattern.text()
@@ -73,11 +86,17 @@ async function updateLobby() {
 
 async function deleteFromLobby(id) {
     console.log("Delete " + id)
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/deleteFromLobby', false);
-    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-    var data = {}
-    data.id = id
-    xhr.send(JSON.stringify(data));
+    sendPOST('/api/deleteFromLobby', { 'id': id })
     updateLobby()
+}
+
+function sendPOST(url, params) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', url, false);
+    xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+    xhr.send(JSON.stringify(params))
+}
+
+function openCustomMenu() {
+
 }
