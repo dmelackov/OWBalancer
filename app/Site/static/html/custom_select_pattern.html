@@ -1,0 +1,33 @@
+<div class="custom_select">
+    <div class="customs">
+        <table id="CustomTableSelect">
+            {{#data}}
+            <tr>
+                <td data-player-id="{{CustomID}}">
+                    <div class="player_inner_container ">
+                        <p class="player_username ">{{Username}}</p>
+                        <div class="sr">
+                            {{#Roles}}
+                            <div class="sr_icon">
+                                <img src="/static/img/tank_icon.png" alt="" width="10" class="role_icon {{^Tank}}innactive{{/Tank}}">
+                                <img src="/static/img/damage_icon.png" alt="" width="10" class="role_icon {{^Damage}}innactive{{/Damage}}">
+                                <img src="/static/img/heal_icon.png" alt="" width="10" class="role_icon {{^Heal}}innactive{{/Heal}}">
+                            </div>
+                            {{/Roles}}
+                            <div class="sr_numbers">
+                                {{#SR}}
+                                <p>{{ Tank }}</p>
+                                <p>{{ Damage }}</p>
+                                <p>{{ Heal }}</p>
+                                {{/SR}}
+                            </div>
+
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {{/data}}
+        </table>
+    </div>
+    <p class="create_container">+ Create custom</p>
+</div>

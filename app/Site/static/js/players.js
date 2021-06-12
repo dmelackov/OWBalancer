@@ -23,29 +23,25 @@ playersTable.addEventListener("click", async(e) => {
     let target = e.target.closest("nav");
     const res = await fetch('/api/getCustoms/' + target.dataset.playerId)
     var data = await res.json()
-    switch (data.type) {
-        case 'list':
-            if (lastActive) lastActive.classList.remove("active")
-            console.log(target.dataset.playerId)
-            customSelect.style.display = 'block'
-            var lineRect = target.getBoundingClientRect()
-            var customerRect = customSelect.getBoundingClientRect()
-            var totalHeight = lineRect.y;
-            if (lineRect.y + customerRect.height > document.documentElement.clientHeight - 20) totalHeight -= lineRect.y + customerRect.height - document.documentElement.clientHeight + 20
-            customSelect.style.top = totalHeight + "px"
-            customSelect.style.left = lineRect.x + lineRect.width + 10 + "px"
-            lastActive = target
-            target.classList.add("active")
-            console.log(lineRect)
-            break;
-
-        case 'custom':
-            sendPOST('/api/addToLobby', { 'id': data.data.CustomID })
-            updateLobby()
-            break;
-        case 'none':
-
-            break;
+    if (data.type == 'custom') {
+        sendPOST('/api/addToLobby', { 'id': data.data.CustomID })
+        updateLobby()
+        return;
+    }
+    if (data.type == "none") {
+        var none_custom_select = await (await fetch('static/html/custom_select_none_pattern.html')).text()
+        openCustomMenu(target, Mustache.render(none_custom_select, data))
+        return
+    }
+    var custom_select = await (await fetch('static/html/custom_select_pattern.html')).text()
+    openCustomMenu(target, Mustache.render(custom_select, data))
+    var CustomTableSelect = document.getElementById("CustomTableSelect")
+    CustomTableSelect.onclick = function(e) {
+        var target = e.target.closest("td")
+        if (lastActive) lastActive.classList.remove("active")
+        customSelect.style.display = 'none'
+        sendPOST('/api/addToLobby', { 'id': target.dataset.playerId })
+        updateLobby()
     }
 
 })
@@ -64,7 +60,7 @@ async function updatePlayers() {
     var pattern_data = await pattern.text()
     data.forEach(element => {
         var tr = document.createElement("tr")
-        tr.innerHTML = Mustache.render(pattern_data, { "id": element.id, "Username": element.Username })
+        tr.innerHTML = Mustache.render(pattern_data, element)
         playersTable.appendChild(tr)
     });
 
@@ -78,7 +74,7 @@ async function updateLobby() {
     var pattern_data = await pattern.text()
     data.forEach(element => {
         var tr = document.createElement("tr")
-        tr.innerHTML = Mustache.render(pattern_data, { "id": element.id, "Username": element.Username })
+        tr.innerHTML = Mustache.render(pattern_data, element)
         lobbyTable.appendChild(tr)
     });
 }
@@ -97,6 +93,16 @@ function sendPOST(url, params) {
     xhr.send(JSON.stringify(params))
 }
 
-function openCustomMenu() {
-
+function openCustomMenu(target, content) {
+    if (lastActive) lastActive.classList.remove("active")
+    customSelect.innerHTML = content
+    customSelect.style.display = 'block'
+    var lineRect = target.getBoundingClientRect()
+    var customerRect = customSelect.getBoundingClientRect()
+    var totalHeight = lineRect.y;
+    if (lineRect.y + customerRect.height > document.documentElement.clientHeight - 20) totalHeight -= lineRect.y + customerRect.height - document.documentElement.clientHeight + 20
+    customSelect.style.top = totalHeight + "px"
+    customSelect.style.left = lineRect.x + lineRect.width + 10 + "px"
+    lastActive = target
+    target.classList.add("active")
 }

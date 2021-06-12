@@ -179,12 +179,14 @@ td tr {
 }
 
 .player_inner_container {
-    display: block;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
     position: relative;
     background-color: #171e27;
     border-radius: 12px;
     border: solid 1px #444444;
-    padding: 12px 24px;
+    padding: 6px 12px;
     width: 100% - 48px;
     cursor: pointer;
 }
@@ -209,6 +211,9 @@ td tr {
     width: max-content;
     overflow-x: hidden;
     text-overflow: ellipsis;
+    height: max-content;
+    margin-top: auto;
+    margin-bottom: auto;
     width: 90%;
 }
 
@@ -249,8 +254,56 @@ td tr {
     background-color: #171e27;
     border-radius: 6px;
     border: solid 1px #444444;
-    padding: 12px 24px;
     width: 15vw;
-    height: 25vh;
-    padding: 32px 16px;
+    height: max-content;
+    padding: 16px 8px;
+    padding-bottom: 2px;
+}
+
+.customs {
+    overflow-y: auto;
+    height: 150px;
+    margin-bottom: 10px;
+}
+
+.customs>table {
+    width: 100%;
+}
+
+.sr {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.sr_icon {
+    margin-left: 2px;
+    padding-top: 7px;
+}
+
+.role_icon {
+    display: block;
+    margin-bottom: 1px;
+}
+
+.sr_numbers {
+    display: inline-block;
+    line-height: 1px;
+    font-size: 12px;
+}
+
+.sr_lobby_icon {
+    display: flex;
+}
+
+.sr_lobby_icon>.role_icon {
+    margin-left: 4px;
+}
+
+.player_username {
+    font-size: 18px;
+}
+
+.innactive {
+    filter: brightness(0.3);
 }
