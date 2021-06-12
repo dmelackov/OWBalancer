@@ -29,6 +29,51 @@ def preGenerate():
     return teamMaskfilled, roleMaskFilled
 
 
-# def formPlayersData(Lobby):
+def formPlayersData(Lobby):
+    Ps = []
+    for Custom_Iterator in range(len(Lobby)):
+        C = Custom.select().where(Custom.ID == Lobby[Custom_Iterator])
+        if C.exists():
+            C = C[0]
+            Ps.append({"Custom": C})
+            if "T" in C.Player.Roles:
+                Ps[Custom_Iterator][0] = C.TSR
+            if "D" in C.Player.Roles:
+                Ps[Custom_Iterator][1] = C.DSR
+            if "H" in C.Player.Roles:
+                Ps[Custom_Iterator][2] = C.HSR
+    return Ps
 
-preGenerate()
+
+# print(formPlayersData(GetLobby(1)))
+def countByMask(teamMask, roleMaskFilled, Ps):
+    first_team = []
+    second_team = []
+    for pointer in range(len(teamMask)):
+        if teamMask[pointer]:
+            second_team.append(Ps[pointer])
+        else:
+            first_team.append(Ps[pointer])
+    corrected_fb = []
+    for Mask in roleMaskFilled:
+        tr = 1
+        for k in range(len(Mask)):
+            if not Mask[k] in list(first_team[k].keys()):
+                tr = 0
+        if tr:
+            print(Mask)
+
+    # print(first_team)
+    # print(second_team)
+
+
+def createGame(Profile_ID):
+    teamMask, roleMask = preGenerate()
+    Lobby = GetLobby(Profile_ID)
+    Ps = formPlayersData(Lobby)
+    # for Mask in roleMask:
+
+    print(countByMask(teamMask[0], roleMask, formPlayersData(GetLobby(1))))
+
+
+createGame(1)

@@ -17,8 +17,14 @@ def AddToLobby(Profile_ID, Custom_ID):
         User, C = User[0], C[0]
 
         CMass = User.Customers.split(".")
+
         if "" in CMass:
             CMass.remove("")
+
+        for C_ID in CMass:
+            if Custom.get(Custom.ID == C_ID).Player == C.Player:
+                return False
+
         if not str(C.ID) in CMass:
             CMass.append(str(C.ID))
         User.Customers = ".".join(CMass)
@@ -55,5 +61,5 @@ def ClearLobby(Profile_ID):
 
 
 # print(DeleteFromLobby(1, 5))
-# AddToLobby(1, 5)
+print(AddToLobby(1, 13))
 # print(GetLobby(1))

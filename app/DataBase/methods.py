@@ -33,9 +33,9 @@ def createPlayer(BattleTag, Username):  # можно что-то одно (то�
     return False
 
 
-def createCustom(Creator_Username, Player_Username):
-    P = Player.select().where(Player.Username == Player_Username)
-    User = Profile.select().where(Profile.Username == Creator_Username)
+def createCustom(Creator_ID, Player_ID):
+    P = Player.select().where(Player.ID == Player_ID)
+    User = Profile.select().where(Profile.ID == Creator_ID)
     if P.exists() and User.exists():
         C = Custom.select().where(Custom.Creator == User, Custom.Player == P)
         if not C.exists():
@@ -106,9 +106,9 @@ def getCustomSR(Custom_ID):
 # get some things
 # -----------------------------------------
 def getCustomID(Profile_ID, Player_ID):
-    C = Custom.select().where(Custom.Player.ID == Player_ID, Custom.Creator.ID == Profile_ID)
+    C = Custom.select().where(Custom.Player == Player_ID & Custom.Creator == Profile_ID)
     if C.exists():
-        return C.ID
+        return C[0].ID
     else:
         return False
 
@@ -157,13 +157,13 @@ def getRoles(Player_ID):
 # print(createCustom("Ivar", "Ivarys"))
 # print(createPlayer("Ivarys#2564", "Ivarys"))
 # print(checkProfile("Ivar", "Ivar"))
-# print(createProfile("Ivarys", "123"))
+# print(createProfile("DemonDimon", "123"))
 # print(getRoles(1))
 # createDB()
 
 # name = "Artmagic"
 # print(createPlayer("", name))
-# print(createCustom("Ivarys", name))
+# print(createCustom(2, 1))
 # print(changeCustomSR_Tank(searchPlayer(name)[0].ID, 2900))
 # print(changeCustomSR_Dps(searchPlayer(name)[0].ID, 3100))
 # print(changeCustomSR_Heal(searchPlayer(name)[0].ID, 2600))
