@@ -3,7 +3,7 @@ from app.DataBase.db import *
 
 def UserPrediction(GameRate, UserRate, WinRate, GamesPlayed):
     if GamesPlayed > 10:
-        return (UserRate / GameRate) * WinRate  # + avg
+        return (UserRate / GameRate) * ((WinRate + AVGEP) / 2)  # + AVGEP
     else:
         return 0.5
 
