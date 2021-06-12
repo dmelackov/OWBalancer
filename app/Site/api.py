@@ -16,19 +16,44 @@ def getPlayers(searchStr=""):
     players = DataBaseMethods.searchPlayer(searchStr)
     return jsonify(list(map(lambda x: x.getJsonInfo(), players)))
 
+
 @api.route('/getLobby')
 @login_required
 def getLobby():
     players = LobbyMethods.GetLobby(current_user.ID)
-    data = list(map(lambda x: MainDB.Custom.get(MainDB.Custom.ID == x).getJsonInfo(), players))
+    data = list(map(lambda x: MainDB.Custom.get(
+        MainDB.Custom.ID == x).getJsonInfo(), players))
     return jsonify(data)
+
+
+@api.route('/getCustoms/<int:id>')
+@login_required
+def getCustoms(id):
+    print("Custom", current_user.ID, id)
+    custom = DataBaseMethods.getCustomID(current_user.ID, id)
+    if custom:
+        data = MainDB.Custom.get(MainDB.Custom.ID == custom).getJsonInfo()
+        data = {'data': data}
+        data['type'] = 'custom'
+        return jsonify(data)
+    customs = DataBaseMethods.getCustoms_byPlayer(id)
+    if customs:
+        data = list(map(lambda x: MainDB.Custom.get(
+            MainDB.Custom.ID == x).getJsonInfo(), customs))
+        data = {'data': data}
+        data['type'] = 'list'
+        return jsonify(data)
+    return jsonify({'status': 200, 'message': 'Customs not found', 'type': 'none'})
+
 
 @api.route('/addToLobby', methods=['POST'])
 @login_required
 def addToLobby():
     data = request.get_json()
     print(data)
+    LobbyMethods.AddToLobby(current_user.ID, data['id'])
     return jsonify({"status": 200})
+
 
 @api.route('/deleteFromLobby', methods=['POST'])
 @login_required

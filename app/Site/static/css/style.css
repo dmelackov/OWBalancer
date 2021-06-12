@@ -201,6 +201,7 @@ td tr {
     position: absolute;
     bottom: 7px;
     right: 15px;
+    height: 30px;
 }
 
 .player_inner_container>p {
@@ -212,7 +213,7 @@ td tr {
 }
 
 .cursor {
-    transform: translate(0, 17px);
+    transform: translate(0, -25px);
     font-size: 22px;
     color: #445368;
 }
