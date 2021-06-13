@@ -307,3 +307,8 @@ td tr {
 .innactive {
     filter: brightness(0.3);
 }
+
+.X {
+    margin-left: auto;
+    justify-content: flex-end;
+}

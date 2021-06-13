@@ -14,10 +14,40 @@ body.addEventListener("click", (e) => {
 
 customSelect.style.display = 'none'
 
+
+let currentElem = null;
+
+lobbyTable.addEventListener("mouseover", (e) => {
+    var target = e.target.closest("td")
+    if (!target) return;
+    if (!lobbyTable.contains(target)) return;
+    let relatedTarget = e.relatedTarget;
+    while (relatedTarget) {
+        if (relatedTarget == currentElem) return;
+        relatedTarget = relatedTarget.parentNode;
+    }
+    currentElem = target;
+    target.getElementsByClassName("sr_lobby")[0].style.display = "none"
+    target.getElementsByClassName("X")[0].style.display = "flex"
+})
+
+lobbyTable.addEventListener("mouseout", (e) => {
+    var target = e.target.closest("td")
+    if (!target) return;
+    let relatedTarget = e.relatedTarget;
+    while (relatedTarget) {
+        if (relatedTarget == currentElem) return;
+        relatedTarget = relatedTarget.parentNode;
+    }
+    target.getElementsByClassName("X")[0].style.display = "none"
+    target.getElementsByClassName("sr_lobby")[0].style.display = "block"
+})
+
 lobbyTable.addEventListener("click", (e) => {
     let target = e.target.closest("td");
     if (!target) return;
-    console.log(target.dataset.playerId)
+    sendPOST("/api/deleteFromLobby", { 'id': target.dataset.playerId })
+    updateLobby()
 })
 
 playersTable.addEventListener("click", async(e) => {
