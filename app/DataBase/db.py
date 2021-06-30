@@ -19,6 +19,12 @@ class Profile(Model, UserMixin):
     def check_password(self, password):
         return check_password_hash(self.Password, password)
 
+    def getJsonInfo(self):
+        return {
+            'id': self.ID,
+            'username': self.Username
+        }
+
     class Meta:
         database = db
 
@@ -28,7 +34,8 @@ class Player(Model):
     BattleTag = TextField(null=True)
     Username = TextField(null=True)
     Roles = TextField(null=True, default="")
-    PlayedGamesData = TextField(default='')
+    PlayedGamesData = TextField(
+        default="{'Win': {'T': {}, 'D': {}, 'H': {}}, 'Lose': {'T': {}, 'D': {}, 'H': {}}}")
     TWin = IntegerField(default=0)
     DWin = IntegerField(default=0)
     HWin = IntegerField(default=0)
@@ -39,7 +46,12 @@ class Player(Model):
     def getJsonInfo(self):
         return {"id": self.ID,
                 "Username": self.Username,
-                "BattleTag": self.BattleTag}
+                "BattleTag": self.BattleTag,
+                "Roles": {"Tank": ("T" in self.Roles),
+                          "Damage": ("D" in self.Roles),
+                          "Heal": ("H" in self.Roles)}
+                }
+
     class Meta:
         database = db
 
@@ -55,7 +67,12 @@ class Custom(Model):
     def getJsonInfo(self):
         data = self.Player.getJsonInfo()
         data['CustomID'] = self.ID
+        data['SR'] = {"Tank": self.TSR,
+                      "Damage": self.DSR,
+                      "Heal": self.HSR}
+        data['Author'] = self.Creator.getJsonInfo()
         return data
+
     class Meta:
         database = db
 
