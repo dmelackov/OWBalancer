@@ -56,6 +56,8 @@ playersTable.addEventListener("click", async(e) => {
     const res = await fetch('/api/getCustoms/' + target.dataset.playerId)
     var data = await res.json()
     if (data.type == 'custom') {
+        if (lastActive) lastActive.classList.remove("active")
+        customSelect.style.display = 'none'
         sendPOST('/api/addToLobby', { 'id': data.data.CustomID })
         updateLobby()
         return;
@@ -90,12 +92,7 @@ async function updatePlayers() {
     playersTable.innerHTML = "";
     var pattern = await fetch('static/html/player_pattern.html')
     var pattern_data = await pattern.text()
-    data.forEach(element => {
-        var tr = document.createElement("tr")
-        tr.innerHTML = Mustache.render(pattern_data, element)
-        playersTable.appendChild(tr)
-    });
-
+    playersTable.innerHTML = Mustache.render(pattern_data, { 'data': data })
 }
 
 async function updateLobby() {
@@ -104,13 +101,8 @@ async function updateLobby() {
     lobbyTable.innerHTML = "";
     var pattern = await fetch('static/html/lobby_pattern.html')
     var pattern_data = await pattern.text()
-    data.forEach(element => {
-        var tr = document.createElement("tr")
-        tr.innerHTML = Mustache.render(pattern_data, element)
-        lobbyTable.appendChild(tr)
-    });
+    lobbyTable.innerHTML = Mustache.render(pattern_data, { 'data': data })
 }
-
 
 async function deleteFromLobby(id) {
     console.log("Delete " + id)
