@@ -11,6 +11,7 @@ class Profile(Model, UserMixin):
     Username = TextField()
     Password = TextField(null=True)
     Customers = TextField(default="")
+    LobbySettings = TextField(default='{"Amount": {"T": 2, "D": 2, "H": 2}}')
 
     def set_password(self, password):
         self.Password = generate_password_hash(password)
@@ -27,7 +28,7 @@ class Player(Model):
     BattleTag = TextField(null=True)
     Username = TextField(null=True)
     Roles = TextField(null=True, default="")
-    PlayedGamesData = TextField(default="{'Win': {'T': {}, 'D': {}, 'H': {}}, 'Lose': {'T': {}, 'D': {}, 'H': {}}}")
+    PlayedGamesData = TextField(default='')
     TWin = IntegerField(default=0)
     DWin = IntegerField(default=0)
     HWin = IntegerField(default=0)

@@ -2,6 +2,7 @@ from app.DataBase.db import *
 
 
 def createDB():
+    # db.drop_tables([Profile])
     db.create_tables([Profile, Games, Custom, Player])
 
 
@@ -161,9 +162,9 @@ def getRoles(Player_ID):
 # print(getRoles(1))
 # createDB()
 
-# name = "Artmagic"
+# name = "DemonDimon1"
 # print(createPlayer("", name))
-# print(createCustom(2, 1))
+# print(createCustom(2, 13))
 # print(changeCustomSR_Tank(searchPlayer(name)[0].ID, 2900))
 # print(changeCustomSR_Dps(searchPlayer(name)[0].ID, 3100))
 # print(changeCustomSR_Heal(searchPlayer(name)[0].ID, 2600))

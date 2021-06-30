@@ -1,79 +1,126 @@
 from app.DataBase.db import *
-from app.DataBase.LobbyСollector import GetLobby
-import itertools
-import copy
+from app.DataBase.LobbyСollector import GetLobby, GetRolesAmount
+import random
+import datetime
 
 
-def preGenerate():
-    teamMask = [0 for i in range(12)]
+def preGenerate(RolesAmount, PlayersInTeam):
+    teamMask = [0 for i in range(PlayersInTeam * 2)]
     teamMaskfilled = []
-    for i in range(2 ** 12 - 1):
+    for i in range(2 ** (PlayersInTeam * 2) - 1):
         teamMask[0] += 1
-        for j in range(11):
+        for j in range(PlayersInTeam * 2 - 1):
             if teamMask[j] > 1:
                 teamMask[j + 1] += 1
                 teamMask[j] -= 2
-        if teamMask.count(0) == teamMask.count(1) == 6:
+        if teamMask.count(0) == teamMask.count(1) == PlayersInTeam and \
+                not [0 if i else 1 for i in teamMask] in teamMaskfilled:
             teamMaskfilled.append(teamMask.copy())
 
-    roleMask = [0 for i in range(6)]
+    roleMask = [0 for i in range(PlayersInTeam)]
     roleMaskFilled = []
-    for i in range(728):
+    for i in range(3 ** PlayersInTeam - 1):
         roleMask[0] += 1
-        for j in range(5):
+        for j in range(PlayersInTeam - 1):
             if roleMask[j] > 2:
                 roleMask[j + 1] += 1
                 roleMask[j] -= 3
-        if roleMask.count(0) == roleMask.count(1) == roleMask.count(2) == 2:
+        if roleMask.count(0) == RolesAmount["Amount"]["T"] and \
+                roleMask.count(1) == RolesAmount["Amount"]["D"] and \
+                roleMask.count(2) == RolesAmount["Amount"]["H"]:
             roleMaskFilled.append(roleMask.copy())
     return teamMaskfilled, roleMaskFilled
 
 
 def formPlayersData(Lobby):
     Ps = []
-    for Custom_Iterator in range(len(Lobby)):
-        C = Custom.select().where(Custom.ID == Lobby[Custom_Iterator])
+    for Custom_Iterator in Lobby:
+        C = Custom.select().where(Custom.ID == Custom_Iterator)
         if C.exists():
             C = C[0]
-            Ps.append({"Custom": C})
-            if "T" in C.Player.Roles:
-                Ps[Custom_Iterator][0] = C.TSR
-            if "D" in C.Player.Roles:
-                Ps[Custom_Iterator][1] = C.DSR
-            if "H" in C.Player.Roles:
-                Ps[Custom_Iterator][2] = C.HSR
+            Ps.append(C)
     return Ps
 
 
-# print(formPlayersData(GetLobby(1)))
-def countByMask(teamMask, roleMaskFilled, Ps):
+# def formGoodBal(first, second, fMask, sMask, fAVG, sAVG):
+#     data = {"first": {}, "second": {}}
+#     data["first"]["AVG"] = fAVG
+#     data["second"]["AVG"] = sAVG
+#     for i in range(len(fMask)):
+#         data["first"][]
+
+
+def tryRoleMask(team, roleMask, PlayersInTeam):
+    goodMask = []
+    for RM in roleMask:
+        tr = True
+        AVG = 0
+        for i in range(len(RM)):
+            if not RM[i] in [0 if i == "T" else 1 if i == "D" else 2 if i == "H" else -1
+                             for i in team[i].Player.Roles]:
+                tr = False
+            else:
+                if RM[i] == 0:
+                    AVG += team[i].TSR
+                elif RM[i] == 1:
+                    AVG += team[i].DSR
+                elif RM[i] == 2:
+                    AVG += team[i].HSR
+        if tr:
+            goodMask.append([AVG // PlayersInTeam, RM])
+    return goodMask
+
+
+def tryTeamMask(TM, roleMask, Ps, PlayersInTeam):
     first_team = []
     second_team = []
-    for pointer in range(len(teamMask)):
-        if teamMask[pointer]:
-            second_team.append(Ps[pointer])
+    for i in range(len(TM)):
+        if TM[i]:
+            second_team.append(Ps[i])
         else:
-            first_team.append(Ps[pointer])
-    corrected_fb = []
-    for Mask in roleMaskFilled:
-        tr = 1
-        for k in range(len(Mask)):
-            if not Mask[k] in list(first_team[k].keys()):
-                tr = 0
-        if tr:
-            print(Mask)
+            first_team.append(Ps[i])
 
-    # print(first_team)
-    # print(second_team)
+    ft_gm = tryRoleMask(first_team, roleMask, PlayersInTeam)
+    st_gm = tryRoleMask(second_team, roleMask, PlayersInTeam)
+
+    good_balance = []
+    for f in ft_gm:
+        for s in st_gm:
+            if s[0] - 10 <= f[0] <= s[0] + 10:
+                good_balance.append([f, s])
+    return len(good_balance)
+
+
+def randLobby(Lobby, PlayersInTeam):
+    ExtendedLobby = False
+    if PlayersInTeam * 2 < len(Lobby):
+        PlayersLobby = random.sample(Lobby, PlayersInTeam * 2)
+        ExtendedLobby = True
+    else:
+        PlayersLobby = Lobby
+    return PlayersLobby, ExtendedLobby
 
 
 def createGame(Profile_ID):
-    teamMask, roleMask = preGenerate()
+
+    RolesAmount = GetRolesAmount(Profile_ID)
+    PlayersInTeam = RolesAmount["Amount"]["T"] + RolesAmount["Amount"]["D"] + RolesAmount["Amount"]["H"]
+
+    teamMask, roleMask = preGenerate(RolesAmount, PlayersInTeam)
     Lobby = GetLobby(Profile_ID)
-    Ps = formPlayersData(Lobby)
-    # for Mask in roleMask:
+    Lobby, ExtendedLobby = randLobby(Lobby, PlayersInTeam)
 
-    print(countByMask(teamMask[0], roleMask, formPlayersData(GetLobby(1))))
+    FullLobby = False
+    if len(Lobby) == PlayersInTeam * 2:
+        FullLobby = True
+        Ps = formPlayersData(Lobby)
+        s = 0
+        for TM in teamMask:
+            s += tryTeamMask(TM, roleMask, Ps, PlayersInTeam)
+        print(s)
 
 
+d1 = datetime.datetime.now()
 createGame(1)
+d2 = datetime.datetime.now()
+print(str(d2 - d1))

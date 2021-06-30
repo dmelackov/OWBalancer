@@ -1,4 +1,5 @@
 from app.DataBase.db import *
+import json
 
 
 def GetLobby(Profile_ID):
@@ -8,6 +9,13 @@ def GetLobby(Profile_ID):
         if "" in CMass:
             CMass.remove("")
         return [int(i) for i in CMass]
+
+
+def GetRolesAmount(Profile_ID):
+    User = Profile.select().where(Profile.ID == Profile_ID)
+    if User.exists():
+        CMass = json.loads(User[0].LobbySettings)
+        return CMass
 
 
 def AddToLobby(Profile_ID, Custom_ID):
@@ -60,6 +68,8 @@ def ClearLobby(Profile_ID):
     return False
 
 
+# print(GetRolesAmount(1))
 # print(DeleteFromLobby(1, 5))
-print(AddToLobby(1, 13))
+# for i in range(1, 13):
+#     print(AddToLobby(1, i))
 # print(GetLobby(1))
