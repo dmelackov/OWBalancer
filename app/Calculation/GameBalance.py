@@ -2,6 +2,8 @@ from app.DataBase.db import *
 from app.DataBase.LobbyСollector import GetLobby, GetRolesAmount
 import random
 import datetime
+from functools import cmp_to_key
+from app.DataBase.methods import getCustomSR
 
 
 def preGenerate(RolesAmount, PlayersInTeam):
@@ -42,12 +44,54 @@ def formPlayersData(Lobby):
     return Ps
 
 
-# def formGoodBal(first, second, fMask, sMask, fAVG, sAVG):
-#     data = {"first": {}, "second": {}}
-#     data["first"]["AVG"] = fAVG
-#     data["second"]["AVG"] = sAVG
-#     for i in range(len(fMask)):
-#         data["first"][]
+def formGoodBal(first, second, fMask, sMask, fAVG, sAVG, fTeamRolePrior, sTeamRolePrior):
+    data = {"pareTeamAVG": 0,
+            "first": {"AVG": fAVG, "RolePoints": fTeamRolePrior, 0: [], 1: [], 2: []},
+            "second": {"AVG": sAVG, "RolePoints": sTeamRolePrior, 0: [], 1: [], 2: []}}
+    T_Range = 0
+    D_Range = 0
+    H_Range = 0
+    for i in range(len(fMask)):
+        data["first"][fMask[i]].append(first[i].ID)
+        if fMask[i] == 0:
+            T_Range += first[i].TSR
+        elif fMask[i] == 1:
+            D_Range += first[i].DSR
+        elif fMask[i] == 2:
+            H_Range += first[i].HSR
+    for i in range(len(sMask)):
+        data["second"][sMask[i]].append(second[i].ID)
+        if sMask[i] == 0:
+            T_Range -= second[i].TSR
+        elif sMask[i] == 1:
+            D_Range -= second[i].DSR
+        elif sMask[i] == 2:
+            H_Range -= second[i].HSR
+    data["pareTeamAVG"] = abs(T_Range) + abs(D_Range) + abs(H_Range)
+    return data
+
+
+def sort_comparator(left, right):
+    left_arg = left["pareTeamAVG"]
+    right_arg = right["pareTeamAVG"]
+    if left_arg < right_arg:
+        return -1
+    elif left_arg > right_arg:
+        return 1
+    elif left["first"]["RolePoints"] + left["second"]["RolePoints"] > \
+            right["first"]["RolePoints"] + right["second"]["RolePoints"]:
+        return -1
+    elif left["first"]["RolePoints"] + left["second"]["RolePoints"] < \
+            right["first"]["RolePoints"] + right["second"]["RolePoints"]:
+        return 1
+    elif abs(left["first"]["RolePoints"] - left["second"]["RolePoints"]) < \
+            abs(right["first"]["RolePoints"] - right["second"]["RolePoints"]):
+        return -1
+    elif abs(left["first"]["RolePoints"] - left["second"]["RolePoints"]) > \
+            abs(right["first"]["RolePoints"] - right["second"]["RolePoints"]):
+        return 1
+    else:
+        return 0
 
 
 def tryRoleMask(team, roleMask, PlayersInTeam):
@@ -55,19 +99,23 @@ def tryRoleMask(team, roleMask, PlayersInTeam):
     for RM in roleMask:
         tr = True
         AVG = 0
+        TeamRolePrior = 0
         for i in range(len(RM)):
-            if not RM[i] in [0 if i == "T" else 1 if i == "D" else 2 if i == "H" else -1
-                             for i in team[i].Player.Roles]:
+            if not RM[i] in [0 if j == "T" else 1 if j == "D" else 2 if j == "H" else -1
+                             for j in team[i].Player.Roles]:
                 tr = False
             else:
                 if RM[i] == 0:
                     AVG += team[i].TSR
+                    TeamRolePrior += (3 - team[i].Player.Roles.index("T"))
                 elif RM[i] == 1:
                     AVG += team[i].DSR
+                    TeamRolePrior += (3 - team[i].Player.Roles.index("D"))
                 elif RM[i] == 2:
                     AVG += team[i].HSR
+                    TeamRolePrior += (3 - team[i].Player.Roles.index("H"))
         if tr:
-            goodMask.append([AVG // PlayersInTeam, RM])
+            goodMask.append([AVG // PlayersInTeam, RM, TeamRolePrior])
     return goodMask
 
 
@@ -86,9 +134,9 @@ def tryTeamMask(TM, roleMask, Ps, PlayersInTeam):
     good_balance = []
     for f in ft_gm:
         for s in st_gm:
-            if s[0] - 10 <= f[0] <= s[0] + 10:
-                good_balance.append([f, s])
-    return len(good_balance)
+            if s[0] - 25 <= f[0] <= s[0] + 25:
+                good_balance.append(formGoodBal(first_team, second_team, f[1], s[1], f[0], s[0], f[2], s[2]))
+    return good_balance
 
 
 def randLobby(Lobby, PlayersInTeam):
@@ -102,7 +150,6 @@ def randLobby(Lobby, PlayersInTeam):
 
 
 def createGame(Profile_ID):
-
     RolesAmount = GetRolesAmount(Profile_ID)
     PlayersInTeam = RolesAmount["Amount"]["T"] + RolesAmount["Amount"]["D"] + RolesAmount["Amount"]["H"]
 
@@ -110,17 +157,18 @@ def createGame(Profile_ID):
     Lobby = GetLobby(Profile_ID)
     Lobby, ExtendedLobby = randLobby(Lobby, PlayersInTeam)
 
-    FullLobby = False
     if len(Lobby) == PlayersInTeam * 2:
-        FullLobby = True
         Ps = formPlayersData(Lobby)
-        s = 0
+        s = []
         for TM in teamMask:
-            s += tryTeamMask(TM, roleMask, Ps, PlayersInTeam)
-        print(s)
+            tTM = tryTeamMask(TM, roleMask, Ps, PlayersInTeam)
+            if tTM:
+                s += tTM
+        return ExtendedLobby, sorted(s, key=cmp_to_key(sort_comparator))
+    return False
 
 
-d1 = datetime.datetime.now()
-createGame(1)
-d2 = datetime.datetime.now()
-print(str(d2 - d1))
+# d1 = datetime.datetime.now()
+print(createGame(1))
+# d2 = datetime.datetime.now()
+# print(str(d2 - d1))
