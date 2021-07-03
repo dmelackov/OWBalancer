@@ -194,7 +194,6 @@ def createImage(gameData):
             draw.text((60, 270 + (i * 144)), f"{P.HSR}", font=text_ranknum)
             draw.text((190, 210 + (i * 144)), f"{P.Player.Username}", font=text_font)
             ite += 1
-    rtank_icon.save('rt.png')
 
     return image
 
