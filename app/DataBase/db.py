@@ -44,12 +44,20 @@ class Player(Model):
     HLose = IntegerField(default=0)
 
     def getJsonInfo(self):
+        priority = list(map(lambda x: {"role": x, "active": True}, list(self.Roles)))
+        if "T" not in self.Roles:
+            priority.append({"role": "T", "active": False})
+        if "D" not in self.Roles:
+            priority.append({"role": "D", "active": False})
+        if "H" not in self.Roles:
+            priority.append({"role": "H", "active": False})
         return {"id": self.ID,
                 "Username": self.Username,
                 "BattleTag": self.BattleTag,
                 "Roles": {"Tank": ("T" in self.Roles),
                           "Damage": ("D" in self.Roles),
-                          "Heal": ("H" in self.Roles)}
+                          "Heal": ("H" in self.Roles)},
+                "RolesPriority": priority
                 }
 
     class Meta:
@@ -66,6 +74,13 @@ class Custom(Model):
 
     def getJsonInfo(self):
         data = self.Player.getJsonInfo()
+        for i in range(3):
+            if data["RolesPriority"][i]["role"] == "T":
+                data["RolesPriority"][i]["sr"] = self.TSR
+            elif data["RolesPriority"][i]["role"] == "D":
+                data["RolesPriority"][i]["sr"] = self.DSR
+            elif data["RolesPriority"][i]["role"] == "H":
+                data["RolesPriority"][i]["sr"] = self.HSR
         data['CustomID'] = self.ID
         data['SR'] = {"Tank": self.TSR,
                       "Damage": self.DSR,

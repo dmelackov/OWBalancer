@@ -63,3 +63,12 @@ def deleteFromLobby():
     print(data)
     LobbyMethods.DeleteFromLobby(current_user.ID, data['id'])
     return Response(status=200)
+
+
+@api.route('/setRoles', methods=['POST'])
+@login_required
+def setRoles():
+    data = request.get_json()
+    print(data)
+    DataBaseMethods.changeRoles(MainDB.Custom.get(MainDB.Custom.ID == data['id']).Player.ID, data['roles'])
+    return Response(status=200)

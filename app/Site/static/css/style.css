@@ -124,10 +124,6 @@ input.error {
     text-align: center;
 }
 
-.lobby>hr {
-    margin-top: 40px;
-}
-
 .lobby_list {
     overflow-y: auto;
     height: 91%;
@@ -136,6 +132,12 @@ input.error {
 #lobby_list {
     width: 100%;
     table-layout: fixed;
+}
+
+#lobby_count {
+    margin-bottom: 14px;
+    margin-top: 0px;
+    text-align: center;
 }
 
 
@@ -183,12 +185,17 @@ td tr {
     flex-direction: row;
     justify-content: flex-start;
     position: relative;
+    border-radius: 12px;
+    min-height: 35px;
+    width: 100% - 48px;
+    cursor: pointer;
+}
+
+.player_container {
     background-color: #171e27;
     border-radius: 12px;
     border: solid 1px #444444;
     padding: 6px 12px;
-    width: 100% - 48px;
-    cursor: pointer;
 }
 
 .player_inner_container:hover {
@@ -200,13 +207,14 @@ td tr {
 }
 
 .player_inner_container>.right {
-    position: absolute;
-    bottom: 7px;
-    right: 15px;
+    display: flex;
     height: 30px;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: flex-end;
 }
 
-.player_inner_container>p {
+.player_inner_container>.player_username {
     margin: 0;
     width: max-content;
     overflow-x: hidden;
@@ -218,7 +226,6 @@ td tr {
 }
 
 .cursor {
-    transform: translate(0, -25px);
     font-size: 22px;
     color: #445368;
 }
@@ -273,7 +280,7 @@ td tr {
 .sr {
     display: flex;
     flex-direction: row;
-    justify-content: flex-start;
+    justify-content: space-between;
 }
 
 .sr_icon {
@@ -300,8 +307,30 @@ td tr {
     margin-left: 4px;
 }
 
+.lobby_sr {
+    padding: 0 20px 0 20px;
+}
+
+.role {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-content: center;
+    align-items: center
+}
+
+.role>p {
+    text-align: center;
+    margin: 0;
+}
+
+.role>img {
+    cursor: pointer;
+}
+
 .player_username {
     font-size: 18px;
+    margin-top: 0;
 }
 
 .innactive {
@@ -311,4 +340,27 @@ td tr {
 .X {
     margin-left: auto;
     justify-content: flex-end;
+    margin: 0;
+    flex-wrap: wrap;
+    align-content: center;
+}
+
+.author-right {
+    position: absolute;
+    color: #3b4b5f;
+    bottom: 2px;
+    right: 12px;
+    width: max-content;
+    margin: 0;
+    font-size: 12px;
+}
+
+.author-left {
+    position: absolute;
+    color: #3b4b5f;
+    bottom: 4px;
+    left: 12px;
+    width: max-content;
+    margin: 0;
+    font-size: 12px;
 }
