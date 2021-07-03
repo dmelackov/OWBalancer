@@ -3,7 +3,6 @@ from app.DataBase.LobbyСollector import GetLobby, GetRolesAmount
 import random
 import datetime
 from functools import cmp_to_key
-from app.DataBase.methods import getCustomSR
 
 
 def preGenerate(RolesAmount, PlayersInTeam):
@@ -164,11 +163,12 @@ def createGame(Profile_ID):
             tTM = tryTeamMask(TM, roleMask, Ps, PlayersInTeam)
             if tTM:
                 s += tTM
+        print(*sorted(s, key=cmp_to_key(sort_comparator)), sep="\n")
         return ExtendedLobby, sorted(s, key=cmp_to_key(sort_comparator))
     return False
 
 
 # d1 = datetime.datetime.now()
-# print(createGame(1))
+print(createGame(1))
 # d2 = datetime.datetime.now()
 # print(str(d2 - d1))
