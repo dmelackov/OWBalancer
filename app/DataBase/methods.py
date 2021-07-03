@@ -162,10 +162,10 @@ def getRoles(Player_ID):
 # print(getRoles(1))
 # createDB()
 
-# name = "DemonDimon1"
+# name = "Mihan"
 # print(createPlayer("", name))
-# print(createCustom(2, 13))
-# print(changeCustomSR_Tank(searchPlayer(name)[0].ID, 2900))
-# print(changeCustomSR_Dps(searchPlayer(name)[0].ID, 3100))
-# print(changeCustomSR_Heal(searchPlayer(name)[0].ID, 2600))
-# print(changeRoles(searchPlayer(name)[0].ID, "TD"))
+# print(createCustom(1, searchPlayer(name)[0].ID))
+# print(changeCustomSR_Tank(searchPlayer(name)[0].ID, 2400))
+# print(changeCustomSR_Dps(searchPlayer(name)[0].ID, 2600))
+# print(changeCustomSR_Heal(searchPlayer(name)[0].ID, 2500))
+# print(changeRoles(searchPlayer(name)[0].ID, "TDH"))

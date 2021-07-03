@@ -163,12 +163,12 @@ def createGame(Profile_ID):
             tTM = tryTeamMask(TM, roleMask, Ps, PlayersInTeam)
             if tTM:
                 s += tTM
-        print(*sorted(s, key=cmp_to_key(sort_comparator)), sep="\n")
+        # print(sorted(s, key=cmp_to_key(sort_comparator))[0:100], len(sorted(s, key=cmp_to_key(sort_comparator))), sep="\n")
         return ExtendedLobby, sorted(s, key=cmp_to_key(sort_comparator))
     return False
 
 
 # d1 = datetime.datetime.now()
-print(createGame(1))
+# createGame(1)
 # d2 = datetime.datetime.now()
 # print(str(d2 - d1))

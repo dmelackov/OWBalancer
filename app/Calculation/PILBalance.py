@@ -99,7 +99,7 @@ def createImage(gameData):
     draw.rectangle((width // 2 + 90, 180, width // 2 + 200, height - 40), "#ff6347")
 
     draw.text((20, 0), "Team 1", "#ffffff", font=team_font)
-    draw.text((width // 2 - 65, 180), "VS", "#ffffff", font=vs_font)
+    draw.text((width // 2 - 62, 560), "VS", "#ffffff", font=vs_font)
     draw.text((30, 100), f"AVG: {gameData['first']['AVG']}", "#ffffff", font=avg_font)
 
     draw.text((width // 2 + 70, 0), "Team 2", "#ffffff", font=team_font)
@@ -199,8 +199,9 @@ def createImage(gameData):
     return image
 
 
-# d = {'pareTeamAVG': 300, 'first': {'AVG': 2933, 'RolePoints': 18, 0: [4, 6], 1: [7, 12], 2: [3, 5]},
-#      'second': {'AVG': 2950, 'RolePoints': 15, 0: [1, 8], 1: [9, 11], 2: [2, 10]}}
-#
-# img = createImage(d)
-# img.save('draw-smile.jpg')
+d = \
+    {'pareTeamAVG': 100, 'first': {'AVG': 2900, 'RolePoints': 14, 0: [10, 1], 1: [2, 18], 2: [19, 16]},
+     'second': {'AVG': 2883, 'RolePoints': 15, 0: [21, 6], 1: [20, 17], 2: [12, 14]}}
+
+img = createImage(d)
+img.save('draw-smile.jpg')
