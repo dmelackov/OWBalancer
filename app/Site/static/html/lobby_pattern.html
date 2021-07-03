@@ -1,18 +1,32 @@
 {{#data}}
 <tr>
-    <td class="lobby_container" data-player-id="{{id}}">
+    <td class="lobby_container player_container" data-player-id="{{CustomID}}">
         <div class="player_inner_container ">
             <p class="player_username ">{{Username}}</p>
             <div class="sr_lobby">
                 {{#Roles}}
                 <div class="sr_lobby_icon">
-                    <img src="/static/img/tank_icon.png" alt="" width="10" class="role_icon {{^Tank}}innactive{{/Tank}}">
-                    <img src="/static/img/damage_icon.png" alt="" width="10" class="role_icon {{^Damage}}innactive{{/Damage}}">
-                    <img src="/static/img/heal_icon.png" alt="" width="10" class="role_icon {{^Heal}}innactive{{/Heal}}">
+                    <img src="/static/img/T_icon.png" alt="" width="15" class="role_icon {{^Tank}}innactive{{/Tank}}">
+                    <img src="/static/img/D_icon.png" alt="" width="15" class="role_icon {{^Damage}}innactive{{/Damage}}">
+                    <img src="/static/img/H_icon.png" alt="" width="15" class="role_icon {{^Heal}}innactive{{/Heal}}">
                 </div>
 
             </div>
-            <p class="X" style="display: none;">X</p> {{/Roles}}
+            <p class="X" style="display: none;">X</p> {{/Roles}} {{#Author}}
+            <p class="author-right">{{username}}</p>
+            {{/Author}}
+
+        </div>
+        <div class="lobby_menu" style="display: none;">
+            <hr>
+            <div class="sr lobby_sr">
+                {{#RolesPriority}}
+                <div class="role" data-role-id="{{role}}">
+                    <img src="/static/img/{{role}}_icon.png" alt="" width="30" class="role_icon {{^active}}innactive{{/active}}">
+                    <p>{{ sr }}</p>
+                </div>
+                {{/RolesPriority}}
+            </div>
         </div>
     </td>
 </tr>
