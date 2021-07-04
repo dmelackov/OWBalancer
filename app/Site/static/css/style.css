@@ -128,7 +128,7 @@ input.error {
 }
 
 .lobby_list {
-    overflow-y: auto;
+    overflow-y: scroll;
     height: 91%;
 }
 
@@ -171,7 +171,7 @@ input.error {
 }
 
 .player_list {
-    overflow-y: auto;
+    overflow-y: scroll;
     height: 91%;
 }
 
@@ -232,6 +232,10 @@ td tr {
 .cursor {
     font-size: 22px;
     color: #445368;
+}
+
+.cursor::selection {
+    background: transparent;
 }
 
 
@@ -347,6 +351,7 @@ td tr {
     margin: 0;
     flex-wrap: wrap;
     align-content: center;
+    padding: 5px;
 }
 
 .author-right {

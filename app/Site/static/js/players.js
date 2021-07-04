@@ -70,10 +70,11 @@
         if (currentLobbyElem && currentLobbyElem != menu) currentLobbyElem.style.display = "none"
         if (menu.style.display == "block") {
             menu.style.display = "none"
+            currentLobbyElem = null
         } else {
             menu.style.display = "block"
+            currentLobbyElem = menu
         }
-        currentLobbyElem = menu
     })
 
     lobbyTable.addEventListener("click", (e) => {
@@ -173,6 +174,7 @@
 
 
     })
+
     balance_controlls_left.addEventListener('click', (e) => {
         index = parseInt(localStorage.getItem("balance_index"))
         balance = JSON.parse(localStorage.getItem("balance"))
@@ -205,6 +207,7 @@
         if (currentLobbyElem) {
             openID = currentLobbyElem.closest("td").dataset.playerId
         }
+        var scroll = lobbyTable.closest("div").scrollTop;
         const res = await fetch('/api/getLobby')
         var data = await res.json()
         lobbyTable.innerHTML = "";
@@ -231,6 +234,8 @@
                 }
             }
         }
+        console.log(scroll)
+        lobbyTable.closest("div").scrollTop = scroll
     }
 
     function sendPOST(url, params) {
