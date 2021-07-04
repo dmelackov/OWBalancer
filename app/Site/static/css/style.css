@@ -16,8 +16,7 @@ header {
     padding: 16px 32px;
 }
 
-input,
-button {
+.custom_input {
     border-radius: 3px;
     padding: 6px;
     background-color: #090C10;
@@ -25,6 +24,12 @@ button {
     border: solid 1px #444444;
     color: #d8d8d8;
     cursor: pointer;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .btn {
@@ -98,6 +103,10 @@ hr {
 
 .error-message {
     font-size: 11px;
+}
+
+.error {
+    border: solid 1px #a30000 !important;
 }
 
 input.error {
@@ -443,4 +452,16 @@ td tr {
     display: flex;
     align-items: center;
     height: max-content;
+}
+
+.lobby_sr_input {
+    width: 30px;
+    background-color: #171e27;
+    color: white;
+    border: none;
+    text-align: center;
+}
+
+.create_container {
+    cursor: pointer;
 }

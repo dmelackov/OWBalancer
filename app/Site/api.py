@@ -27,6 +27,16 @@ def getLobby():
     players = LobbyMethods.GetLobby(current_user.ID)
     data = list(map(lambda x: MainDB.Custom.get(
         MainDB.Custom.ID == x).getJsonInfo(), players))
+    for i in data:
+        if i['Author']['id'] == current_user.ID:
+            i['editable'] = True
+        else:
+            i['editable'] = False
+        if (i["SR"]["Damage"] == 0 and i["SR"]["Heal"] == 0 and i["SR"]["Tank"] == 0) \
+            or (not i["Roles"]["Damage"] and not i["Roles"]["Heal"] and not i["Roles"]["Tank"]):
+            i["warn"] = True
+        else:
+            i["warn"] = False
     return jsonify(data)
 
 
@@ -87,6 +97,23 @@ def balanceImage():
     return serve_pil_image(createImage(data))
 
 
+@api.route('/changeRoleSr', methods=['POST'])
+@login_required
+def changeRoleSr():
+    data = request.get_json()
+    data["customId"] = int(data["customId"])
+    data["rating"] = int(data["rating"])
+    if not (0 <= data["rating"] <= 5000):
+        return Response(status=200)
+    if (data['role'] == "T"):
+        DataBaseMethods.changeCustomSR_Tank(data["customId"], data["rating"])
+    elif (data['role'] == "D"):
+        DataBaseMethods.changeCustomSR_Dps(data["customId"], data["rating"])
+    elif (data['role'] == "H"):
+        DataBaseMethods.changeCustomSR_Heal(data["customId"], data["rating"])
+    return Response(status=200)
+
+
 @api.route('/getBalances', methods=['GET'])
 @login_required
 def getBalances():
@@ -94,11 +121,21 @@ def getBalances():
     newBalance = {}
     if balance:
         newBalance["External"] = balance[0]
-        newBalance["Balances"] = balance[1]
+        newBalance["Balances"] = balance[1][:5000]
         newBalance["ok"] = True
     else:
         newBalance["ok"] = False
     return json.dumps(newBalance)
+
+
+@api.route('/createCustom', methods=['POST'])
+@login_required
+def createCustom():
+    data = request.get_json()
+    print(data)
+    C = DataBaseMethods.createCustom(current_user.ID, data["id"])
+    LobbyMethods.AddToLobby(current_user.ID, C.ID)
+    return Response(status=200)
 
 
 def serve_pil_image(pil_img):

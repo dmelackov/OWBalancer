@@ -1,8 +1,7 @@
 {% extends 'base.html' %} {% block content %}
 <header>
     <nav class="menu">
-        <a href="/">Главная страница</a>
-        <a href="/players">Игроки</a>
+        <a href="/">Main page</a>
         <div class="menu-right">
             <a href="/logout">{{current_user.Username}}</a>
         </div>
@@ -11,9 +10,9 @@
 <div class="content">
     <div class="players">
         <p class="title">
-            Игроки
+            Players
         </p>
-        <input type="text" id="PlayersSearch" placeholder="Поиск">
+        <input type="text" id="PlayersSearch" placeholder="Search" class="custom_input">
         <hr>
         <div class="player_list">
             <table id="players_list">
@@ -23,9 +22,9 @@
     </div>
     <div class="lobby">
         <p class="title">
-            Лобби
+            Lobby
         </p>
-        <p id="lobby_count">Игроков в лобби: </p>
+        <p id="lobby_count">Players in lobby: </p>
         <hr>
         <div class="lobby_list">
             <table id="lobby_list"></table>
