@@ -163,7 +163,7 @@ def createGame(Profile_ID):
             tTM = tryTeamMask(TM, roleMask, Ps, PlayersInTeam)
             if tTM:
                 s += tTM
-        # print(sorted(s, key=cmp_to_key(sort_comparator))[0:100], len(sorted(s, key=cmp_to_key(sort_comparator))), sep="\n")
+        print(sorted(s, key=cmp_to_key(sort_comparator))[0:100], len(sorted(s, key=cmp_to_key(sort_comparator))), sep="\n")
         return ExtendedLobby, sorted(s, key=cmp_to_key(sort_comparator))
     return False
 
