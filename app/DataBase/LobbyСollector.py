@@ -29,9 +29,11 @@ def AddToLobby(Profile_ID, Custom_ID):
         if "" in CMass:
             CMass.remove("")
 
+        cacheToChange = -1
         for C_ID in CMass:
             if Custom.get(Custom.ID == C_ID).Player == C.Player:
-                return False
+                cacheToChange = C_ID
+        CMass.remove(cacheToChange)
 
         if not str(C.ID) in CMass:
             CMass.append(str(C.ID))
