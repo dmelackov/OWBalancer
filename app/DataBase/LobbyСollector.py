@@ -33,7 +33,8 @@ def AddToLobby(Profile_ID, Custom_ID):
         for C_ID in CMass:
             if Custom.get(Custom.ID == C_ID).Player == C.Player:
                 cacheToChange = C_ID
-        CMass.remove(cacheToChange)
+        if cacheToChange != -1:
+            CMass.remove(cacheToChange)
 
         if not str(C.ID) in CMass:
             CMass.append(str(C.ID))
