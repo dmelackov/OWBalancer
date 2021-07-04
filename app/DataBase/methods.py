@@ -28,20 +28,21 @@ def checkProfile(Username, Password):
 
 def createPlayer(BattleTag, Username):  # можно что-то одно (тоже работает)
     if BattleTag or Username:
-        if not Player.select().where(((Player.BattleTag == BattleTag) & (BattleTag != "")) | (Player.Username == Username)).exists():
-            Player.create(BattleTag=BattleTag, Username=Username)
-            return True
+        if not Player.select().where(((Player.BattleTag == BattleTag) & (BattleTag != "")) |
+                                     (Player.Username == Username)).exists():
+            P = Player.create(BattleTag=BattleTag, Username=Username)
+            return P
     return False
 
 
-def createCustom(Creator_ID, Player_ID):
+def createCustom(Profile_ID, Player_ID):
     P = Player.select().where(Player.ID == Player_ID)
-    User = Profile.select().where(Profile.ID == Creator_ID)
+    User = Profile.select().where(Profile.ID == Profile_ID)
     if P.exists() and User.exists():
         C = Custom.select().where(Custom.Creator == User, Custom.Player == P)
         if not C.exists():
-            Custom.create(Creator=User[0], Player=P[0])
-            return True
+            C = Custom.create(Creator=User[0], Player=P[0])
+            return C
     return False
 # -----------------------------------------
 
@@ -148,6 +149,31 @@ def getRoles(Player_ID):
     else:
         return []
 
+# -----------------------------------------
+# Full Creation
+
+
+def Full_CreateCustom(Player_ID, Profile_ID, TSR, DSR, HSR):
+    C = createCustom(Profile_ID, Player_ID)
+    if C:
+        status = True
+        status *= changeCustomSR_Tank(C.ID, TSR)
+        status *= changeCustomSR_Dps(C.ID, DSR)
+        status *= changeCustomSR_Heal(C.ID, HSR)
+        return bool(status)
+    return False
+
+
+def Full_CreatePlayer(Profile_ID, Username, TSR, DSR, HSR, Roles):
+    P = createPlayer("", Username)
+    PBool = Full_CreateCustom(P.ID, Profile_ID, TSR, DSR, HSR)
+    PBool *= changeRoles(P.ID, Roles)
+    return bool(PBool)
+
+
+# print(Full_CreateCustom(2, 2, 2600, 2400, 2100))
+# print(Full_CreatePlayer(1, "Svevoloch", 3000, 2700, 2800, "TD"))
+
 
 # print(getCustoms_byPlayer(1))
 # print(changeRoles(2, "TH"))
@@ -156,16 +182,7 @@ def getRoles(Player_ID):
 # print(changeCustomSR_Heal(1, 3000))
 # print(changeCustomSR_Dps(1, 3200))
 # print(createCustom("Ivar", "Ivarys"))
-# print(createPlayer("Ivarys#2564", "Ivarys"))
 # print(checkProfile("Ivar", "Ivar"))
 # print(createProfile("DemonDimon", "123"))
 # print(getRoles(1))
 # createDB()
-
-# name = "Mihan"
-# print(createPlayer("", name))
-# print(createCustom(1, searchPlayer(name)[0].ID))
-# print(changeCustomSR_Tank(searchPlayer(name)[0].ID, 2400))
-# print(changeCustomSR_Dps(searchPlayer(name)[0].ID, 2600))
-# print(changeCustomSR_Heal(searchPlayer(name)[0].ID, 2500))
-# print(changeRoles(searchPlayer(name)[0].ID, "TDH"))
