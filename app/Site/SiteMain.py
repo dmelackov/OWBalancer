@@ -49,10 +49,10 @@ class FlaskSite:
         self.app.run(port=80, host="0.0.0.0")
 
     def initRouters(self):
-
         @self.login_manager.user_loader
         def load_user(user_id):
             return MainDB.Profile.get(MainDB.Profile.ID == user_id)
+
 
         @self.app.route("/")
         @self.app.route("/index")
@@ -61,11 +61,21 @@ class FlaskSite:
                 return redirect("/login")
             return render_template('mainPage.html', **self.ParamsManagerObject.getParams())
 
+
+        @self.app.route("/")
+        @self.app.route("/settings")
+        def Setting():
+            if not current_user.is_authenticated:
+                return redirect("/settings")
+            return render_template('settings.html', **self.ParamsManagerObject.getParams())
+
+
         @self.app.route('/logout')
         @login_required
         def logout():
             logout_user()
             return redirect("/")
+
 
         @self.app.route('/login', methods=['GET', 'POST'])
         def login():

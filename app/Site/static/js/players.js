@@ -12,10 +12,15 @@
     const balance_controlls_right = document.getElementById("balance_button_right")
 
     body.addEventListener("click", (e) => {
-        var element = document.elementFromPoint(e.clientX, e.clientY)
-        if (element.id == "body") {
+        if (!e.target.closest(".customSelect")) {
             if (lastActive) lastActive.classList.remove("active")
             customSelect.style.display = 'none'
+        }
+        if (!e.target.closest(".lobby_container ")) {
+            if (currentLobbyElem) {
+                currentLobbyElem.style.display = "none"
+                currentLobbyElem = null
+            }
         }
     })
 
@@ -186,8 +191,43 @@
 
     })
 
+    lobbyTable.addEventListener("input", (e) => {
+        var target = e.target.closest("input")
+        if (!target) return;
+        if (target.value > 5000) {
+            target.value = 5000
+        }
+        if (target.value < 0) {
+            target.value = 0
+        }
+    })
 
+    lobbyTable.addEventListener("change", (e) => {
+        var target = e.target.closest("input")
+        if (!target) return;
+        dataSend = {}
+        dataSend["role"] = target.closest(".role").dataset.roleId
+        dataSend["rating"] = target.value
+        dataSend["customId"] = target.closest("td").dataset.playerId
+        sendPOST("/api/changeRoleSr", dataSend)
+    })
+
+    lobbyTable.addEventListener("keydown", (e) => {
+        var target = e.target.closest("input")
+        if (!target) return;
+        if (e.keyCode === 13) {
+            target.blur()
+        }
+    })
+
+    customSelect.addEventListener("click", (e) => {
+        let target = e.target.closest(".create_container")
+        if (!target) return;
+        sendPOST("/api/createCustom", { "id": lastActive.dataset.playerId })
+        updateLobby()
+    })
     searchField.addEventListener('input', updatePlayers)
+
     updatePlayers()
     updateLobby()
 
@@ -221,7 +261,7 @@
         });
 
         lobbyTable.innerHTML = Mustache.render(pattern_data, { 'data': data })
-        lobby_count.innerText = "Игроков в лобби: " + data.length
+        lobby_count.innerText = "Players in lobby: " + data.length
         if (openID != null) {
             var tbody = lobbyTable.getElementsByTagName("tbody")[0]
             for (let i = 0; i < tbody.children.length; i++) {
@@ -259,10 +299,14 @@
         target.classList.add("active")
     }
 
-
     async function updateimage() {
         index = parseInt(localStorage.getItem("balance_index"))
         balance = JSON.parse(localStorage.getItem("balance"))
+        if (balance["Balances"].length == 0) {
+            balance_img.src = "/static/img/balance_404.png"
+            balance_count.innerText = "0/0"
+            return
+        }
         current_balance = balance["Balances"][index]
         var image = await (await fetch('/api/balanceImage', {
             method: 'POST',
@@ -273,7 +317,7 @@
         })).blob()
         var urlCreator = window.URL || window.webkitURL;
         var imageUrl = urlCreator.createObjectURL(image);
-        balance_image.src = imageUrl
+        balance_img.src = imageUrl
         balance_count.innerText = (index + 1) + "/" + balance["Balances"].length
     }
 
