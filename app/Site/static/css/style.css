@@ -384,8 +384,8 @@ td tr {
 /* Balance */
 
 .balance_container {
-    margin-right: 100px;
-    margin-left: 100px;
+    margin-right: 50px;
+    margin-left: 50px;
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -398,11 +398,8 @@ td tr {
 
 .balance_controlls {
     border-radius: 6px;
-    border: solid 1px #444444;
-    margin-top: 10px;
-    padding: 16px 16px;
-    background-color: #11161d;
-    height: 50px;
+    padding: 8px 16px;
+    height: max-content;
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
@@ -410,14 +407,14 @@ td tr {
     justify-content: space-between;
 }
 
-#balance_button {
-    font-size: 50px;
-    cursor: pointer;
-}
-
 .balance_button {
-    font-size: 50px;
     cursor: pointer;
+    height: max-content;
+    margin: 0;
+    border: solid 1px #444444;
+    background-color: #11161d;
+    border-radius: 6px;
+    padding: 8px 32px;
 }
 
 .balance_button::selection {
@@ -425,9 +422,9 @@ td tr {
 }
 
 #balance_count {
-    font-size: 50px;
     padding-left: 20px;
     padding-right: 20px;
+    margin: 0;
 }
 
 #balance_count::selection {
@@ -439,9 +436,11 @@ td tr {
     flex-wrap: nowrap;
     align-content: center;
     align-items: center;
+    height: max-content;
 }
 
 .balance_controlls_left {
     display: flex;
     align-items: center;
+    height: max-content;
 }
