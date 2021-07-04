@@ -58,7 +58,9 @@ a {
 
 .content {
     height: 92vh;
-    display: inline-block;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
 }
 
 hr {
@@ -113,7 +115,8 @@ input.error {
     margin: 8px;
     margin-top: 10px;
     padding: 16px 16px;
-    width: 15vw;
+    min-width: 15vw;
+    max-width: 15vw;
     background-color: #11161d;
     height: 90%;
 }
@@ -155,7 +158,8 @@ input.error {
     margin: 8px;
     margin-top: 10px;
     padding: 16px 16px;
-    width: 15vw;
+    min-width: 15vw;
+    max-width: 15vw;
     background-color: #11161d;
     height: 90%;
 }
@@ -363,4 +367,76 @@ td tr {
     width: max-content;
     margin: 0;
     font-size: 12px;
+}
+
+.switch_button {
+    font-size: 30px;
+    margin: 0;
+    cursor: pointer;
+}
+
+
+/* Balance */
+
+.balance_container {
+    margin-right: 100px;
+    margin-left: 100px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+#balance_image {
+    width: 100%;
+}
+
+.balance_controlls {
+    border-radius: 6px;
+    border: solid 1px #444444;
+    margin-top: 10px;
+    padding: 16px 16px;
+    background-color: #11161d;
+    height: 50px;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-content: center;
+    justify-content: space-between;
+}
+
+#balance_button {
+    font-size: 50px;
+    cursor: pointer;
+}
+
+.balance_button {
+    font-size: 50px;
+    cursor: pointer;
+}
+
+.balance_button::selection {
+    background: transparent;
+}
+
+#balance_count {
+    font-size: 50px;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+#balance_count::selection {
+    background: transparent;
+}
+
+.balance_controlls_right {
+    display: flex;
+    flex-wrap: nowrap;
+    align-content: center;
+    align-items: center;
+}
+
+.balance_controlls_left {
+    display: flex;
+    align-items: center;
 }

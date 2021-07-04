@@ -5,6 +5,11 @@
     const customSelect = document.getElementById("customSelect")
     const body = document.getElementById("body")
     const lobby_count = document.getElementById("lobby_count")
+    const balance_button = document.getElementById("balance_button")
+    const balance_img = document.getElementById("balance_image")
+    const balance_count = document.getElementById("balance_count")
+    const balance_controlls_left = document.getElementById("balance_button_left")
+    const balance_controlls_right = document.getElementById("balance_button_right")
 
     body.addEventListener("click", (e) => {
         var element = document.elementFromPoint(e.clientX, e.clientY)
@@ -15,7 +20,9 @@
     })
 
     customSelect.style.display = 'none'
-
+    if (localStorage.getItem("balance_index")) {
+        updateimage()
+    }
 
     let currentElem = null;
     let currentLobbyElem = null;
@@ -61,7 +68,6 @@
         if (!e.target.closest(".player_inner_container")) return;
         let menu = target.getElementsByClassName("lobby_menu")[0]
         if (currentLobbyElem && currentLobbyElem != menu) currentLobbyElem.style.display = "none"
-        console.log(menu.style.display)
         if (menu.style.display == "block") {
             menu.style.display = "none"
         } else {
@@ -77,6 +83,7 @@
         rolesStr = ""
         for (let i = 0; i < roles.length; i++) {
             element = roles[i];
+            if (element.tagName == "P") continue;
             if (!element.getElementsByTagName("img")[0].classList.contains("innactive")) rolesStr += element.dataset.roleId
         }
         roleTarget = target.closest("div")
@@ -88,6 +95,27 @@
 
         console.log({ "id": target.closest("td").dataset.playerId, "roles": rolesStr })
         sendPOST("/api/setRoles", { "id": target.closest("td").dataset.playerId, "roles": rolesStr })
+        updateLobby()
+    })
+
+    lobbyTable.addEventListener('click', (e) => {
+        let target = e.target.closest("p");
+        if (!target || !target.classList.contains("switch_button")) return;
+        var roles = target.closest(".lobby_sr").children
+        console.log(roles)
+        rolesStr = ""
+        for (let i = 0; i < roles.length; i++) {
+            element = roles[i];
+            if (element.tagName == "P") continue;
+            if (!element.getElementsByTagName("img")[0].classList.contains("innactive")) rolesStr += element.dataset.roleId
+        }
+        if (target.dataset.buttonId == 0) {
+            newRoles = rolesStr.charAt(1) + rolesStr.charAt(0) + rolesStr.charAt(2)
+        } else {
+            newRoles = rolesStr.charAt(0) + rolesStr.charAt(2) + rolesStr.charAt(1)
+        }
+        console.log({ "id": target.closest("td").dataset.playerId, "roles": newRoles })
+        sendPOST("/api/setRoles", { "id": target.closest("td").dataset.playerId, "roles": newRoles })
         updateLobby()
     })
 
@@ -121,6 +149,42 @@
 
     })
 
+    balance_button.addEventListener("click", async(e) => {
+        var balance = await (await fetch('/api/getBalances')).json()
+        if (balance["ok"]) {
+            localStorage.setItem("balance", JSON.stringify(balance))
+            localStorage.setItem("balance_index", 0)
+
+            updateimage()
+        } else {
+            console.log("It's not ok")
+        }
+    })
+
+    balance_controlls_right.addEventListener('click', (e) => {
+        index = parseInt(localStorage.getItem("balance_index"))
+        balance = JSON.parse(localStorage.getItem("balance"))
+
+
+        if (index + 1 < balance["Balances"].length) {
+            localStorage.setItem("balance_index", index + 1)
+            updateimage()
+        }
+
+
+    })
+    balance_controlls_left.addEventListener('click', (e) => {
+        index = parseInt(localStorage.getItem("balance_index"))
+        balance = JSON.parse(localStorage.getItem("balance"))
+
+        if (index - 1 >= 0) {
+            localStorage.setItem("balance_index", index - 1)
+            updateimage()
+        }
+
+    })
+
+
     searchField.addEventListener('input', updatePlayers)
     updatePlayers()
     updateLobby()
@@ -146,6 +210,13 @@
         lobbyTable.innerHTML = "";
         var pattern = await fetch('static/html/lobby_pattern.html')
         var pattern_data = await pattern.text()
+        data.forEach(element => {
+            for (let i = 0; i < 3; i++) {
+                element.RolesPriority[i].btn = (i != 2)
+                if (i != 2) element.RolesPriority[i].btn_id = i
+            }
+        });
+
         lobbyTable.innerHTML = Mustache.render(pattern_data, { 'data': data })
         lobby_count.innerText = "Игроков в лобби: " + data.length
         if (openID != null) {
@@ -182,4 +253,23 @@
         lastActive = target
         target.classList.add("active")
     }
+
+
+    async function updateimage() {
+        index = parseInt(localStorage.getItem("balance_index"))
+        balance = JSON.parse(localStorage.getItem("balance"))
+        current_balance = balance["Balances"][index]
+        var image = await (await fetch('/api/balanceImage', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json;charset=utf-8'
+            },
+            body: JSON.stringify(current_balance)
+        })).blob()
+        var urlCreator = window.URL || window.webkitURL;
+        var imageUrl = urlCreator.createObjectURL(image);
+        balance_image.src = imageUrl
+        balance_count.innerText = (index + 1) + "/" + balance["Balances"].length
+    }
+
 })();

@@ -106,11 +106,11 @@ def createImage(gameData):
     draw.text((width // 2 + 80, 100), f"AVG: {gameData['second']['AVG']}", "#ffffff", font=avg_font)
 
     # right team handler
-    ind = len(gameData["second"][0])
+    ind = len(gameData["second"]["0"])
     ite = 0
     for i in range(ind):
         image.paste(rtank_icon, (width // 2 + 95, 200 + (i * 144)))
-        P = Custom.select().where(Custom.ID == gameData["second"][0][ite])
+        P = Custom.select().where(Custom.ID == gameData["second"]["0"][ite])
         if P.exists():
             P = P[0]
 
@@ -122,9 +122,9 @@ def createImage(gameData):
             ite += 1
 
     ite = 0
-    for i in range(ind, ind + len(gameData["second"][1])):
+    for i in range(ind, ind + len(gameData["second"]["1"])):
         image.paste(rdps_icon, (width // 2 + 95, 200 + (i * 144)))
-        P = Custom.select().where(Custom.ID == gameData["second"][1][ite])
+        P = Custom.select().where(Custom.ID == gameData["second"]["1"][ite])
         if P.exists():
             P = P[0]
 
@@ -134,12 +134,12 @@ def createImage(gameData):
             draw.text((width // 2 + 110, 270 + (i * 144)), f"{P.DSR}", font=text_ranknum)
             draw.text((width // 2 + 240, 210 + (i * 144)), f"{P.Player.Username}", font=text_font)
             ite += 1
-    ind += len(gameData["second"][1])
+    ind += len(gameData["second"]["1"])
 
     ite = 0
-    for i in range(ind, ind + len(gameData["second"][2])):
+    for i in range(ind, ind + len(gameData["second"]["2"])):
         image.paste(rheal_icon, (width // 2 + 95, 200 + (i * 144)))
-        P = Custom.select().where(Custom.ID == gameData["second"][2][ite])
+        P = Custom.select().where(Custom.ID == gameData["second"]["2"][ite])
         if P.exists():
             P = P[0]
 
@@ -151,11 +151,11 @@ def createImage(gameData):
             ite += 1
 
     # left team handler
-    ind = len(gameData["first"][0])
+    ind = len(gameData["first"]["0"])
     ite = 0
     for i in range(ind):
         image.paste(btank_icon, (45, 200 + (i * 144)))
-        P = Custom.select().where(Custom.ID == gameData["first"][0][ite])
+        P = Custom.select().where(Custom.ID == gameData["first"]["0"][ite])
         if P.exists():
             P = P[0]
 
@@ -167,9 +167,9 @@ def createImage(gameData):
             ite += 1
 
     ite = 0
-    for i in range(ind, ind + len(gameData["first"][1])):
+    for i in range(ind, ind + len(gameData["first"]["1"])):
         image.paste(bdps_icon, (45, 200 + (i * 144)))
-        P = Custom.select().where(Custom.ID == gameData["first"][1][ite])
+        P = Custom.select().where(Custom.ID == gameData["first"]["1"][ite])
         if P.exists():
             P = P[0]
 
@@ -179,12 +179,12 @@ def createImage(gameData):
             draw.text((60, 270 + (i * 144)), f"{P.DSR}", font=text_ranknum)
             draw.text((190, 210 + (i * 144)), f"{P.Player.Username}", font=text_font)
             ite += 1
-    ind += len(gameData["first"][1])
+    ind += len(gameData["first"]["1"])
 
     ite = 0
-    for i in range(ind, ind + len(gameData["first"][2])):
+    for i in range(ind, ind + len(gameData["first"]["2"])):
         image.paste(bheal_icon, (45, 200 + (i * 144)))
-        P = Custom.select().where(Custom.ID == gameData["first"][2][ite])
+        P = Custom.select().where(Custom.ID == gameData["first"]["2"][ite])
         if P.exists():
             P = P[0]
 
@@ -198,9 +198,9 @@ def createImage(gameData):
     return image
 
 
-d = \
+#d = \
     {'pareTeamAVG': 100, 'first': {'AVG': 2900, 'RolePoints': 14, 0: [10, 1], 1: [2, 18], 2: [19, 16]},
      'second': {'AVG': 2883, 'RolePoints': 15, 0: [21, 6], 1: [20, 17], 2: [12, 14]}}
 
-img = createImage(d)
-img.save('draw-smile.jpg')
+#img = createImage(d)
+#img.save('draw-smile.jpg')
