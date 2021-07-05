@@ -46,7 +46,7 @@ class FlaskSite:
         self.app.register_blueprint(api, url_prefix='/api')
 
     def startFlask(self):
-        self.app.run(port=80, host="0.0.0.0")
+        self.app.run(port=5000, host="0.0.0.0")
 
     def initRouters(self):
         @self.login_manager.user_loader
