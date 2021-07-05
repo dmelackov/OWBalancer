@@ -181,7 +181,7 @@ input.error {
 
 .player_list {
     overflow-y: scroll;
-    height: 91%;
+    height: 85%;
 }
 
 #players_list {
@@ -426,6 +426,10 @@ td tr {
     padding: 8px 32px;
 }
 
+.balance_button:hover {
+    background-color: #242e3b;
+}
+
 .balance_button::selection {
     background: transparent;
 }
@@ -464,4 +468,9 @@ td tr {
 
 .create_container {
     cursor: pointer;
+}
+
+.copy_button {
+    margin-right: 30px;
+    padding: 8px 38px;
 }

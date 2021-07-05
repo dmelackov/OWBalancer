@@ -10,6 +10,9 @@
     const balance_count = document.getElementById("balance_count")
     const balance_controlls_left = document.getElementById("balance_button_left")
     const balance_controlls_right = document.getElementById("balance_button_right")
+    const copy_button = document.getElementById("copy_button")
+    const UserNickname = document.getElementById("UserNickname")
+    const UserCreateButton = document.getElementById("UserCreateButton")
 
     body.addEventListener("click", (e) => {
         if (!e.target.closest(".customSelect")) {
@@ -31,6 +34,7 @@
 
     let currentElem = null;
     let currentLobbyElem = null;
+    let imageBlob = null;
 
     lobbyTable.addEventListener("mouseover", (e) => { //mouseout
         var target = e.target.closest("td")
@@ -210,6 +214,7 @@
         dataSend["rating"] = target.value
         dataSend["customId"] = target.closest("td").dataset.playerId
         sendPOST("/api/changeRoleSr", dataSend)
+        updateLobby()
     })
 
     lobbyTable.addEventListener("keydown", (e) => {
@@ -223,9 +228,30 @@
     customSelect.addEventListener("click", (e) => {
         let target = e.target.closest(".create_container")
         if (!target) return;
+        if (lastActive) lastActive.classList.remove("active")
+        customSelect.style.display = 'none'
         sendPOST("/api/createCustom", { "id": lastActive.dataset.playerId })
         updateLobby()
     })
+
+    copy_button.addEventListener("click", async(e) => {
+        if (imageBlob == null) return;
+        await navigator.clipboard.writeText([
+            new ClipboardItem({
+                [pngBlob.type]: imageBlob
+            })
+        ]);
+    })
+
+    UserCreateButton.addEventListener("click", (e) => {
+        value = UserNickname.value.replace(/^\s+|\s+$/g, '')
+        if (value != "") {
+            UserNickname.value = ""
+            sendPOST("/api/createPlayer", { "Username": value })
+            updatePlayers()
+        }
+    })
+
     searchField.addEventListener('input', updatePlayers)
 
     updatePlayers()
@@ -315,10 +341,10 @@
             },
             body: JSON.stringify(current_balance)
         })).blob()
+        imageBlob = image
         var urlCreator = window.URL || window.webkitURL;
         var imageUrl = urlCreator.createObjectURL(image);
         balance_img.src = imageUrl
         balance_count.innerText = (index + 1) + "/" + balance["Balances"].length
     }
-
 })();
