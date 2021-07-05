@@ -138,7 +138,7 @@ input.error {
 
 .lobby_list {
     overflow-y: scroll;
-    height: 91%;
+    height: calc(100% - 75px);
 }
 
 #lobby_list {
@@ -181,7 +181,7 @@ input.error {
 
 .player_list {
     overflow-y: scroll;
-    height: 85%;
+    height: calc(100% - 120px);
 }
 
 #players_list {
@@ -473,4 +473,17 @@ td tr {
 .copy_button {
     margin-right: 30px;
     padding: 8px 38px;
+}
+
+.user_create_container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-content: center;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#UserNickname {
+    flex: 1;
 }

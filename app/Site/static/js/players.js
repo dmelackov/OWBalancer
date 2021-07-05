@@ -10,7 +10,7 @@
     const balance_count = document.getElementById("balance_count")
     const balance_controlls_left = document.getElementById("balance_button_left")
     const balance_controlls_right = document.getElementById("balance_button_right")
-    const copy_button = document.getElementById("copy_button")
+        //const copy_button = document.getElementById("copy_button")
     const UserNickname = document.getElementById("UserNickname")
     const UserCreateButton = document.getElementById("UserCreateButton")
 
@@ -232,15 +232,6 @@
         customSelect.style.display = 'none'
         sendPOST("/api/createCustom", { "id": lastActive.dataset.playerId })
         updateLobby()
-    })
-
-    copy_button.addEventListener("click", async(e) => {
-        if (imageBlob == null) return;
-        await navigator.clipboard.writeText([
-            new ClipboardItem({
-                [pngBlob.type]: imageBlob
-            })
-        ]);
     })
 
     UserCreateButton.addEventListener("click", (e) => {
