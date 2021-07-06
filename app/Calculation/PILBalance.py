@@ -198,9 +198,9 @@ def createImage(gameData):
     return image
 
 
-#d = \
-    {'pareTeamAVG': 100, 'first': {'AVG': 2900, 'RolePoints': 14, 0: [10, 1], 1: [2, 18], 2: [19, 16]},
-     'second': {'AVG': 2883, 'RolePoints': 15, 0: [21, 6], 1: [20, 17], 2: [12, 14]}}
+# d = \
+    # {'pareTeamAVG': 100, 'first': {'AVG': 2900, 'RolePoints': 14, 0: [10, 1], 1: [2, 18], 2: [19, 16]},
+    #  'second': {'AVG': 2883, 'RolePoints': 15, 0: [21, 6], 1: [20, 17], 2: [12, 14]}}
 
-#img = createImage(d)
-#img.save('draw-smile.jpg')
+# img = createImage(d)
+# img.save('draw-smile.jpg')

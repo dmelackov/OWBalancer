@@ -3,7 +3,7 @@ from app.params import DB_NAME
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
 
-db = SqliteDatabase(DB_NAME)
+db = MySQLDatabase(DB_NAME, host="blackserver.sytes.net", port=3306, user="Ivarys", password="c44vwi")
 
 
 class Profile(Model, UserMixin):
@@ -34,6 +34,7 @@ class Player(Model):
     BattleTag = TextField(null=True)
     Username = TextField(null=True)
     Roles = TextField(null=True, default="")
+    isFlex = BooleanField(default=False)
     PlayedGamesData = TextField(
         default='{"Win": {"T": {}, "D": {}, "H": {}}, "Lose": {"T": {}, "D": {}, "H": {}}}')
     TWin = IntegerField(default=0)

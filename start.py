@@ -1,6 +1,7 @@
 from app.DataBase.methods import createDB
 from app.Site.SiteMain import FlaskSite
 from threading import Thread
+from app.DataBase.db import db
 
 
 class SiteThread(Thread):

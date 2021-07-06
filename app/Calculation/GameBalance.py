@@ -73,21 +73,15 @@ def formGoodBal(first, second, fMask, sMask, fAVG, sAVG, fTeamRolePrior, sTeamRo
 def sort_comparator(left, right):
     left_arg = left["pareTeamAVG"]
     right_arg = right["pareTeamAVG"]
-    if left_arg < right_arg:
-        return -1
-    elif left_arg > right_arg:
-        return 1
-    elif left["first"]["RolePoints"] + left["second"]["RolePoints"] > \
+    if left["first"]["RolePoints"] + left["second"]["RolePoints"] > \
             right["first"]["RolePoints"] + right["second"]["RolePoints"]:
         return -1
     elif left["first"]["RolePoints"] + left["second"]["RolePoints"] < \
             right["first"]["RolePoints"] + right["second"]["RolePoints"]:
         return 1
-    elif abs(left["first"]["RolePoints"] - left["second"]["RolePoints"]) < \
-            abs(right["first"]["RolePoints"] - right["second"]["RolePoints"]):
+    elif left_arg < right_arg:
         return -1
-    elif abs(left["first"]["RolePoints"] - left["second"]["RolePoints"]) > \
-            abs(right["first"]["RolePoints"] - right["second"]["RolePoints"]):
+    elif left_arg > right_arg:
         return 1
     else:
         return 0
@@ -134,7 +128,9 @@ def tryTeamMask(TM, roleMask, Ps, PlayersInTeam):
     for f in ft_gm:
         for s in st_gm:
             if s[0] - 25 <= f[0] <= s[0] + 25:
-                good_balance.append(formGoodBal(first_team, second_team, f[1], s[1], f[0], s[0], f[2], s[2]))
+                gd_bl = formGoodBal(first_team, second_team, f[1], s[1], f[0], s[0], f[2], s[2])
+                if gd_bl["pareTeamAVG"] <= 1500:
+                    good_balance.append(gd_bl)
     return good_balance
 
 
@@ -163,7 +159,7 @@ def createGame(Profile_ID):
             tTM = tryTeamMask(TM, roleMask, Ps, PlayersInTeam)
             if tTM:
                 s += tTM
-        print(sorted(s, key=cmp_to_key(sort_comparator))[0:100], len(sorted(s, key=cmp_to_key(sort_comparator))), sep="\n")
+        # print(*sorted(s, key=cmp_to_key(sort_comparator))[0:100], sep="\n")
         return ExtendedLobby, sorted(s, key=cmp_to_key(sort_comparator))
     return False
 

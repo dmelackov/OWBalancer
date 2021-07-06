@@ -1,1 +1,1 @@
-DB_NAME = "OWPlayers.db"
+DB_NAME = "owplayers"
