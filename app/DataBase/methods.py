@@ -60,6 +60,17 @@ def changeRoles(Player_ID, NewRoles):
         return False
 
 
+def confirmFlex(Player_ID, isFlex):
+    P = Player.select().where(Player.ID == Player_ID)
+    if P.exists():
+        P = P[0]
+        P.isFlex = isFlex
+        P.save()
+        return True
+    else:
+        return False
+
+
 def changeCustomSR_Tank(Custom_ID, New_SR):
     C = Custom.select().where(Custom.ID == Custom_ID)
     if C.exists():

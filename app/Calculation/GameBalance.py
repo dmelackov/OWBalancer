@@ -100,13 +100,13 @@ def tryRoleMask(team, roleMask, PlayersInTeam):
             else:
                 if RM[i] == 0:
                     AVG += team[i].TSR
-                    TeamRolePrior += (3 - team[i].Player.Roles.index("T"))
+                    TeamRolePrior += (3 - team[i].Player.Roles.index("T")) if not team[i].Player.isFlex else 3
                 elif RM[i] == 1:
                     AVG += team[i].DSR
-                    TeamRolePrior += (3 - team[i].Player.Roles.index("D"))
+                    TeamRolePrior += (3 - team[i].Player.Roles.index("D")) if not team[i].Player.isFlex else 3
                 elif RM[i] == 2:
                     AVG += team[i].HSR
-                    TeamRolePrior += (3 - team[i].Player.Roles.index("H"))
+                    TeamRolePrior += (3 - team[i].Player.Roles.index("H")) if not team[i].Player.isFlex else 3
         if tr:
             goodMask.append([AVG // PlayersInTeam, RM, TeamRolePrior])
     return goodMask
