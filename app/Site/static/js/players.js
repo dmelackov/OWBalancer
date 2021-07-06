@@ -209,6 +209,7 @@
     lobbyTable.addEventListener("change", (e) => {
         var target = e.target.closest("input")
         if (!target) return;
+        if (target.value == "") target.value = "0"
         dataSend = {}
         dataSend["role"] = target.closest(".role").dataset.roleId
         dataSend["rating"] = target.value

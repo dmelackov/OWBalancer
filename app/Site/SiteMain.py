@@ -8,7 +8,9 @@ from app.Site.forms.user import LoginForm
 from peewee import fn
 from flask import jsonify
 from app.Site.api import api
-
+import logging
+ 
+module_logger = logging.getLogger("site")
 
 class FlaskSite:
     class ParamsManager:
@@ -29,9 +31,11 @@ class FlaskSite:
             self.params['description'] = "Сайт для балансировки игроков между командами в Overwatch"
 
     def __init__(self):
+        module_logger.info("Site init")
         self.initFlaskConfig()
         self.initRouters()
         self.ParamsManagerObject = self.ParamsManager()
+        module_logger.info("Site init complete")
 
     def initFlaskConfig(self):
         self.app = Flask(__name__)
@@ -84,8 +88,10 @@ class FlaskSite:
                 user = MainDB.Profile.select().where(
                     fn.lower(MainDB.Profile.Username) == form.login.data.lower())
                 if len(user) and user[0].check_password(form.password.data):
+                    module_logger.info(f"Sucefful log in {form.login.data}")
                     login_user(user[0], remember=form.remember_me.data)
                     return redirect("/")
+                module_logger.info(f"Incorrect log in {form.login.data}")
                 return render_template('login.html',
                                        message="Неправильный логин или пароль",
                                        form=form, **self.ParamsManagerObject.getParams())

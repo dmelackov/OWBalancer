@@ -24,7 +24,7 @@
                 {{#RolesPriority}}
                 <div class="role" data-role-id="{{role}}">
                     <img src="/static/img/{{role}}_icon.png" alt="" width="30" class="role_icon {{^active}}innactive{{/active}}"> {{#editable}}
-                    <input type="number" value="{{ sr }}" class="lobby_sr_input" }></input>
+                    <input type="number" value="{{ sr }}" class="lobby_sr_input" onFocus="this.select()"></input>
                     {{/editable}} {{^editable}}
                     <p>{{ sr }}</p>
                     {{/editable}}
