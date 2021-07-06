@@ -1,9 +1,9 @@
 from peewee import *
-from app.params import DB_NAME
+from app.params import DB_NAME, port, password, user, host
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
 
-db = MySQLDatabase(DB_NAME, host="blackserver.sytes.net", port=3306, user="Ivarys", password="c44vwi")
+db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password)
 
 
 class Profile(Model, UserMixin):
