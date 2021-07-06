@@ -132,9 +132,16 @@ def getBalances():
 @login_required
 def createCustom():
     data = request.get_json()
-    print(data)
     C = DataBaseMethods.createCustom(current_user.ID, data["id"])
     LobbyMethods.AddToLobby(current_user.ID, C.ID)
+    return Response(status=200)
+
+
+@api.route('/createPlayer', methods=['POST'])
+@login_required
+def createPlayer():
+    data = request.get_json()
+    DataBaseMethods.createPlayer("", data["Username"])
     return Response(status=200)
 
 
