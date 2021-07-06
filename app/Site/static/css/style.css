@@ -566,3 +566,7 @@ td tr {
 .clear:hover {
     color: #b3b3b3;
 }
+
+.flex {
+    transform: translate(15px, 0);
+}
