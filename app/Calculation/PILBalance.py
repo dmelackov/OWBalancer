@@ -28,6 +28,7 @@ gtank_icon = Image.open("app/icons/GrayTank.png")
 wheal_icon = Image.open("app/icons/heal_icon.png").resize((60, 60))
 wdps_icon = Image.open("app/icons/dps_icon.png").resize((60, 60))
 wtank_icon = Image.open("app/icons/tank_icon.png").resize((60, 60))
+wflex = Image.open("app/icons/flex.png").resize((60, 60))
 
 
 def get_rank_icon(rank):
@@ -50,40 +51,46 @@ def get_rank_icon(rank):
 def roles_priority_right(P, image, i, width):
     roles = P.Player.Roles
     s_roles = roles[1:]
-    if roles[0] == "T":
+    if P.Player.isFlex:
+        image.paste(wflex, (width - 110, 220 + (i * 144)), mask=wflex)
+    elif roles[0] == "T":
         image.paste(wtank_icon, (width - 110, 220 + (i * 144)), mask=wtank_icon)
     elif roles[0] == "D":
         image.paste(wdps_icon, (width - 110, 220 + (i * 144)), mask=wdps_icon)
     elif roles[0] == "H":
         image.paste(wheal_icon, (width - 110, 220 + (i * 144)), mask=wheal_icon)
 
-    for r in range(len(s_roles)):
-        if s_roles[r] == "T":
-            image.paste(gtank_icon.resize((40, 40)), (width - 150 - (r * 40), 240 + (i * 144)))
-        elif s_roles[r] == "D":
-            image.paste(gdps_icon.resize((40, 40)), (width - 150 - (r * 40), 240 + (i * 144)))
-        elif s_roles[r] == "H":
-            image.paste(gheal_icon.resize((40, 40)), (width - 150 - (r * 40), 240 + (i * 144)))
+    if not P.Player.isFlex:
+        for r in range(len(s_roles)):
+            if s_roles[r] == "T":
+                image.paste(gtank_icon.resize((40, 40)), (width - 150 - (r * 40), 240 + (i * 144)))
+            elif s_roles[r] == "D":
+                image.paste(gdps_icon.resize((40, 40)), (width - 150 - (r * 40), 240 + (i * 144)))
+            elif s_roles[r] == "H":
+                image.paste(gheal_icon.resize((40, 40)), (width - 150 - (r * 40), 240 + (i * 144)))
 
 
 def roles_priority_left(P, image, i, width):
     roles = P.Player.Roles
     s_roles = roles[1:]
     padding = 0
-    if roles[0] == "T":
+    if P.Player.isFlex:
+        image.paste(wflex, (width // 2 - 160 - (padding * 40), 220 + (i * 144)), mask=wflex)
+    elif roles[0] == "T":
         image.paste(wtank_icon, (width // 2 - 160 - (padding * 40), 220 + (i * 144)), mask=wtank_icon)
     elif roles[0] == "D":
         image.paste(wdps_icon, (width // 2 - 160 - (padding * 40), 220 + (i * 144)), mask=wdps_icon)
     elif roles[0] == "H":
         image.paste(wheal_icon, (width // 2 - 160 - (padding * 40), 220 + (i * 144)), mask=wheal_icon)
 
-    for r in range(len(s_roles)):
-        if s_roles[r] == "T":
-            image.paste(gtank_icon.resize((40, 40)), (width // 2 - 200 - (r * 40), 240 + (i * 144)))
-        elif s_roles[r] == "D":
-            image.paste(gdps_icon.resize((40, 40)), (width // 2 - 200 - (r * 40), 240 + (i * 144)))
-        elif s_roles[r] == "H":
-            image.paste(gheal_icon.resize((40, 40)), (width // 2 - 200 - (r * 40), 240 + (i * 144)))
+    if not P.Player.isFlex:
+        for r in range(len(s_roles)):
+            if s_roles[r] == "T":
+                image.paste(gtank_icon.resize((40, 40)), (width // 2 - 200 - (r * 40), 240 + (i * 144)))
+            elif s_roles[r] == "D":
+                image.paste(gdps_icon.resize((40, 40)), (width // 2 - 200 - (r * 40), 240 + (i * 144)))
+            elif s_roles[r] == "H":
+                image.paste(gheal_icon.resize((40, 40)), (width // 2 - 200 - (r * 40), 240 + (i * 144)))
 
 
 def createImage(gameData):
@@ -199,8 +206,8 @@ def createImage(gameData):
 
 
 # d = \
-    # {'pareTeamAVG': 100, 'first': {'AVG': 2900, 'RolePoints': 14, 0: [10, 1], 1: [2, 18], 2: [19, 16]},
-    #  'second': {'AVG': 2883, 'RolePoints': 15, 0: [21, 6], 1: [20, 17], 2: [12, 14]}}
-
+#     {'pareTeamAVG': 450, 'first': {'AVG': 2991, 'RolePoints': 17, "0": [7, 15], "1": [9, 10], "2": [11, 14]},
+#      'second': {'AVG': 2983, 'RolePoints': 17, "0": [4, 8], "1": [1, 6], "2": [5, 13]}}
+#
 # img = createImage(d)
-# img.save('draw-smile.jpg')
+# img.save('IMAGE.jpg')
