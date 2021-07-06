@@ -128,6 +128,7 @@
         for (let i = 0; i < roles.length; i++) {
             element = roles[i];
             if (element.tagName == "P") continue;
+            if (!element.getElementsByTagName("img")[0]) continue;
             if (!element.getElementsByTagName("img")[0].classList.contains("innactive")) rolesStr += element.dataset.roleId
         }
         if (target.dataset.buttonId == 0) {
