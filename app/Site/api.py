@@ -9,7 +9,9 @@ from app.Calculation.GameBalance import createGame
 from io import BytesIO
 import json
 import logging
- 
+import re
+
+
 module_logger = logging.getLogger("api")
 
 api = Blueprint('api', __name__, template_folder='templates',
@@ -92,8 +94,20 @@ def deleteFromLobby():
 def setRoles():
     data = request.get_json()
     module_logger.info(f"{current_user.Username} trying to set custom {data['id']} roles '{data['roles']}'")
+    if(not re.fullmatch("[TDH]?[TDH]?[TDH]?", data['roles'])):
+        return Response(status=200)
     DataBaseMethods.changeRoles(MainDB.Custom.get(
         MainDB.Custom.ID == data['id']).Player.ID, data['roles'])
+    return Response(status=200)
+
+
+@api.route('/setFlex', methods=['POST'])
+@login_required
+def setFlex():
+    data = request.get_json()
+    module_logger.info(f"{current_user.Username} trying to set flex {data['id']} to '{data['status']}'")
+    DataBaseMethods.confirmFlex(MainDB.Custom.get(
+        MainDB.Custom.ID == data['id']).Player.ID, bool(data['status']))
     return Response(status=200)
 
 
@@ -155,6 +169,14 @@ def createPlayer():
     data = request.get_json()
     module_logger.info(f"{current_user.Username} trying create player {data['Username']}")
     DataBaseMethods.createPlayer("", data["Username"])
+    return Response(status=200)
+
+
+@api.route('/clearLobby', methods=['POST'])
+@login_required
+def clearLobby():
+    module_logger.info(f"{current_user.Username} trying clear lobby")
+    LobbyMethods.ClearLobby(current_user.ID)
     return Response(status=200)
 
 

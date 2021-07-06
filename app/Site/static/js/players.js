@@ -13,8 +13,9 @@
         //const copy_button = document.getElementById("copy_button")
     const UserNickname = document.getElementById("UserNickname")
     const UserCreateButton = document.getElementById("UserCreateButton")
+    const clear_button = document.getElementById("clear_button")
 
-    body.addEventListener("click", (e) => {
+    body.addEventListener("mousedown", (e) => {
         if (!e.target.closest(".customSelect")) {
             if (lastActive) lastActive.classList.remove("active")
             customSelect.style.display = 'none'
@@ -88,12 +89,16 @@
 
     lobbyTable.addEventListener("click", (e) => {
         let target = e.target.closest("img");
+
         if (!target) return;
+        if (!target.closest(".role")) return;
+        if (!target.closest(".lobby_sr").getElementsByClassName("flex")[0].classList.contains("innactive")) return
         var roles = target.closest(".lobby_sr").children
         rolesStr = ""
         for (let i = 0; i < roles.length; i++) {
             element = roles[i];
             if (element.tagName == "P") continue;
+            if (!element.getElementsByTagName("img")[0]) continue;
             if (!element.getElementsByTagName("img")[0].classList.contains("innactive")) rolesStr += element.dataset.roleId
         }
         roleTarget = target.closest("div")
@@ -103,8 +108,15 @@
             rolesStr += roleTarget.dataset.roleId
         }
 
-        console.log({ "id": target.closest("td").dataset.playerId, "roles": rolesStr })
         sendPOST("/api/setRoles", { "id": target.closest("td").dataset.playerId, "roles": rolesStr })
+        updateLobby()
+    })
+
+    lobbyTable.addEventListener("click", (e) => {
+        let target = e.target.closest("img")
+        if (!target) return;
+        if (!target.classList.contains("flex")) return;
+        sendPOST("/api/setFlex", { "id": target.closest("td").dataset.playerId, "status": target.classList.contains("innactive") })
         updateLobby()
     })
 
@@ -112,7 +124,6 @@
         let target = e.target.closest("p");
         if (!target || !target.classList.contains("switch_button")) return;
         var roles = target.closest(".lobby_sr").children
-        console.log(roles)
         rolesStr = ""
         for (let i = 0; i < roles.length; i++) {
             element = roles[i];
@@ -124,7 +135,6 @@
         } else {
             newRoles = rolesStr.charAt(0) + rolesStr.charAt(2) + rolesStr.charAt(1)
         }
-        console.log({ "id": target.closest("td").dataset.playerId, "roles": newRoles })
         sendPOST("/api/setRoles", { "id": target.closest("td").dataset.playerId, "roles": newRoles })
         updateLobby()
     })
@@ -226,6 +236,12 @@
         }
     })
 
+    UserNickname.addEventListener("keydown", (e) => {
+        if (e.keyCode === 13) {
+            UserCreateButton.click()
+        }
+    })
+
     customSelect.addEventListener("click", (e) => {
         let target = e.target.closest(".create_container")
         if (!target) return;
@@ -242,6 +258,11 @@
             sendPOST("/api/createPlayer", { "Username": value })
             updatePlayers()
         }
+    })
+
+    clear_button.addEventListener("click", (e) => {
+        sendPOST("/api/clearLobby", {})
+        updateLobby()
     })
 
     searchField.addEventListener('input', updatePlayers)
@@ -292,7 +313,6 @@
                 }
             }
         }
-        console.log(scroll)
         lobbyTable.closest("div").scrollTop = scroll
     }
 

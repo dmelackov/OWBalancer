@@ -29,9 +29,10 @@
                     <p>{{ sr }}</p>
                     {{/editable}}
                 </div>
-                {{#btn}}
+                {{^isFlex}} {{#btn}}
                 <p class="switch_button" data-button-id="{{btn_id}}">⇆</p>
-                {{/btn}} {{/RolesPriority}}
+                {{/btn}} {{/isFlex}}{{/RolesPriority}}
+                <img src="/static/img/flex.svg" alt="" width="30" class="role_icon flex {{^isFlex}}innactive{{/isFlex}}">
             </div>
         </div>
     </td>

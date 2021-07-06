@@ -3,7 +3,7 @@
     <nav class="menu">
         <a href="/">Main page</a>
         <div class="menu-right">
-            <a href="/logout">{{current_user.Username}}</a>
+            <a href="/logout" data-tooltip="Quit">{{current_user.Username}}</a>
         </div>
     </nav>
 </header>
@@ -31,7 +31,11 @@
         <p class="title">
             Lobby
         </p>
-        <p id="lobby_count">Players in lobby: </p>
+        <div class="players_count">
+            <p id="lobby_count">Players in lobby: </p>
+            <p class="clear" id="clear_button">Clear</p>
+        </div>
+
         <hr>
         <div class="lobby_list">
             <table id="lobby_list"></table>

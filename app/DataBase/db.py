@@ -52,13 +52,18 @@ class Player(Model):
             priority.append({"role": "D", "active": False})
         if "H" not in self.Roles:
             priority.append({"role": "H", "active": False})
+        if self.isFlex:
+            for i in priority:
+                i["active"] = True
+
         return {"id": self.ID,
                 "Username": self.Username,
                 "BattleTag": self.BattleTag,
-                "Roles": {"Tank": ("T" in self.Roles),
-                          "Damage": ("D" in self.Roles),
-                          "Heal": ("H" in self.Roles)},
-                "RolesPriority": priority
+                "Roles": {"Tank": ("T" in self.Roles or self.isFlex),
+                          "Damage": ("D" in self.Roles or self.isFlex),
+                          "Heal": ("H" in self.Roles or self.isFlex)},
+                "RolesPriority": priority,
+                "isFlex": self.isFlex
                 }
 
     class Meta:

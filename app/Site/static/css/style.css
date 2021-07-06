@@ -16,6 +16,32 @@ header {
     padding: 16px 32px;
 }
 
+[data-tooltip] {
+    position: relative;
+}
+
+[data-tooltip]::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    width: max-content;
+    left: 50%;
+    transform: translate(-50%, 0);
+    top: 0;
+    background: #444444;
+    color: #fff;
+    padding: 0.5em;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    opacity: 0;
+    transition: 0.5s;
+    border-radius: 6px;
+}
+
+[data-tooltip]:hover::after {
+    opacity: 0.3;
+    top: 2em;
+}
+
 .custom_input {
     border-radius: 3px;
     padding: 6px;
@@ -38,6 +64,13 @@ input::-webkit-inner-spin-button {
 
 .btn-submit {
     background-color: #069401;
+}
+
+p {
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
 }
 
 .menu {
@@ -147,8 +180,7 @@ input.error {
 }
 
 #lobby_count {
-    margin-bottom: 14px;
-    margin-top: 0px;
+    margin: 0px;
     text-align: center;
 }
 
@@ -308,6 +340,7 @@ td tr {
 .role_icon {
     display: block;
     margin-bottom: 1px;
+    cursor: pointer;
 }
 
 .sr_numbers {
@@ -339,10 +372,6 @@ td tr {
 .role>p {
     text-align: center;
     margin: 0;
-}
-
-.role>img {
-    cursor: pointer;
 }
 
 .player_username {
@@ -470,6 +499,10 @@ td tr {
     cursor: pointer;
 }
 
+.create_container:hover {
+    color: #b3b3b3;
+}
+
 .copy_button {
     margin-right: 30px;
     padding: 8px 38px;
@@ -486,4 +519,50 @@ td tr {
 
 #UserNickname {
     flex: 1;
+}
+
+.contacts {
+    width: max-content;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    top: 390px;
+    display: flex;
+    align-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.contacts>p {
+    color: #555555;
+    font-size: 14px;
+}
+
+.contacts>a {
+    color: #42556d;
+    font-size: 14px;
+}
+
+.contacts>a:hover {
+    color: #4e6785;
+}
+
+.players_count {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    align-content: center;
+    margin-bottom: 14px;
+}
+
+.clear {
+    margin: 0;
+    margin-right: 3px;
+    cursor: pointer;
+    color: #dbdbdb;
+}
+
+.clear:hover {
+    color: #b3b3b3;
 }
