@@ -1,6 +1,8 @@
 autopep8==1.5.7
+cffi==1.14.5
 click==8.0.1
 colorama==0.4.4
+cryptography==3.4.7
 Flask==2.0.1
 Flask-Login==0.5.0
 Flask-WTF==0.15.1
@@ -10,6 +12,8 @@ MarkupSafe==2.0.1
 peewee==3.14.4
 Pillow==8.3.0
 pycodestyle==2.7.0
+pycparser==2.20
+PyMySQL==1.0.2
 toml==0.10.2
 Werkzeug==2.0.1
 WTForms==2.3.3
