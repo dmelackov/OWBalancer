@@ -1,34 +1,35 @@
 {% extends 'base.html' %} {% block content %}
-<header>
+<div class="header">
     <nav class="menu">
         <a href="/">Main page</a>
         <div class="menu-right">
             <a href="/logout" data-tooltip="Quit">{{current_user.Username}}</a>
         </div>
     </nav>
-</header>
+</div>
 <div class="content">
-    <div class="players">
-
-        <p class="title">
-            Players
-        </p>
-        <div class="user_create_container">
-            <input type="text" id="UserNickname" placeholder="Username" class="custom_input">
-            <button class="btn btn-submit custom_input" id="UserCreateButton">Create</button>
+    <div class="column_widget players">
+        <div class="column_controlls">
+            <p class="column_title">
+                Players
+            </p>
+            <div class="user_create_container">
+                <input type="text" id="UserNickname" placeholder="Username" class="custom_input">
+                <button class="btn btn-submit custom_input" id="UserCreateButton">Create</button>
+            </div>
+            <hr>
+            <input type="text" id="PlayersSearch" placeholder="Search" class="custom_input">
         </div>
-        <hr>
-        <input type="text" id="PlayersSearch" placeholder="Search" class="custom_input">
+
         <hr>
         <div class="player_list">
-            <table id="players_list">
-                <col class="player_container" />
-            </table>
+            <div id="players_list">
+            </div>
         </div>
 
     </div>
-    <div class="lobby">
-        <p class="title">
+    <div class="column_widget lobby">
+        <p class="column_title">
             Lobby
         </p>
         <div class="players_count">
@@ -38,7 +39,7 @@
 
         <hr>
         <div class="lobby_list">
-            <table id="lobby_list"></table>
+            <div id="lobby_list"></div>
         </div>
     </div>
     <div class="balance_container">

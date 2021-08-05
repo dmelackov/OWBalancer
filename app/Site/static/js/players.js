@@ -37,8 +37,8 @@
     let currentLobbyElem = null;
     let imageBlob = null;
 
-    lobbyTable.addEventListener("mouseover", (e) => { //mouseout
-        var target = e.target.closest("td")
+    lobbyTable.addEventListener("mouseover", (e) => { //X
+        var target = e.target.closest(".player_container")
         if (!target) return;
         if (!lobbyTable.contains(target)) return;
         let relatedTarget = e.relatedTarget;
@@ -52,8 +52,8 @@
         target.getElementsByClassName("X")[0].style.display = "flex"
     })
 
-    lobbyTable.addEventListener("mouseout", (e) => { //mouseover
-        var target = e.target.closest("td")
+    lobbyTable.addEventListener("mouseout", (e) => { //X
+        var target = e.target.closest(".player_container")
         if (!target) return;
         let relatedTarget = e.relatedTarget;
         while (relatedTarget) {
@@ -65,15 +65,15 @@
         target.getElementsByClassName("author-right")[0].style.display = "block"
     })
 
-    lobbyTable.addEventListener("click", (e) => {
+    lobbyTable.addEventListener("click", (e) => { // Delete from lobby event or open menu
         let target = e.target.closest("p");
         if (target && target.classList.contains("X")) {
-            target = target.closest("td")
+            target = target.closest(".player_container")
             sendPOST("/api/deleteFromLobby", { 'id': target.dataset.playerId })
             updateLobby()
             return
         }
-        target = e.target.closest("td")
+        target = e.target.closest(".player_container")
         if (!target) return;
         if (!e.target.closest(".player_inner_container")) return;
         let menu = target.getElementsByClassName("lobby_menu")[0]
@@ -87,7 +87,7 @@
         }
     })
 
-    lobbyTable.addEventListener("click", (e) => {
+    lobbyTable.addEventListener("click", (e) => { // Role swap
         let target = e.target.closest("img");
 
         if (!target) return;
@@ -108,19 +108,19 @@
             rolesStr += roleTarget.dataset.roleId
         }
 
-        sendPOST("/api/setRoles", { "id": target.closest("td").dataset.playerId, "roles": rolesStr })
+        sendPOST("/api/setRoles", { "id": target.closest(".player_container").dataset.playerId, "roles": rolesStr })
         updateLobby()
     })
 
-    lobbyTable.addEventListener("click", (e) => {
+    lobbyTable.addEventListener("click", (e) => { // Flex change
         let target = e.target.closest("img")
         if (!target) return;
         if (!target.classList.contains("flex")) return;
-        sendPOST("/api/setFlex", { "id": target.closest("td").dataset.playerId, "status": target.classList.contains("innactive") })
+        sendPOST("/api/setFlex", { "id": target.closest(".player_container").dataset.playerId, "status": target.classList.contains("innactive") })
         updateLobby()
     })
 
-    lobbyTable.addEventListener('click', (e) => {
+    lobbyTable.addEventListener('click', (e) => { // Role activate/deactivate
         let target = e.target.closest("p");
         if (!target || !target.classList.contains("switch_button")) return;
         var roles = target.closest(".lobby_sr").children
@@ -136,11 +136,11 @@
         } else {
             newRoles = rolesStr.charAt(0) + rolesStr.charAt(2) + rolesStr.charAt(1)
         }
-        sendPOST("/api/setRoles", { "id": target.closest("td").dataset.playerId, "roles": newRoles })
+        sendPOST("/api/setRoles", { "id": target.closest(".player_container").dataset.playerId, "roles": newRoles })
         updateLobby()
     })
 
-    playersTable.addEventListener("click", async(e) => {
+    playersTable.addEventListener("click", async(e) => { // Add to lobby
         let target = e.target.closest("nav");
         if (!target) return;
         const res = await fetch('/api/getCustoms/' + target.dataset.playerId)
@@ -170,7 +170,7 @@
 
     })
 
-    balance_button.addEventListener("click", async(e) => {
+    balance_button.addEventListener("click", async(e) => { // Balance
         var balance = await (await fetch('/api/getBalances')).json()
         if (balance["ok"]) {
             localStorage.setItem("balance", JSON.stringify(balance))
@@ -206,7 +206,7 @@
 
     })
 
-    lobbyTable.addEventListener("input", (e) => {
+    lobbyTable.addEventListener("input", (e) => { // Role sr inputs control
         var target = e.target.closest("input")
         if (!target) return;
         if (target.value > 5000) {
@@ -217,19 +217,19 @@
         }
     })
 
-    lobbyTable.addEventListener("change", (e) => {
+    lobbyTable.addEventListener("change", (e) => { // Sr change 
         var target = e.target.closest("input")
         if (!target) return;
         if (target.value == "") target.value = "0"
         dataSend = {}
         dataSend["role"] = target.closest(".role").dataset.roleId
         dataSend["rating"] = target.value
-        dataSend["customId"] = target.closest("td").dataset.playerId
+        dataSend["customId"] = target.closest(".player_container").dataset.playerId
         sendPOST("/api/changeRoleSr", dataSend)
         updateLobby()
     })
 
-    lobbyTable.addEventListener("keydown", (e) => {
+    lobbyTable.addEventListener("keydown", (e) => { // Inputs enter blur
         var target = e.target.closest("input")
         if (!target) return;
         if (e.keyCode === 13) {
@@ -237,13 +237,13 @@
         }
     })
 
-    UserNickname.addEventListener("keydown", (e) => {
+    UserNickname.addEventListener("keydown", (e) => { // User enter create
         if (e.keyCode === 13) {
             UserCreateButton.click()
         }
     })
 
-    customSelect.addEventListener("click", (e) => {
+    customSelect.addEventListener("click", (e) => { // Create custom button
         let target = e.target.closest(".create_container")
         if (!target) return;
         if (lastActive) lastActive.classList.remove("active")
@@ -252,7 +252,7 @@
         updateLobby()
     })
 
-    UserCreateButton.addEventListener("click", (e) => {
+    UserCreateButton.addEventListener("click", (e) => { //User create
         value = UserNickname.value.replace(/^\s+|\s+$/g, '')
         if (value != "") {
             UserNickname.value = ""
@@ -261,7 +261,7 @@
         }
     })
 
-    clear_button.addEventListener("click", (e) => {
+    clear_button.addEventListener("click", (e) => { // Clear lobby
         sendPOST("/api/clearLobby", {})
         updateLobby()
     })
@@ -285,7 +285,7 @@
     async function updateLobby() {
         let openID = null;
         if (currentLobbyElem) {
-            openID = currentLobbyElem.closest("td").dataset.playerId
+            openID = currentLobbyElem.closest(".player_container").dataset.playerId
         }
         var scroll = lobbyTable.closest("div").scrollTop;
         const res = await fetch('/api/getLobby')
@@ -306,7 +306,7 @@
             var tbody = lobbyTable.getElementsByTagName("tbody")[0]
             for (let i = 0; i < tbody.children.length; i++) {
                 element = tbody.children[i];
-                var elem = element.getElementsByTagName("td")[0];
+                var elem = element.getElementsByTagName(".player_container")[0];
                 if (elem.dataset.playerId == openID) {
                     let menu = element.getElementsByClassName("lobby_menu")[0]
                     menu.style.display = "block"

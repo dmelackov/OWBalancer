@@ -1,17 +1,17 @@
 body {
     background-color: #090C10;
+    min-width: 1200px;
     color: #d8d8d8;
     font-family: 'Open Sans', sans-serif;
-    width: 100%;
+    width: 100vw;
     height: 100vh;
     margin: 0 auto;
     position: relative;
 }
 
-header {
+.header {
     position: relative;
-    width: 100% - 32px;
-    height: 4vh;
+    height: 32px;
     background-color: #161B22;
     padding: 16px 32px;
 }
@@ -43,6 +43,8 @@ header {
 }
 
 .custom_input {
+    box-sizing: border-box;
+    width: 100%;
     border-radius: 3px;
     padding: 6px;
     background-color: #090C10;
@@ -59,6 +61,7 @@ input::-webkit-inner-spin-button {
 }
 
 .btn {
+    width: max-content;
     padding: 5px 10px 5px 10px;
 }
 
@@ -95,7 +98,7 @@ a {
 }
 
 .content {
-    height: 92vh;
+    height: 92%;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -104,6 +107,7 @@ a {
 hr {
     border: solid 1px #444444;
     border-radius: 1px;
+    width: 90%;
 }
 
 
@@ -149,21 +153,20 @@ input.error {
 
 /* */
 
-.lobby {
-    display: inline-block;
-    vertical-align: top;
+.column_widget {
+    display: flex;
+    flex-direction: column;
     border-radius: 6px;
     border: solid 1px #444444;
     margin: 8px;
     margin-top: 10px;
     padding: 16px 16px;
-    min-width: 15vw;
-    max-width: 15vw;
+    min-width: 15%;
+    max-width: 15%;
     background-color: #11161d;
-    height: 90%;
 }
 
-.lobby>.title {
+.column_title {
     margin: 0;
     margin-bottom: 5px;
     text-align: center;
@@ -171,7 +174,7 @@ input.error {
 
 .lobby_list {
     overflow-y: scroll;
-    height: calc(100% - 75px);
+    height: 100%
 }
 
 #lobby_list {
@@ -187,33 +190,9 @@ input.error {
 
 /* */
 
-.players>#PlayersSearch {
-    width: 95%;
-}
-
-.players {
-    display: inline-block;
-    vertical-align: top;
-    border-radius: 6px;
-    border: solid 1px #444444;
-    margin: 8px;
-    margin-top: 10px;
-    padding: 16px 16px;
-    min-width: 15vw;
-    max-width: 15vw;
-    background-color: #11161d;
-    height: 90%;
-}
-
-.players>.title {
-    margin: 0;
-    margin-bottom: 5px;
-    text-align: center;
-}
-
 .player_list {
     overflow-y: scroll;
-    height: calc(100% - 120px);
+    height: 100%;
 }
 
 #players_list {
@@ -232,7 +211,7 @@ td tr {
     position: relative;
     border-radius: 12px;
     min-height: 35px;
-    width: 100% - 48px;
+    width: 100%;
     cursor: pointer;
 }
 
@@ -310,7 +289,7 @@ td tr {
     background-color: #171e27;
     border-radius: 6px;
     border: solid 1px #444444;
-    width: 15vw;
+    width: 15%;
     height: max-content;
     padding: 16px 8px;
     padding-bottom: 2px;
@@ -426,8 +405,9 @@ td tr {
     margin-left: 50px;
     display: flex;
     flex-direction: column;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: center;
+    width: 60%;
 }
 
 #balance_image {
@@ -488,11 +468,13 @@ td tr {
 }
 
 .lobby_sr_input {
-    width: 30px;
+    width: 35px;
     background-color: #171e27;
     color: white;
     border: none;
     text-align: center;
+    font-size: 16px;
+    -moz-appearance: textfield;
 }
 
 .create_container {
