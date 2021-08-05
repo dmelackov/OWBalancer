@@ -131,3 +131,4 @@ dmypy.json
 OWPlayers.db
 app/params.py
 /IMAGE.jpg
+/owplayers.db

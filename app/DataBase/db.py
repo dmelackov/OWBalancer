@@ -3,7 +3,16 @@ from app.params import DB_NAME, port, password, user, host
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
 
-db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password)
+# db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password)
+db = SqliteDatabase(DB_NAME + ".db")
+
+
+class Roles(Model):
+    ID = PrimaryKeyField()
+    Name = TextField()
+
+    class Meta:
+        database = db
 
 
 class Profile(Model, UserMixin):
@@ -12,6 +21,7 @@ class Profile(Model, UserMixin):
     Password = TextField(null=True)
     Customers = TextField(default="")
     LobbySettings = TextField(default='{"Amount": {"T": 2, "D": 2, "H": 2}}')
+    Role = ForeignKeyField(Roles, to_field="ID", null=True)
 
     def set_password(self, password):
         self.Password = generate_password_hash(password)
@@ -31,18 +41,10 @@ class Profile(Model, UserMixin):
 
 class Player(Model):
     ID = PrimaryKeyField()
-    BattleTag = TextField(null=True)
     Username = TextField(null=True)
     Roles = TextField(null=True, default="")
     isFlex = BooleanField(default=False)
-    PlayedGamesData = TextField(
-        default='{"Win": {"T": {}, "D": {}, "H": {}}, "Lose": {"T": {}, "D": {}, "H": {}}}')
-    TWin = IntegerField(default=0)
-    DWin = IntegerField(default=0)
-    HWin = IntegerField(default=0)
-    TLose = IntegerField(default=0)
-    DLose = IntegerField(default=0)
-    HLose = IntegerField(default=0)
+    Creator = ForeignKeyField(Profile, to_field="ID")
 
     def getJsonInfo(self):
         priority = list(map(lambda x: {"role": x, "active": True}, list(self.Roles)))
@@ -58,7 +60,7 @@ class Player(Model):
 
         return {"id": self.ID,
                 "Username": self.Username,
-                "BattleTag": self.BattleTag,
+                "Creator": self.Creator,
                 "Roles": {"Tank": ("T" in self.Roles or self.isFlex),
                           "Damage": ("D" in self.Roles or self.isFlex),
                           "Heal": ("H" in self.Roles or self.isFlex)},
@@ -98,22 +100,18 @@ class Custom(Model):
         database = db
 
 
-class Games(Model):
+class Perms(Model):
     ID = PrimaryKeyField()
-    Creator = ForeignKeyField(Profile, to_field="ID")
-    T1Tank1 = ForeignKeyField(Player, to_field="ID")
-    T1Tank2 = ForeignKeyField(Player, to_field="ID")
-    T1Dps1 = ForeignKeyField(Player, to_field="ID")
-    T1Dps2 = ForeignKeyField(Player, to_field="ID")
-    T1Heal1 = ForeignKeyField(Player, to_field="ID")
-    T1Heal2 = ForeignKeyField(Player, to_field="ID")
-    T2Tank1 = ForeignKeyField(Player, to_field="ID")
-    T2Tank2 = ForeignKeyField(Player, to_field="ID")
-    T2Dps1 = ForeignKeyField(Player, to_field="ID")
-    T2Dps2 = ForeignKeyField(Player, to_field="ID")
-    T2Heal1 = ForeignKeyField(Player, to_field="ID")
-    T2Heal2 = ForeignKeyField(Player, to_field="ID")
-    Win = IntegerField()
+    Name = TextField()
+
+    class Meta:
+        database = db
+
+
+class RolePerms(Model):
+    ID = PrimaryKeyField()
+    Role = ForeignKeyField(Roles, to_field="ID")
+    Perm = ForeignKeyField(Perms, to_field="ID")
 
     class Meta:
         database = db

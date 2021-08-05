@@ -2,8 +2,7 @@ from app.DataBase.db import *
 
 
 def createDB():
-    # db.drop_tables([Profile])
-    db.create_tables([Profile, Games, Custom, Player])
+    db.create_tables([Profile, Custom, Player, Perms, Roles, RolePerms])
 
 
 # create things
@@ -26,11 +25,10 @@ def checkProfile(Username, Password):
         return False
 
 
-def createPlayer(BattleTag, Username):  # можно что-то одно (тоже работает)
-    if BattleTag or Username:
-        if not Player.select().where(((Player.BattleTag == BattleTag) & (BattleTag != "")) |
-                                     (Player.Username == Username)).exists():
-            P = Player.create(BattleTag=BattleTag, Username=Username)
+def createPlayer(Username, Creator):  # можно что-то одно (тоже работает)
+    if Username and Creator:
+        if not Player.select().where(Player.Username == Username).exists():
+            P = Player.create(Username=Username, Creator=Creator)
             return P
     return False
 
@@ -175,16 +173,16 @@ def Full_CreateCustom(Player_ID, Profile_ID, TSR, DSR, HSR):
     return False
 
 
-def Full_CreatePlayer(Profile_ID, Username, TSR, DSR, HSR, Roles):
-    P = createPlayer("", Username)
+def Full_CreatePlayer(Profile_ID, Username, TSR, DSR, HSR, Roles, Creator):
+    P = createPlayer(Username, Creator)
     PBool = Full_CreateCustom(P.ID, Profile_ID, TSR, DSR, HSR)
     PBool *= changeRoles(P.ID, Roles)
     return bool(PBool)
 
 
 # print(Full_CreateCustom(2, 2, 2600, 2400, 2100))
-# print(Full_CreatePlayer(1, "Svevoloch", 3000, 2700, 2800, "TD"))
-
+# print(Full_CreatePlayer(1, "Svevoloch", 3000, 2700, 2800, "TD",
+#                         Profile.select().where(Profile.Username == "Ivarys")[0]))
 
 # print(getCustoms_byPlayer(1))
 # print(changeRoles(2, "TH"))
@@ -194,6 +192,8 @@ def Full_CreatePlayer(Profile_ID, Username, TSR, DSR, HSR, Roles):
 # print(changeCustomSR_Dps(1, 3200))
 # print(createCustom("Ivar", "Ivarys"))
 # print(checkProfile("Ivar", "Ivar"))
-# print(createProfile("DemonDimon", "123"))
+# print(createProfile("Ivarys", "123"))
 # print(getRoles(1))
 # createDB()
+# print(createPlayer("Ivarys",
+#              Profile.select().where(Profile.Username == "Ivarys")[0]))
