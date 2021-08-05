@@ -5,6 +5,8 @@ from flask_login import UserMixin
 
 # db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password)
 db = SqliteDatabase(DB_NAME + ".db")
+ProfileDataConst = '{"Amount": {"T": 2, "D": 2, "H": 2},' \
+                   ' "TeamNames": {"1": "Team 1", "2": "Team 2"}, "AutoCustom": true}'
 
 
 class Roles(Model):
@@ -20,7 +22,7 @@ class Profile(Model, UserMixin):
     Username = TextField()
     Password = TextField(null=True)
     Customers = TextField(default="")
-    LobbySettings = TextField(default='{"Amount": {"T": 2, "D": 2, "H": 2}}')
+    LobbySettings = TextField(default=ProfileDataConst)
     Role = ForeignKeyField(Roles, to_field="ID", null=True)
 
     def set_password(self, password):
