@@ -173,4 +173,4 @@ def createGame(Profile_ID):
 # d1 = datetime.datetime.now()
 # print(len(createGame(1)[1]))
 # d2 = datetime.datetime.now()
-# print(str(d2 - d1))
+# print("Весь метод:", str(d2 - d1))
