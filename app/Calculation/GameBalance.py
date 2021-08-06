@@ -1,5 +1,5 @@
 from app.DataBase.db import *
-from app.DataBase.LobbyСollector import GetLobby, GetRolesAmount
+from app.DataBase.LobbyСollector import GetLobby, GetUserSettings
 import random
 import datetime
 from functools import cmp_to_key
@@ -35,11 +35,10 @@ def preGenerate(RolesAmount, PlayersInTeam):
 
 def formPlayersData(Lobby):
     Ps = []
-    for Custom_Iterator in Lobby:
-        C = Custom.select().where(Custom.ID == Custom_Iterator)
-        if C.exists():
-            C = C[0]
-            Ps.append(C)
+    C = Custom.select().where(Custom.ID in Lobby)
+    if C.exists():
+        for CustomIterator in C:
+            Ps.append(CustomIterator)
     return Ps
 
 
@@ -83,6 +82,12 @@ def sort_comparator(left, right):
         return -1
     elif left_arg > right_arg:
         return 1
+    elif abs(left["first"]["RolePoints"] - left["second"]["RolePoints"]) < \
+            abs(right["first"]["RolePoints"] - right["second"]["RolePoints"]):
+        return -1
+    elif abs(left["first"]["RolePoints"] - left["second"]["RolePoints"]) > \
+            abs(right["first"]["RolePoints"] - right["second"]["RolePoints"]):
+        return 1
     else:
         return 0
 
@@ -94,19 +99,20 @@ def tryRoleMask(team, roleMask, PlayersInTeam):
         AVG = 0
         TeamRolePrior = 0
         for i in range(len(RM)):
+            P = team[i].Player
             if not RM[i] in [0 if j == "T" else 1 if j == "D" else 2 if j == "H" else -1
-                             for j in team[i].Player.Roles]:
+                             for j in P.Roles]:
                 tr = False
             else:
                 if RM[i] == 0:
                     AVG += team[i].TSR
-                    TeamRolePrior += (3 - team[i].Player.Roles.index("T")) if not team[i].Player.isFlex else 3
+                    TeamRolePrior += (3 - P.Roles.index("T")) if not P.isFlex else 3
                 elif RM[i] == 1:
                     AVG += team[i].DSR
-                    TeamRolePrior += (3 - team[i].Player.Roles.index("D")) if not team[i].Player.isFlex else 3
+                    TeamRolePrior += (3 - P.Roles.index("D")) if not P.isFlex else 3
                 elif RM[i] == 2:
                     AVG += team[i].HSR
-                    TeamRolePrior += (3 - team[i].Player.Roles.index("H")) if not team[i].Player.isFlex else 3
+                    TeamRolePrior += (3 - P.Roles.index("H")) if not P.isFlex else 3
         if tr:
             goodMask.append([AVG // PlayersInTeam, RM, TeamRolePrior])
     return goodMask
@@ -127,9 +133,9 @@ def tryTeamMask(TM, roleMask, Ps, PlayersInTeam):
     good_balance = []
     for f in ft_gm:
         for s in st_gm:
-            if s[0] - 25 <= f[0] <= s[0] + 25:
+            if s[0] - 50 <= f[0] <= s[0] + 50:
                 gd_bl = formGoodBal(first_team, second_team, f[1], s[1], f[0], s[0], f[2], s[2])
-                if gd_bl["pareTeamAVG"] <= 1500:
+                if gd_bl["pareTeamAVG"] <= 1000:
                     good_balance.append(gd_bl)
     return good_balance
 
@@ -145,10 +151,10 @@ def randLobby(Lobby, PlayersInTeam):
 
 
 def createGame(Profile_ID):
-    RolesAmount = GetRolesAmount(Profile_ID)
-    PlayersInTeam = RolesAmount["Amount"]["T"] + RolesAmount["Amount"]["D"] + RolesAmount["Amount"]["H"]
+    UserSettings = GetUserSettings(Profile_ID)
+    PlayersInTeam = UserSettings["Amount"]["T"] + UserSettings["Amount"]["D"] + UserSettings["Amount"]["H"]
 
-    teamMask, roleMask = preGenerate(RolesAmount, PlayersInTeam)
+    teamMask, roleMask = preGenerate(UserSettings, PlayersInTeam)
     Lobby = GetLobby(Profile_ID)
     Lobby, ExtendedLobby = randLobby(Lobby, PlayersInTeam)
 
@@ -165,6 +171,6 @@ def createGame(Profile_ID):
 
 
 # d1 = datetime.datetime.now()
-# createGame(1)
+# print(len(createGame(1)[1]))
 # d2 = datetime.datetime.now()
-# print(str(d2 - d1))
+# print("Весь метод:", str(d2 - d1))

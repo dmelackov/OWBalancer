@@ -11,7 +11,7 @@ def GetLobby(Profile_ID):
         return [int(i) for i in CMass]
 
 
-def GetRolesAmount(Profile_ID):
+def GetUserSettings(Profile_ID):
     User = Profile.select().where(Profile.ID == Profile_ID)
     if User.exists():
         CMass = json.loads(User[0].LobbySettings)
