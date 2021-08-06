@@ -60,7 +60,7 @@ class Player(Model):
 
         return {"id": self.ID,
                 "Username": self.Username,
-                "Creator": self.Creator,
+                "Creator": self.Creator.getJsonInfo(),
                 "Roles": {"Tank": ("T" in self.Roles or self.isFlex),
                           "Damage": ("D" in self.Roles or self.isFlex),
                           "Heal": ("H" in self.Roles or self.isFlex)},

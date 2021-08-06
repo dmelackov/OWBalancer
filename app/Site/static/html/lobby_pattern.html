@@ -1,39 +1,30 @@
-{{#data}}
-
-<div class="{{#warn}}error{{/warn}} lobby_container player_container " data-player-id="{{CustomID}}">
+<div :class="{error: player.warn, lobby_container: true, player_container: true}">
     <div class="player_inner_container ">
-        <p class="player_username ">{{Username}}</p>
+        <p class="player_username ">{{player.Username}}</p>
         <div class="sr_lobby">
             <div class="sr_lobby_icon">
-                {{#RolesPriority}}
-                <img src="/static/img/{{role}}_icon.png" alt="" width="15" class="role_icon {{^active}}innactive{{/active}}"> {{/RolesPriority}}
+                <img :src="'/static/img/' + role.role + '_icon.png'" alt="" width="15" :class="{role_icon: true, innactive: !role.active}" v-for="role in player.RolesPriority">
             </div>
         </div>
-        {{#Author}}
-        <p class="author-right">{{username}}</p>
-        {{/Author}}
+        <p class="author-right">{{player.Author.username}}</p>
         <p class="X" style="display: none;">✖</p>
 
     </div>
-    <div class="lobby_menu" style="display: none;">
+    <div class="lobby_menu" style="display: none;" v-if="false">
         <hr>
         <div class="sr lobby_sr">
-            {{#RolesPriority}}
-            <div class="role" data-role-id="{{role}}">
-                <img src="/static/img/{{role}}_icon.png" alt="" width="30" class="role_icon {{^active}}innactive{{/active}}"> {{#editable}}
-                <input type="number" value="{{ sr }}" class="lobby_sr_input" onFocus="this.select()"></input>
-                {{/editable}} {{^editable}}
-                <p>{{ sr }}</p>
-                {{/editable}}
-            </div>
-            {{^isFlex}} {{#btn}}
-            <p class="switch_button" data-button-id="{{btn_id}}">⇆</p>
-            {{/btn}} {{/isFlex}}{{/RolesPriority}}
-            <img src="/static/img/flex.svg" alt="" width="30" class="role_icon flex {{^isFlex}}innactive{{/isFlex}}">
+            <template v-for="role in player.RolesPriority">
+                <div class="role">
+
+                    <img :src="'/static/img/' + role.role + '_icon.png'" alt="" width="30" :class="{role_icon: true, innactive: !role.active}">
+                    <input type="number" :value="role.sr" class="lobby_sr_input" onFocus="this.select()" v-if="role.editable"></input>
+                    <p v-if="!role.editable">{{ role.sr }}</p>
+
+                </div>
+                <p class="switch_button" v-if="role.btn">⇆</p>
+            </template>
+            <img src="/static/img/flex.svg" alt="" width="30" :class="{role_icon: true, flex: true, innactive: player.isFlex}">
         </div>
     </div>
 
 </div>
-
-
-{{/data}}

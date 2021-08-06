@@ -66,7 +66,6 @@ class FlaskSite:
             return render_template('mainPage.html', **self.ParamsManagerObject.getParams())
 
 
-        @self.app.route("/")
         @self.app.route("/settings")
         def Setting():
             if not current_user.is_authenticated:
@@ -78,7 +77,7 @@ class FlaskSite:
         @login_required
         def logout():
             logout_user()
-            return redirect("/")
+            return redirect("/login")
 
 
         @self.app.route('/login', methods=['GET', 'POST'])
