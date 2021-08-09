@@ -66,27 +66,34 @@ def formGoodBal(first, second, fMask, sMask, fAVG, sAVG, fTeamRolePrior, sTeamRo
         elif sMask[i] == 2:
             H_Range -= second[i].HSR
     data["pareTeamAVG"] = abs(T_Range) + abs(D_Range) + abs(H_Range)
+    data["rangeTeam"] = T_Range + D_Range + H_Range
     return data
 
 
 def sort_comparator(left, right):
     left_arg = left["pareTeamAVG"]
     right_arg = right["pareTeamAVG"]
-    if left["first"]["RolePoints"] + left["second"]["RolePoints"] > \
-            right["first"]["RolePoints"] + right["second"]["RolePoints"]:
+
+    lf = left["first"]["RolePoints"]
+    ls = left["second"]["RolePoints"]
+    rf = right["first"]["RolePoints"]
+    rs = right["second"]["RolePoints"]
+    if lf + ls > rf + rs:
         return -1
-    elif left["first"]["RolePoints"] + left["second"]["RolePoints"] < \
-            right["first"]["RolePoints"] + right["second"]["RolePoints"]:
+    elif lf + ls < rf + rs:
         return 1
+    elif abs(left_arg - right_arg) < 100:
+        if abs(left["rangeTeam"]) < abs(right["rangeTeam"]):
+            return -1
+        else:
+            return 1
     elif left_arg < right_arg:
         return -1
     elif left_arg > right_arg:
         return 1
-    elif abs(left["first"]["RolePoints"] - left["second"]["RolePoints"]) < \
-            abs(right["first"]["RolePoints"] - right["second"]["RolePoints"]):
+    elif abs(lf - ls) < abs(rf - rs):
         return -1
-    elif abs(left["first"]["RolePoints"] - left["second"]["RolePoints"]) > \
-            abs(right["first"]["RolePoints"] - right["second"]["RolePoints"]):
+    elif abs(lf - ls) > abs(rf - rs):
         return 1
     else:
         return 0
@@ -118,7 +125,7 @@ def tryRoleMask(team, roleMask, PlayersInTeam):
     return goodMask
 
 
-def tryTeamMask(TM, roleMask, Ps, PlayersInTeam):
+def tryTeamMask(TM, roleMask, Ps, PlayersInTeam, pareTeam):
     first_team = []
     second_team = []
     for i in range(len(TM)):
@@ -133,9 +140,9 @@ def tryTeamMask(TM, roleMask, Ps, PlayersInTeam):
     good_balance = []
     for f in ft_gm:
         for s in st_gm:
-            if s[0] - 50 <= f[0] <= s[0] + 50:
+            if abs(s[0] - f[0]) <= 50:
                 gd_bl = formGoodBal(first_team, second_team, f[1], s[1], f[0], s[0], f[2], s[2])
-                if gd_bl["pareTeamAVG"] <= 1000:
+                if gd_bl["pareTeamAVG"] <= pareTeam:
                     good_balance.append(gd_bl)
     return good_balance
 
@@ -150,7 +157,7 @@ def randLobby(Lobby, PlayersInTeam):
     return PlayersLobby, ExtendedLobby
 
 
-def createGame(Profile_ID):
+def createGame(Profile_ID, pareTeam=1000):
     UserSettings = GetUserSettings(Profile_ID)
     PlayersInTeam = UserSettings["Amount"]["T"] + UserSettings["Amount"]["D"] + UserSettings["Amount"]["H"]
 
@@ -162,15 +169,15 @@ def createGame(Profile_ID):
         Ps = formPlayersData(Lobby)
         s = []
         for TM in teamMask:
-            tTM = tryTeamMask(TM, roleMask, Ps, PlayersInTeam)
+            tTM = tryTeamMask(TM, roleMask, Ps, PlayersInTeam, pareTeam)
             if tTM:
                 s += tTM
-        # print(*sorted(s, key=cmp_to_key(sort_comparator))[0:100], sep="\n")
+        print(*sorted(s, key=cmp_to_key(sort_comparator))[0:100], sep="\n")
         return ExtendedLobby, sorted(s, key=cmp_to_key(sort_comparator))
     return False
 
 
-# d1 = datetime.datetime.now()
-# print(len(createGame(1)[1]))
-# d2 = datetime.datetime.now()
-# print("Весь метод:", str(d2 - d1))
+d1 = datetime.datetime.now()
+print(len(createGame(1)[1]))
+d2 = datetime.datetime.now()
+print("Весь метод:", str(d2 - d1))
