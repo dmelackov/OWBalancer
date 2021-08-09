@@ -210,16 +210,17 @@ td tr {
     justify-content: flex-start;
     position: relative;
     border-radius: 12px;
-    min-height: 35px;
+    min-height: 42px;
     width: 100%;
     cursor: pointer;
+    padding: 6px 12px;
+    box-sizing: border-box;
 }
 
 .player_container {
     background-color: #171e27;
     border-radius: 12px;
     border: solid 1px #444444;
-    padding: 6px 12px;
 }
 
 .player_inner_container:hover {

@@ -15,6 +15,7 @@
     const UserCreateButton = document.getElementById("UserCreateButton")
     const clear_button = document.getElementById("clear_button")
 
+
     body.addEventListener("mousedown", (e) => {
         if (!e.target.closest(".customSelect")) {
             if (lastActive) lastActive.classList.remove("active")
@@ -360,4 +361,5 @@
         balance_img.src = imageUrl
         balance_count.innerText = (index + 1) + "/" + balance["Balances"].length
     }
+
 })();

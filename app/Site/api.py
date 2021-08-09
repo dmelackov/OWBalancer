@@ -168,7 +168,7 @@ def createCustom():
 def createPlayer():
     data = request.get_json()
     module_logger.info(f"{current_user.Username} trying create player {data['Username']}")
-    DataBaseMethods.createPlayer("", data["Username"])
+    DataBaseMethods.createPlayer(data["Username"], current_user)
     return Response(status=200)
 
 
