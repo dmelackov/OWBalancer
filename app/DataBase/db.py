@@ -2,11 +2,12 @@ from peewee import *
 from app.params import DB_NAME, port, password, user, host
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
+import json
 
 # db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password)
 db = SqliteDatabase(DB_NAME + ".db")
-ProfileDataConst = '{"Amount": {"T": 2, "D": 2, "H": 2},' \
-                   ' "TeamNames": {"1": "Team 1", "2": "Team 2"}, "AutoCustom": true}'
+ProfileDataConst = '{"Amount": {"T": 2, "D": 2, "H": 2}, ' \
+                   '"TeamNames": {"1": "Team 1", "2": "Team 2"}, "AutoCustom": true, "ExtendedLobby": false}'
 
 
 class Roles(Model):
@@ -36,6 +37,13 @@ class Profile(Model, UserMixin):
             'id': self.ID,
             'username': self.Username
         }
+
+    def getUserSettings(self):
+        return json.loads(self.LobbySettings)
+
+    def setUserSettings(self, USettings):
+        self.LobbySettings = json.dumps(USettings)
+        self.save()
 
     class Meta:
         database = db

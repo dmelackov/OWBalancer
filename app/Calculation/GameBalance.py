@@ -35,7 +35,7 @@ def preGenerate(RolesAmount, PlayersInTeam):
 
 def formPlayersData(Lobby):
     Ps = []
-    C = Custom.select().where(Custom.ID in Lobby)
+    C = Custom.select().where(Custom.ID << Lobby)
     if C.exists():
         for CustomIterator in C:
             Ps.append(CustomIterator)
