@@ -108,8 +108,15 @@ def createImage(gameData):
     draw.text((width // 2 - 62, 560), "VS", "#ffffff", font=vs_font)
     draw.text((30, 100), f"AVG: {gameData['first']['AVG']}", "#ffffff", font=avg_font)
 
-    draw.text((width // 2 + 70, 0), "Team 2", "#ffffff", font=team_font)
-    draw.text((width // 2 + 80, 100), f"AVG: {gameData['second']['AVG']}", "#ffffff", font=avg_font)
+    w, h = team_font.getsize("Team 2")
+    draw.text((width - 20 - w, 0), "Team 2", "#ffffff", font=team_font)
+    avg = f"AVG: {gameData['second']['AVG']}"
+    w, h = avg_font.getsize(avg)
+    draw.text((width - 30 - w, 100), avg, "#ffffff", font=avg_font)
+
+    TDiff = f"Evaluation: {d['pareTeamAVG']}"
+    w, h = avg_font.getsize(TDiff)
+    draw.text((width // 2 - w // 2, 10), TDiff, font=avg_font)
 
     # right team handler
     ind = len(gameData["second"]["0"])
@@ -204,9 +211,9 @@ def createImage(gameData):
     return image
 
 
-d = \
-    {'pareTeamAVG': 450, 'first': {'AVG': 2991, 'RolePoints': 17, "0": [7, 15], "1": [9, 10], "2": [11, 14]},
-     'second': {'AVG': 2983, 'RolePoints': 17, "0": [4, 8], "1": [1, 6], "2": [5, 13]}}
-
-img = createImage(d)
-img.save('IMAGE.jpg')
+# d = \
+#     {'pareTeamAVG': 450, 'first': {'AVG': 2991, 'RolePoints': 17, "0": [7, 15], "1": [9, 10], "2": [11, 14]},
+#      'second': {'AVG': 2983, 'RolePoints': 17, "0": [4, 8], "1": [1, 6], "2": [5, 13]}}
+#
+# img = createImage(d)
+# img.save('IMAGE.jpg')

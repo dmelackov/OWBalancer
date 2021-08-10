@@ -87,23 +87,25 @@ def roles_priority(P, image, width, k, pl, left_padding):
 
 
 def foo(draw, width, image, text_role, color, k, icon, Cs, Ranks, team):
-    left_padding = width // 2 + 50 if team else 0
-    draw.text((150 + left_padding, 160 + k), text_role, font=role_font, fill=color)
-    # draw.line((150, 254 + k, 367, 254 + k), fill=color, width=6)
+    if len(Cs):
+        left_padding = width // 2 + 50 if team else 0
+        draw.text((150 + left_padding, 160 + k), text_role, font=role_font, fill=color)
+        # draw.line((150, 254 + k, 367, 254 + k), fill=color, width=6)
 
-    draw.line((30 + left_padding, 164 + k, 109 + left_padding, 164 + k), fill=color, width=10)
-    image.paste(icon, (30 + left_padding, 170 + k))
-    draw.line((30 + left_padding, 254 + k, 109 + left_padding, 254 + k), fill=color, width=10)
+        draw.line((30 + left_padding, 164 + k, 109 + left_padding, 164 + k), fill=color, width=10)
+        image.paste(icon, (30 + left_padding, 170 + k))
+        draw.line((30 + left_padding, 254 + k, 109 + left_padding, 254 + k), fill=color, width=10)
 
-    for i, C in enumerate(Cs):
-        p = i * 93
-        top_padding = p + k
-        rank_icon = get_rank_icon(Ranks[i], team)
-        image.paste(rank_icon, (30 + left_padding, 260 + top_padding), mask=rank_icon)
-        draw.text((38 + left_padding, 320 + top_padding), Ranks[i], font=text_ranknum)
-        draw.text((150 + left_padding, 270 + top_padding), C.Player.Username, font=text_font)
-        roles_priority(C.Player, image, width, k, i, left_padding)
-    return k + (len(Cs) * 93 + 114)
+        for i, C in enumerate(Cs):
+            p = i * 93
+            top_padding = p + k
+            rank_icon = get_rank_icon(Ranks[i], team)
+            image.paste(rank_icon, (30 + left_padding, 260 + top_padding), mask=rank_icon)
+            draw.text((38 + left_padding, 320 + top_padding), Ranks[i], font=text_ranknum)
+            draw.text((150 + left_padding, 270 + top_padding), C.Player.Username, font=text_font)
+            roles_priority(C.Player, image, width, k, i, left_padding)
+        return k + (len(Cs) * 93 + 114)
+    return k
 
 
 def createImage(d):
@@ -211,10 +213,7 @@ def createImage(d):
     return image
 
 
-d = {'pareTeamAVG': 400, 'first': {'AVG': 3066, 'RolePoints': 17, '0': [1, 3], '1': [7, 22], '2': [11, 21]},
-     'second': {'AVG': 3066, 'RolePoints': 17, '0': [6, 8], '1': [9, 10], '2': [4, 5]}, 'rangeTeam': 0}
-
-
-
-img = createImage(d)
-img.save('IMAGE.png')
+# d = {'pareTeamAVG': 400, 'first': {'AVG': 3066, 'RolePoints': 17, '0': [1, 3], '1': [7, 22], '2': [11, 21]},
+#      'second': {'AVG': 3066, 'RolePoints': 17, '0': [6, 8], '1': [9, 10], '2': [4, 5]}, 'rangeTeam': 0}
+# img = createImage(d)
+# img.save('IMAGE.jpg')
