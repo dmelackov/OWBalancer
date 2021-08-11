@@ -6,8 +6,8 @@ import json
 
 # db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password)
 db = SqliteDatabase(DB_NAME + ".db")
-ProfileDataConst = '{"Amount": {"T": 2, "D": 2, "H": 2}, ' \
-                   '"TeamNames": {"1": "Team 1", "2": "Team 2"}, "AutoCustom": true, "ExtendedLobby": false}'
+ProfileDataConst = '{"Amount": {"T": 2, "D": 2, "H": 2}, "TeamNames": {"1": "Team 1", "2": "Team 2"},' \
+                   ' "AutoCustom": true, "ExtendedLobby": false}'
 
 
 class Roles(Model):

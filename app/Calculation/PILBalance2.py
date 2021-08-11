@@ -1,5 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
-from app.DataBase.db import Custom
+from app.DataBase.db import Custom, Profile
 
 RBronse = Image.open("app/icons/PIL2/Rank/RBronse.png").resize((80, 80))
 RSilver = Image.open("app/icons/PIL2/Rank/RSilver.png").resize((80, 80))
@@ -108,7 +108,7 @@ def foo(draw, width, image, text_role, color, k, icon, Cs, Ranks, team):
     return k
 
 
-def createImage(d):
+def createImage(d, U):
     width = 1980
     height = 1080
     image = Image.new('RGB', (width, height), '#090C10')
@@ -125,10 +125,11 @@ def createImage(d):
     image.paste(sword, (width // 2 - 50, 560), mask=sword)
 
     # название команд и AVG
-    draw.text((40, 20), "Team 1", font=team_font)
+    USettings = U.getUserSettings()
+    draw.text((40, 20), USettings["TeamNames"]["1"], font=team_font)
     draw.text((40, 110), f"AVG: {d['first']['AVG']}", font=avg_font)
 
-    team2 = "Team 2"
+    team2 = USettings["TeamNames"]["2"]
     avg2 = f"AVG: {d['second']['AVG']}"
     wt, ht = team_font.getsize(team2)
     wa, ha = avg_font.getsize(avg2)
@@ -215,5 +216,5 @@ def createImage(d):
 
 # d = {'pareTeamAVG': 400, 'first': {'AVG': 3066, 'RolePoints': 17, '0': [1, 3], '1': [7, 22], '2': [11, 21]},
 #      'second': {'AVG': 3066, 'RolePoints': 17, '0': [6, 8], '1': [9, 10], '2': [4, 5]}, 'rangeTeam': 0}
-# img = createImage(d)
+# img = createImage(d, Profile.select().where(Profile.Username == "Ivarys")[0])
 # img.save('IMAGE.jpg')

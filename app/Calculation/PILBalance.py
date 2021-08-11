@@ -1,5 +1,5 @@
 from PIL import Image, ImageDraw, ImageFont
-from app.DataBase.db import Custom
+from app.DataBase.db import Custom, Profile
 bronse_icon = Image.open("app/icons/PIL1/bronse.png").resize((80, 80))
 silver_icon = Image.open("app/icons/PIL1/silver.png").resize((80, 80))
 gold_icon = Image.open("app/icons/PIL1/gold.png").resize((80, 80))
@@ -92,7 +92,7 @@ def roles_priority_left(P, image, i, width):
                 image.paste(gheal_icon.resize((40, 40)), (width // 2 - 200 - (r * 40), 240 + (i * 144)))
 
 
-def createImage(gameData):
+def createImage(gameData, U):
     width = 1920
     height = 1080
     image = Image.new('RGB', (width, height), 'white')
@@ -104,17 +104,18 @@ def createImage(gameData):
     draw.rectangle((width // 2 + 70, 160, width - 20, height - 20), "#161B22")
     draw.rectangle((width // 2 + 90, 180, width // 2 + 200, height - 40), "#ff6347")
 
-    draw.text((20, 0), "Team 1", "#ffffff", font=team_font)
+    USettings = U.getUserSettings()
+    draw.text((20, 0), USettings["TeamNames"]["1"], "#ffffff", font=team_font)
     draw.text((width // 2 - 62, 560), "VS", "#ffffff", font=vs_font)
     draw.text((30, 100), f"AVG: {gameData['first']['AVG']}", "#ffffff", font=avg_font)
 
-    w, h = team_font.getsize("Team 2")
-    draw.text((width - 20 - w, 0), "Team 2", "#ffffff", font=team_font)
+    w, h = team_font.getsize(USettings["TeamNames"]["2"])
+    draw.text((width - 20 - w, 0), USettings["TeamNames"]["2"], "#ffffff", font=team_font)
     avg = f"AVG: {gameData['second']['AVG']}"
     w, h = avg_font.getsize(avg)
     draw.text((width - 30 - w, 100), avg, "#ffffff", font=avg_font)
 
-    TDiff = f"Evaluation: {d['pareTeamAVG']}"
+    TDiff = f"Evaluation: {gameData['pareTeamAVG']}"
     w, h = avg_font.getsize(TDiff)
     draw.text((width // 2 - w // 2, 10), TDiff, font=avg_font)
 
@@ -211,9 +212,8 @@ def createImage(gameData):
     return image
 
 
-# d = \
-#     {'pareTeamAVG': 450, 'first': {'AVG': 2991, 'RolePoints': 17, "0": [7, 15], "1": [9, 10], "2": [11, 14]},
-#      'second': {'AVG': 2983, 'RolePoints': 17, "0": [4, 8], "1": [1, 6], "2": [5, 13]}}
+# d = {'pareTeamAVG': 400, 'first': {'AVG': 3066, 'RolePoints': 17, '0': [1, 3], '1': [7, 22], '2': [11, 21]},
+#      'second': {'AVG': 3066, 'RolePoints': 17, '0': [6, 8], '1': [9, 10], '2': [4, 5]}, 'rangeTeam': 0}
 #
-# img = createImage(d)
+# img = createImage(d, Profile.select().where(Profile.Username == "Ivarys")[0])
 # img.save('IMAGE.jpg')
