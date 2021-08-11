@@ -1,30 +1,26 @@
 <div :class="{error: player.warn, lobby_container: true, player_container: true}">
-    <div class="player_inner_container ">
+    <div class="player_inner_container" @click="open($event)" @mouseenter="active = true" @mouseleave="active = false">
         <p class="player_username ">{{player.Username}}</p>
-        <div class="sr_lobby">
+        <div class="sr_lobby" v-if="!active">
             <div class="sr_lobby_icon">
                 <img :src="'/static/img/' + role.role + '_icon.png'" alt="" width="15" :class="{role_icon: true, innactive: !role.active}" v-for="role in player.RolesPriority">
             </div>
         </div>
         <p class="author-right">{{player.Author.username}}</p>
-        <p class="X" style="display: none;">✖</p>
-
+        <p class="X" v-if="active" @click="deleteFromLobby">✖</p>
     </div>
-    <div class="lobby_menu" style="display: none;" v-if="false">
+    <div class="lobby_menu" :style="styleObj">
         <hr>
         <div class="sr lobby_sr">
-            <template v-for="role in player.RolesPriority">
+            <template v-for="(role, index) in player.RolesPriority">
                 <div class="role">
-
-                    <img :src="'/static/img/' + role.role + '_icon.png'" alt="" width="30" :class="{role_icon: true, innactive: !role.active}">
-                    <input type="number" :value="role.sr" class="lobby_sr_input" onFocus="this.select()" v-if="role.editable"></input>
-                    <p v-if="!role.editable">{{ role.sr }}</p>
-
+                    <img :src="'/static/img/' + role.role + '_icon.png'" alt="" width="30" :class="{role_icon: true, innactive: !role.active}" @click="toggleRole(role.role)">
+                    <sr-input v-if="player.editable" :role="role" :CustomID="player.CustomID"/>
+                    <p v-if="!player.editable">{{ role.sr }}</p>
                 </div>
-                <p class="switch_button" v-if="role.btn">⇆</p>
+                <p class="switch_button" v-if="index != 2" @click="swapRoles(index)">⇆</p>
             </template>
-            <img src="/static/img/flex.svg" alt="" width="30" :class="{role_icon: true, flex: true, innactive: player.isFlex}">
+            <img src="/static/img/flex.svg" alt="" width="30" :class="{role_icon: true, flex: true, innactive: !player.isFlex}" @click="toggleFlex">
         </div>
     </div>
-
 </div>
