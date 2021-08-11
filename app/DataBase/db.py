@@ -45,6 +45,41 @@ class Profile(Model, UserMixin):
         self.LobbySettings = json.dumps(USettings)
         self.save()
 
+    def settingsChangeTanks(self, TanksCount):
+        USettings = json.loads(self.LobbySettings)
+        USettings["Amount"]["T"] = TanksCount
+        self.LobbySettings = json.dumps(USettings)
+
+    def settingsChangeDps(self, DpsCount):
+        USettings = json.loads(self.LobbySettings)
+        USettings["Amount"]["D"] = DpsCount
+        self.LobbySettings = json.dumps(USettings)
+
+    def settingsChangeHeal(self, HealCount):
+        USettings = json.loads(self.LobbySettings)
+        USettings["Amount"]["H"] = HealCount
+        self.LobbySettings = json.dumps(USettings)
+
+    def settingsTeamOne(self, TeamName):
+        USettings = json.loads(self.LobbySettings)
+        USettings["TeamNames"]["1"] = TeamName
+        self.LobbySettings = json.dumps(USettings)
+
+    def settingsTeamTwo(self, TeamName):
+        USettings = json.loads(self.LobbySettings)
+        USettings["TeamNames"]["2"] = TeamName
+        self.LobbySettings = json.dumps(USettings)
+
+    def settingsAutoCustom(self, AutoCustom):
+        USettings = json.loads(self.LobbySettings)
+        USettings["AutoCustom"] = AutoCustom
+        self.LobbySettings = json.dumps(USettings)
+
+    def settingsExtendedLobby(self, ExtendedLobby):
+        USettings = json.loads(self.LobbySettings)
+        USettings["ExtendedLobby"] = ExtendedLobby
+        self.LobbySettings = json.dumps(USettings)
+
     class Meta:
         database = db
 
