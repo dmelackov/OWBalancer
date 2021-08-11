@@ -210,7 +210,7 @@ td tr {
     justify-content: flex-start;
     position: relative;
     border-radius: 12px;
-    min-height: 42px;
+    min-height: 50px;
     width: 100%;
     cursor: pointer;
     padding: 6px 12px;
@@ -548,8 +548,4 @@ td tr {
 
 .clear:hover {
     color: #b3b3b3;
-}
-
-.flex {
-    transform: translate(15px, 0);
 }

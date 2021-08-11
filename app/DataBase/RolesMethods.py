@@ -48,7 +48,7 @@ def getUserPermissions(P):
         RPs = RolePerms.select().where(RolePerms.Role == P.Role)
         mass = []
         for RP in RPs:
-            mass.append(RP)
+            mass.append(RP.Perm)
         return mass
     else:
         return None

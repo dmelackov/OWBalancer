@@ -5,31 +5,124 @@ document.addEventListener("DOMContentLoaded", async() => {
 
     document.body.addEventListener("mousedown", (e) => {
         if (!e.target.closest(".customSelect")) {
-            //if (lastActive) lastActive.classList.remove("active")
-            app.$refs.CustomMenu.customMenuVisible = false;
+            app.$refs.CustomMenu.close();
         }
-        //if (!e.target.closest(".lobby_container ")) {
-        //    if (currentLobbyElem) {
-        //        currentLobbyElem.style.display = "none"
-        //        currentLobbyElem = null
-        //    }
-        //}
+        if (!e.target.closest(".lobby_container")) {
+            if (app.activeLobbyMenu) {
+                app.activeLobbyMenu.close();
+            }
+        }
     })
+    Vue.component("sr-input", {
+        template: '<input type="number" v-model="sr" class="lobby_sr_input" onFocus="this.select()" @keydown.enter="this.blur()"></input>',
+        props: ["CustomID", "role"],
+        methods: {
+            ratingSet(value) {
+                sendPOST("/api/changeRoleSr", { "role": this.role.role, "rating": value, "customId": this.CustomID })
+                app.updateLobby()
+            }
+        },
+        computed: {
+            sr: {
+                get() { return this.role.sr },
+                set(v) {
+                    if (v > 5000) {
+                        this.role.sr = 5000;
+                    } else if (v < 0) {
+                        this.role.sr = 0;
+                    } else {
+                        this.role.sr = v;
+                    }
 
+                    this.ratingSet(this.role.sr)
+                }
+            }
+        },
+    })
     Vue.component('player-container', {
         props: ["player", "index"],
-
+        data() {
+            return {
+                active: false
+            }
+        },
         template: await (await fetch('static/html/player_pattern.html')).text(),
 
         methods: {
             openCustomsMenu() {
+                this.active = true;
                 app.$refs.CustomMenu.open(this);
             }
         }
     });
 
     Vue.component('lobby-player-container', {
-        props: ["player"],
+        props: ["player", "opened"],
+        data() {
+            return {
+                menuOpened: false,
+                active: false
+            }
+        },
+        methods: {
+            open(event) {
+                if (app.activeLobbyMenu == this) { this.close(); return; }
+                if (app.activeLobbyMenu) {
+                    app.activeLobbyMenu.close();
+                }
+                if (event.target.classList.contains("X")) return;
+                app.activeLobbyMenu = this;
+                this.menuOpened = true;
+                app.activeLobbyId = this.player.CustomID;
+            },
+            close() {
+                this.menuOpened = false;
+                app.activeLobbyMenu = null;
+                app.activeLobbyId = null;
+            },
+            deleteFromLobby() {
+                sendPOST("/api/deleteFromLobby", { 'id': this.player.CustomID })
+                app.updateLobby();
+            },
+            toggleRole(ARGrole) {
+                let newRoleStr = "";
+                for (roleIndex in this.player.RolesPriority) {
+                    let role = this.player.RolesPriority[roleIndex]
+                    let tempActive = role.active;
+                    if (role.role == ARGrole) tempActive = !tempActive;
+                    if (tempActive) newRoleStr += role.role;
+                }
+                sendPOST("/api/setRoles", { "id": this.player.CustomID, "roles": newRoleStr })
+                app.updateLobby()
+            },
+            swapRoles(index) {
+                let newRoleStr = "";
+                for (roleIndex in this.player.RolesPriority) {
+                    let role = this.player.RolesPriority[roleIndex]
+                    if (role.active) newRoleStr += role.role;
+                }
+                let tempMass = newRoleStr.split("");
+                let tempChar = tempMass[index]
+                tempMass[index] = tempMass[index + 1]
+                tempMass[index + 1] = tempChar
+                sendPOST("/api/setRoles", { "id": this.player.CustomID, "roles": tempMass.join("") })
+                app.updateLobby()
+            },
+            toggleFlex() {
+                sendPOST("/api/setFlex", { "id": this.player.CustomID, "status": !this.player.isFlex })
+                app.updateLobby();
+            }
+        },
+        created() {
+            this.menuOpened = this.opened;
+        },
+        computed: {
+            styleObj: function() {
+                return {
+                    display: this.menuOpened ? "block" : "none"
+                }
+            }
+        },
         template: await (await fetch('static/html/lobby_pattern.html')).text()
     });
 
@@ -43,21 +136,32 @@ document.addEventListener("DOMContentLoaded", async() => {
         },
         methods: {
             async open(target) {
-                this.target = target
-                const res = await fetch('/api/getCustoms/' + target.player.id)
-                const resData = await res.json()
+                this.target = target;
+                const res = await fetch('/api/getCustoms/' + target.player.id);
+                const resData = await res.json();
                 if (resData.type == 'custom') {
-                    this.customMenuVisible = false
-                    sendPOST('/api/addToLobby', { 'id': resData.data.CustomID })
-                    app.updateLobby()
+                    this.close();
+                    sendPOST('/api/addToLobby', { 'id': resData.data.CustomID });
+                    app.updateLobby();
                     return;
                 }
                 if (resData.data) {
-                    this.customList = resData.data
+                    this.customList = resData.data;
                 } else {
-                    this.customList = []
+                    this.customList = [];
                 }
-                this.customMenuVisible = true
+                this.customMenuVisible = true;
+            },
+
+            close() {
+                if (this.target) this.target.active = false;
+                this.customMenuVisible = false;
+            },
+
+            createCustom() {
+                sendPOST("/api/createCustom", { "id": this.target.player.id });
+                app.updateLobby();
+                this.close();
             }
         },
         computed: {
@@ -99,7 +203,14 @@ document.addEventListener("DOMContentLoaded", async() => {
                 createPlayerNickname: "",
                 playersNicknameFilter: "",
                 playerList: [],
-                lobbyPlayerList: []
+                lobbyPlayerList: [],
+                activeLobbyMenu: null,
+                activeLobbyId: null,
+                imageSrc: "/static/img/balance_alt.png",
+                balanceLenght: 0,
+                currentImageIndex: 0,
+                perms: []
+
             }
         },
 
@@ -125,8 +236,81 @@ document.addEventListener("DOMContentLoaded", async() => {
                 fetch('/api/getLobby')
                     .then(response => response.json())
                     .then(data => (this.lobbyPlayerList = data));
-            }
+            },
 
+            getPermissions() {
+                fetch('/api/getLobby')
+                    .then(response => response.json())
+                    .then(data => (this.perms = data));
+            },
+
+            clearLobby() {
+                sendPOST("/api/clearLobby", {})
+                this.updateLobby();
+            },
+
+            changeImageIndex(deff) {
+                let index = parseInt(localStorage.getItem("balance_index"))
+                let newIndex = index + deff
+                if (newIndex < 0) return;
+                if (newIndex >= this.balanceLenght) return;
+                localStorage.setItem("balance_index", newIndex)
+                this.setCurrentImageIndex();
+                this.updateImage();
+            },
+
+            async getBalances() {
+                this.imageSrc = "/static/img/balance_load.png"
+                let res = await fetch('/api/getBalances');
+                let balance = await res.json();
+                if (balance["ok"] && balance.Balances.length > 0) {
+                    localStorage.setItem("balance", JSON.stringify(balance))
+                    localStorage.setItem("balance_index", 0)
+                    this.updateImage()
+                } else {
+                    this.imageSrc = "/static/img/balance_404.png"
+                    if (localStorage.getItem("balance")) localStorage.removeItem("balance")
+                    if (localStorage.getItem("balance_index")) localStorage.removeItem("balance_index")
+                }
+                this.setCurrentImageIndex()
+                this.setBalanceLenght()
+            },
+
+            setCurrentImageIndex() {
+                let index = localStorage.getItem("balance_index")
+                if (index) {
+                    this.currentImageIndex = parseInt(index) + 1
+                } else {
+                    this.currentImageIndex = 0
+                }
+            },
+
+            setBalanceLenght() {
+                let balances = localStorage.getItem("balance")
+                if (balances) {
+                    this.balanceLenght = JSON.parse(balances).Balances.length
+                } else {
+                    this.balanceLenght = 0
+                }
+            },
+
+            async updateImage() {
+                let index = parseInt(localStorage.getItem("balance_index"))
+                let balances = JSON.parse(localStorage.getItem("balance"))
+                if (!balances) return;
+                current_balance = balances["Balances"][index]
+                let image = await (await fetch('/api/balanceImage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify(current_balance)
+                })).blob()
+                imageBlob = image
+                let urlCreator = window.URL || window.webkitURL;
+                let imageUrl = urlCreator.createObjectURL(image);
+                this.imageSrc = imageUrl
+            }
         },
 
         computed: {
@@ -148,6 +332,10 @@ document.addEventListener("DOMContentLoaded", async() => {
         async created() {
             this.updatePlayers();
             this.updateLobby();
+            this.setCurrentImageIndex();
+            this.setBalanceLenght();
+            this.updateImage();
+            this.getPermissions();
         }
     });
 

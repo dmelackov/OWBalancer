@@ -27,28 +27,28 @@
     </p>
     <div class="players_count">
         <p id="lobby_count">Players in lobby: {{lobbyPlayerCount}}</p>
-        <p class="clear" id="clear_button">Clear</p>
+        <p class="clear" id="clear_button" @click="clearLobby">Clear</p>
     </div>
 
     <hr>
     <div class="lobby_list">
         <div id="lobby_list">
             <template v-for="player in lobbyPlayerList">
-                <lobby-player-container :player="player"/>
+                <lobby-player-container :player="player" :opened="player.CustomID == activeLobbyId"/>
             </template>
         </div>
     </div>
 </div>
 <div class="balance_container">
-    <img src="/static/img/balance_alt.png" alt="" id="balance_image">
+    <img :src="imageSrc" alt="" id="balance_image">
     <div class="balance_controlls">
         <div class="balance_controlls_left">
-            <p class="btn balance_button" id="balance_button">Balance teams</p>
+            <p class="btn balance_button" id="balance_button" @click="getBalances">Balance teams</p>
         </div>
         <div class="balance_controlls_right">
-            <p class="btn balance_button" id="balance_button_left">❮</p>
-            <p id="balance_count">0/0</p>
-            <p class="btn balance_button" id="balance_button_right">❱</p>
+            <p class="btn balance_button" id="balance_button_left" @click="changeImageIndex(-1)">❮</p>
+            <p id="balance_count">{{currentImageIndex}}/{{balanceLenght}}</p>
+            <p class="btn balance_button" id="balance_button_right" @click="changeImageIndex(1)">❱</p>
         </div>
     </div>
 </div>
