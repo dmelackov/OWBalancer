@@ -197,3 +197,8 @@ def Full_CreatePlayer(Profile_ID, Username, TSR, DSR, HSR, Roles, Creator):
 # createDB()
 # print(createPlayer("Ivarys",
 #              Profile.select().where(Profile.Username == "Ivarys")[0]))
+print(Profile.select().where(Profile.Username == "Ivarys")[0].getUserSettings())
+# ProfileDataConst = {"Amount": {"T": 2, "D": 2, "H": 2},
+#                     "TeamNames": {"1": "Team 1", "2": "Team 2"}, "AutoCustom": True,
+#                     "ExtendedLobby": False}
+# print(Profile.select().where(Profile.Username == "Ivarys")[0].setUserSettings(ProfileDataConst))
