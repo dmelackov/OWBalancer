@@ -114,7 +114,7 @@ def createImage(gameData):
     w, h = avg_font.getsize(avg)
     draw.text((width - 30 - w, 100), avg, "#ffffff", font=avg_font)
 
-    TDiff = f"Evaluation: {d['pareTeamAVG']}"
+    TDiff = f"Evaluation: {gameData['pareTeamAVG']}"
     w, h = avg_font.getsize(TDiff)
     draw.text((width // 2 - w // 2, 10), TDiff, font=avg_font)
 
