@@ -2,9 +2,10 @@
     <div class="player_inner_container" @click="open($event)" @mouseenter="active = true" @mouseleave="active = false">
         <p class="player_username ">{{player.Username}}</p>
         <div class="sr_lobby" v-if="!active">
-            <div class="sr_lobby_icon">
+            <div class="sr_lobby_icon" v-if="!player.isFlex">
                 <img :src="'/static/img/' + role.role + '_icon.png'" alt="" width="15" :class="{role_icon: true, innactive: !role.active}" v-for="role in player.RolesPriority">
             </div>
+            <img src="/static/img/flex.svg" alt="" v-if="player.isFlex" width="16">
         </div>
         <p class="author-right">{{player.Author.username}}</p>
         <p class="X" v-if="active" @click="deleteFromLobby">✖</p>

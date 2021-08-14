@@ -9,6 +9,15 @@ body {
     position: relative;
 }
 
+button {
+    padding: 0;
+    border: none;
+    font: inherit;
+    color: inherit;
+    background-color: transparent;
+    cursor: pointer;
+}
+
 .header {
     position: relative;
     height: 32px;
@@ -70,10 +79,7 @@ input::-webkit-inner-spin-button {
 }
 
 p {
-    -ms-user-select: none;
-    -moz-user-select: none;
-    -khtml-user-select: none;
-    -webkit-user-select: none;
+    user-select: none;
 }
 
 .menu {
@@ -89,7 +95,7 @@ a {
     padding: 10px;
 }
 
-.menu>a:hover {
+.menu>a:hover:enabled {
     color: #d3d3d3;
 }
 
@@ -207,7 +213,7 @@ td tr {
 .player_inner_container {
     display: flex;
     flex-direction: row;
-    justify-content: flex-start;
+    justify-content: space-between;
     position: relative;
     border-radius: 12px;
     min-height: 50px;
@@ -479,10 +485,10 @@ td tr {
 }
 
 .create_container {
-    cursor: pointer;
+    margin-bottom: 10px;
 }
 
-.create_container:hover {
+.create_container:hover:not([enabled="enabled"]) {
     color: #b3b3b3;
 }
 
@@ -548,4 +554,52 @@ td tr {
 
 .clear:hover {
     color: #b3b3b3;
+}
+
+.settings_checkbox {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: max-content;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.checkbox_title {
+    margin: 0;
+}
+
+.settings_role_count {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    margin-top: 10px;
+    justify-content: space-around;
+}
+
+.settings_amout_input {
+    text-align: center;
+    margin-top: 10px;
+    width: 95%;
+}
+
+.settings_team_names {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: nowrap;
+    flex-direction: row;
+}
+
+.team {
+    text-align: center;
+}
+
+.settings_team_input {
+    width: 95%;
+}
+
+.settings_team_title {
+    margin: 0;
+    margin-bottom: 10px;
+    margin-top: 5px;
 }

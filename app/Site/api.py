@@ -11,7 +11,6 @@ import json
 import logging
 import re
 from app.DataBase.RolesMethods import checkProfilePermission, getUserPermissions
-
 module_logger = logging.getLogger("api")
 
 api = Blueprint('api', __name__, template_folder='templates',
@@ -124,7 +123,7 @@ def setFlex():
 def balanceImage():
     module_logger.info(f"{current_user.Username} trying get balance image'")
     data = request.get_json()
-    return serve_pil_image(createImage(data))
+    return serve_pil_image(createImage(data, current_user))
 
 
 @api.route('/changeRoleSr', methods=['POST'])

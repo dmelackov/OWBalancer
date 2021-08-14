@@ -38,7 +38,8 @@ document.addEventListener("DOMContentLoaded", async() => {
                 }
             }
         },
-    })
+    });
+
     Vue.component('player-container', {
         props: ["player", "index"],
         data() {
@@ -239,7 +240,7 @@ document.addEventListener("DOMContentLoaded", async() => {
             },
 
             getPermissions() {
-                fetch('/api/getLobby')
+                fetch('/api/getPermissions')
                     .then(response => response.json())
                     .then(data => (this.perms = data));
             },
