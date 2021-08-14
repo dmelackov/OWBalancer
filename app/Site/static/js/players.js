@@ -303,12 +303,10 @@
         lobbyTable.innerHTML = Mustache.render(pattern_data, { 'data': data })
         lobby_count.innerText = "Players in lobby: " + data.length
         if (openID != null) {
-            var tbody = lobbyTable.getElementsByTagName("tbody")[0]
-            for (let i = 0; i < tbody.children.length; i++) {
-                element = tbody.children[i];
-                var elem = element.getElementsByTagName(".player_container")[0];
+            for (let i = 0; i < lobbyTable.children.length; i++) {
+                let elem = lobbyTable.children[i];
                 if (elem.dataset.playerId == openID) {
-                    let menu = element.getElementsByClassName("lobby_menu")[0]
+                    let menu = elem.getElementsByClassName("lobby_menu")[0]
                     menu.style.display = "block"
                     currentLobbyElem = menu
                 }
