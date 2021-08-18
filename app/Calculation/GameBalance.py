@@ -180,12 +180,12 @@ def createGame(Profile_ID, pareTeam=1000):
             tTM = tryTeamMask(TM, roleMask, Ps, PlayersInTeam, pareTeam)
             if tTM:
                 s += tTM
-        print(*sorted(s, key=cmp_to_key(sort_comparator))[0:100], sep="\n")
+        #print(*sorted(s, key=cmp_to_key(sort_comparator))[0:100], sep="\n")
         return ExtendedLobby, sorted(s, key=cmp_to_key(sort_comparator))
     return False
 
 
-d1 = datetime.datetime.now()
-print(len(createGame(1)[1]))
-d2 = datetime.datetime.now()
-print("Весь метод:", str(d2 - d1))
+#d1 = datetime.datetime.now()
+#print(len(createGame(1)[1]))
+#d2 = datetime.datetime.now()
+#print("Весь метод:", str(d2 - d1))
