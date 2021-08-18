@@ -138,31 +138,7 @@ def createImage(d, U):
 
     TDiff = f"Evaluation: {d['pareTeamAVG']}"
     w, h = avg_font.getsize(TDiff)
-    draw.text((width // 2 - w // 2, 30), TDiff, font=avg_font)
-
-    # предсказание победителя
-    if d["rangeTeam"] / 10 > 13.4:
-        percent_color = "#ff6347"
-    elif d["rangeTeam"] / 10 < -13.4:
-        percent_color = "#1e90ff"
-    else:
-        percent_color = "#505459"
-    prediction = int(d["rangeTeam"] / 10 * 5.2) + 990
-    draw.line((prediction, 120, prediction, 140), fill=percent_color, width=8)
-    percent = str(d["rangeTeam"] / 10)
-    w, h = percent_font.getsize(percent)
-    draw.text((prediction - w // 2, 115 - h), percent, font=percent_font, fill=percent_color)
-
-    draw.line((width // 2 + 70, 140, 1510, 140), fill="#ff6347", width=10)
-    draw.line((1510, 120, 1510, 145), fill="#ff6347", width=10)
-    draw.text((1520, 115), "100", font=percent_font, fill="#ff6347")
-
-    draw.line((width // 2 - 70, 141, 470, 141), fill="#1e90ff", width=10)
-    draw.line((470, 120, 470, 145), fill="#1e90ff", width=10)
-    w, h = percent_font.getsize("-100")
-    draw.text((460 - w, 115), "-100", font=percent_font, fill="#1e90ff")
-
-    draw.line((width // 2 - 69, 140, width // 2 + 69, 140), fill="#505459", width=10)
+    draw.text((width // 2 - w // 2, 30), TDiff, font=avg_font, fill="#46494D")
 
     # баланс
     RedColor = "#ff6347"
@@ -214,7 +190,9 @@ def createImage(d, U):
     return image
 
 
-# d = {'pareTeamAVG': 400, 'first': {'AVG': 3066, 'RolePoints': 17, '0': [1, 3], '1': [7, 22], '2': [11, 21]},
-#      'second': {'AVG': 3066, 'RolePoints': 17, '0': [6, 8], '1': [9, 10], '2': [4, 5]}, 'rangeTeam': 0}
-# img = createImage(d, Profile.select().where(Profile.Username == "Ivarys")[0])
-# img.save('IMAGE.jpg')
+d = {'pareTeamAVG': 900, 'first': {'AVG': 3050, 'RolePoints': 17, '0': [6, 8], '1': [9, 22], '2': [10, 11]},
+     'second': {'AVG': 3033, 'RolePoints': 16, '0': [1, 7], '1': [3, 21], '2': [4, 5]}, 'rangeTeam': 862.9481656538007}
+
+
+img = createImage(d, Profile.select().where(Profile.Username == "Ivarys")[0])
+img.save('IMAGE.jpg')

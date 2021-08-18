@@ -49,24 +49,32 @@ def formGoodBal(first, second, fMask, sMask, fAVG, sAVG, fTeamRolePrior, sTeamRo
     T_Range = 0
     D_Range = 0
     H_Range = 0
+    FTSquare = 0
+    STSquare = 0
     for i in range(len(fMask)):
         data["first"][fMask[i]].append(first[i].ID)
         if fMask[i] == 0:
             T_Range += first[i].TSR
+            FTSquare += (first[i].TSR - data["first"]["AVG"]) ** 2
         elif fMask[i] == 1:
             D_Range += first[i].DSR
+            FTSquare += (first[i].DSR - data["first"]["AVG"]) ** 2
         elif fMask[i] == 2:
             H_Range += first[i].HSR
+            FTSquare += (first[i].HSR - data["first"]["AVG"]) ** 2
     for i in range(len(sMask)):
         data["second"][sMask[i]].append(second[i].ID)
         if sMask[i] == 0:
             T_Range -= second[i].TSR
+            STSquare += (first[i].TSR - data["second"]["AVG"]) ** 2
         elif sMask[i] == 1:
             D_Range -= second[i].DSR
+            STSquare += (first[i].DSR - data["second"]["AVG"]) ** 2
         elif sMask[i] == 2:
             H_Range -= second[i].HSR
+            STSquare += (first[i].HSR - data["second"]["AVG"]) ** 2
     data["pareTeamAVG"] = abs(T_Range) + abs(D_Range) + abs(H_Range)
-    data["rangeTeam"] = T_Range + D_Range + H_Range
+    data["rangeTeam"] = abs((FTSquare // len(fMask)) ** 0.5 - (STSquare // len(sMask)) ** 0.5)
     return data
 
 
@@ -82,7 +90,7 @@ def sort_comparator(left, right):
         return -1
     elif lf + ls < rf + rs:
         return 1
-    elif abs(left_arg - right_arg) < 100:
+    elif abs(left_arg - right_arg) <= 100:
         if abs(left["rangeTeam"]) < abs(right["rangeTeam"]):
             return -1
         else:

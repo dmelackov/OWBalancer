@@ -117,7 +117,7 @@ def createImage(gameData, U):
 
     TDiff = f"Evaluation: {gameData['pareTeamAVG']}"
     w, h = avg_font.getsize(TDiff)
-    draw.text((width // 2 - w // 2, 10), TDiff, font=avg_font)
+    draw.text((width // 2 - w // 2, 10), TDiff, font=avg_font, fill="#46494D")
 
     # right team handler
     ind = len(gameData["second"]["0"])
@@ -212,8 +212,8 @@ def createImage(gameData, U):
     return image
 
 
-# d = {'pareTeamAVG': 400, 'first': {'AVG': 3066, 'RolePoints': 17, '0': [1, 3], '1': [7, 22], '2': [11, 21]},
-#      'second': {'AVG': 3066, 'RolePoints': 17, '0': [6, 8], '1': [9, 10], '2': [4, 5]}, 'rangeTeam': 0}
-#
-# img = createImage(d, Profile.select().where(Profile.Username == "Ivarys")[0])
-# img.save('IMAGE.jpg')
+d = {'pareTeamAVG': 500, 'first': {'AVG': 3016, 'RolePoints': 17, "0": [6, 8], "1": [21, 22], "2": [10, 11]}, 'second': {'AVG': 3033, 'RolePoints': 16, "0": [1, 3], "1": [7, 9], "2": [4, 5]}, 'rangeTeam': 0.3211380438195306}
+
+
+img = createImage(d, Profile.select().where(Profile.Username == "Ivarys")[0])
+img.save('IMAGE.jpg')
