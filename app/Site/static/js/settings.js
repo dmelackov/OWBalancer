@@ -24,7 +24,55 @@ document.addEventListener("DOMContentLoaded", async() => {
                 get() {
                     return this.ExtendedLobbySet;
                 }
-            }
+            },
+            CustomAutoChoice: {
+                set(v) {
+                    console.log(v)
+                },
+                get() {
+                    return this.CustomAutoChoiceSet;
+                }
+            },
+            TeamTCount: {
+                set(v) {
+                    console.log(v)
+                },
+                get() {
+                    return this.TeamTCountSet;
+                }
+            },
+            TeamDCount: {
+                set(v) {
+                    console.log(v)
+                },
+                get() {
+                    return this.TeamDCountSet;
+                }
+            },
+            TeamHCount: {
+                set(v) {
+                    console.log(v)
+                },
+                get() {
+                    return this.TeamHCountSet;
+                }
+            },
+            Team1Name: {
+                set(v) {
+                    console.log(v)
+                },
+                get() {
+                    return this.Team1NameSet;
+                }
+            },
+            Team2Name: {
+                set(v) {
+                    console.log(v)
+                },
+                get() {
+                    return this.Team2NameSet;
+                }
+            },
         },
         methods: {
             updateSettings() {

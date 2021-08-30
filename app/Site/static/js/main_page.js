@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", async() => {
         props: ["CustomID", "role"],
         methods: {
             ratingSet(value) {
-                sendPOST("/api/changeRoleSr", { "role": this.role.role, "rating": value, "customId": this.CustomID })
+                sendPOST("/api/customs/changeRoleSr", { "role": this.role.role, "rating": value, "customId": this.CustomID })
                 app.updateLobby()
             }
         },
@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", async() => {
                 app.activeLobbyId = null;
             },
             deleteFromLobby() {
-                sendPOST("/api/deleteFromLobby", { 'id': this.player.CustomID })
+                sendPOST("/api/lobby/deleteFromLobby", { 'id': this.player.CustomID })
                 app.updateLobby();
             },
             toggleRole(ARGrole) {
@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", async() => {
                     if (role.role == ARGrole) tempActive = !tempActive;
                     if (tempActive) newRoleStr += role.role;
                 }
-                sendPOST("/api/setRoles", { "id": this.player.CustomID, "roles": newRoleStr })
+                sendPOST("/api/players/setRoles", { "id": this.player.CustomID, "roles": newRoleStr })
                 app.updateLobby()
             },
             swapRoles(index) {
@@ -106,11 +106,11 @@ document.addEventListener("DOMContentLoaded", async() => {
                 let tempChar = tempMass[index]
                 tempMass[index] = tempMass[index + 1]
                 tempMass[index + 1] = tempChar
-                sendPOST("/api/setRoles", { "id": this.player.CustomID, "roles": tempMass.join("") })
+                sendPOST("/api/players/setRoles", { "id": this.player.CustomID, "roles": tempMass.join("") })
                 app.updateLobby()
             },
             toggleFlex() {
-                sendPOST("/api/setFlex", { "id": this.player.CustomID, "status": !this.player.isFlex })
+                sendPOST("/api/players/setFlex", { "id": this.player.CustomID, "status": !this.player.isFlex })
                 app.updateLobby();
             }
         },
@@ -138,11 +138,11 @@ document.addEventListener("DOMContentLoaded", async() => {
         methods: {
             async open(target) {
                 this.target = target;
-                const res = await fetch('/api/getCustoms/' + target.player.id);
+                const res = await fetch('/api/customs/getCustoms/' + target.player.id);
                 const resData = await res.json();
                 if (resData.type == 'custom') {
                     this.close();
-                    sendPOST('/api/addToLobby', { 'id': resData.data.CustomID });
+                    sendPOST('/api/lobby/addToLobby', { 'id': resData.data.CustomID });
                     app.updateLobby();
                     return;
                 }
@@ -160,7 +160,7 @@ document.addEventListener("DOMContentLoaded", async() => {
             },
 
             createCustom() {
-                sendPOST("/api/createCustom", { "id": this.target.player.id });
+                sendPOST("/api/customs/createCustom", { "id": this.target.player.id });
                 app.updateLobby();
                 this.close();
             }
@@ -189,7 +189,7 @@ document.addEventListener("DOMContentLoaded", async() => {
         methods: {
             addToLobby() {
                 app.$refs.CustomMenu.customMenuVisible = false;
-                sendPOST('/api/addToLobby', { 'id': this.custom.id })
+                sendPOST('/api/lobby/addToLobby', { 'id': this.custom.id })
                 app.updateLobby();
             }
         },
@@ -218,7 +218,7 @@ document.addEventListener("DOMContentLoaded", async() => {
         methods: {
 
             createPlayer() {
-                sendPOST("/api/createPlayer", { "Username": this.createPlayerNickname });
+                sendPOST("/api/players/createPlayer", { "Username": this.createPlayerNickname });
                 this.createPlayerNickname = "";
                 this.updatePlayers();
             },
@@ -228,25 +228,25 @@ document.addEventListener("DOMContentLoaded", async() => {
             },
 
             updatePlayers() {
-                fetch('/api/getPlayers/')
+                fetch('/api/players/getPlayers/')
                     .then(response => response.json())
                     .then(data => (this.playerList = data));
             },
 
             updateLobby() {
-                fetch('/api/getLobby')
+                fetch('/api/lobby/getLobby')
                     .then(response => response.json())
                     .then(data => (this.lobbyPlayerList = data));
             },
 
             getPermissions() {
-                fetch('/api/getPermissions')
+                fetch('/api/profile/getPermissions')
                     .then(response => response.json())
                     .then(data => (this.perms = data));
             },
 
             clearLobby() {
-                sendPOST("/api/clearLobby", {})
+                sendPOST("/api/lobby/clearLobby", {})
                 this.updateLobby();
             },
 
@@ -262,7 +262,7 @@ document.addEventListener("DOMContentLoaded", async() => {
 
             async getBalances() {
                 this.imageSrc = "/static/img/balance_load.png"
-                let res = await fetch('/api/getBalances');
+                let res = await fetch('/api/profile/getBalances');
                 let balance = await res.json();
                 if (balance["ok"] && balance.Balances.length > 0) {
                     localStorage.setItem("balance", JSON.stringify(balance))
@@ -300,7 +300,7 @@ document.addEventListener("DOMContentLoaded", async() => {
                 let balances = JSON.parse(localStorage.getItem("balance"))
                 if (!balances) return;
                 current_balance = balances["Balances"][index]
-                let image = await (await fetch('/api/balanceImage', {
+                let image = await (await fetch('/api/profile/balanceImage', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json;charset=utf-8'

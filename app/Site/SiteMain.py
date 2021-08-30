@@ -1,14 +1,12 @@
 import app.DataBase.db as MainDB
 import app.DataBase.methods as DataBaseMethods
 import app.DataBase.RolesMethods as RolesMethods
-from flask import Flask, url_for, request, render_template, redirect, abort, send_file
-import datetime
-from flask_login import LoginManager, login_manager, login_required, login_user, logout_user, current_user
-from io import BytesIO
+from flask import Flask, render_template, redirect
+from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from app.Site.forms.user import LoginForm, RegisterForm
 from peewee import fn
 from flask import jsonify
-from app.Site.api import api, createPlayer
+from app.Site.api.api import api
 import logging
 
 module_logger = logging.getLogger("site")

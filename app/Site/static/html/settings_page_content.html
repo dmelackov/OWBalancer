@@ -4,11 +4,11 @@
     </p>
     <hr>
     <div class="settings_checkbox">
-        <input type="checkbox" name="Extended Lobby">
+        <input type="checkbox" name="Extended Lobby" v-model="ExtendedLobby">
         <p class="checkbox_title">Extended Lobby</p>
     </div>
     <div class="settings_checkbox">
-        <input type="checkbox" name="Custom Autochoice">
+        <input type="checkbox" name="Custom Autochoice" v-model="CustomAutoChoice">
         <p class="checkbox_title">Custom Autochoice</p>
     </div>
     <hr>
@@ -18,15 +18,15 @@
     <div class="settings_role_count">
         <div class="role">
             <img src="/static/img/T_icon.png" alt="" width="30">
-            <input type="number" name="" id="" onFocus="this.select()" @keydown.enter="this.blur()" class="settings_amout_input custom_input">
+            <input type="number" name="" id="" onFocus="this.select()" @keydown.enter="this.blur()" class="settings_amout_input custom_input" v-model="TeamTCount">
         </div>
         <div class="role">
             <img src="/static/img/D_icon.png" alt="" width="30">
-            <input type="number" name="" id="" onFocus="this.select()" @keydown.enter="this.blur()" class="settings_amout_input custom_input">
+            <input type="number" name="" id="" onFocus="this.select()" @keydown.enter="this.blur()" class="settings_amout_input custom_input" v-model="TeamDCount">
         </div>
         <div class="role">
             <img src="/static/img/H_icon.png" alt="" width="30">
-            <input type="number" name="" id="" onFocus="this.select()" @keydown.enter="this.blur()" class="settings_amout_input custom_input">
+            <input type="number" name="" id="" onFocus="this.select()" @keydown.enter="this.blur()" class="settings_amout_input custom_input" v-model="TeamHCount">
         </div>
     </div>
     <hr>
@@ -36,11 +36,11 @@
     <div class="settings_team_names">
         <div class="team" id="team1">
             <p class="settings_team_title">Team 1</p>
-            <input type="text" class="custom_input settings_team_input">
+            <input type="text" class="custom_input settings_team_input" v-model="Team1Name">
         </div>
         <div class="team" id="team2">
             <p class="settings_team_title">Team 2</p>
-            <input type="text" class="custom_input settings_team_input">
+            <input type="text" class="custom_input settings_team_input" v-model="Team2Name">
         </div>
     </div>
 </div>
