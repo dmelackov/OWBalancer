@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", async() => {
         computed: {
             ExtendedLobby: {
                 set(v) {
-
+                    console.log(v)
                 },
                 get() {
                     return this.ExtendedLobbySet;

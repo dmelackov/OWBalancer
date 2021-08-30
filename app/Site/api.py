@@ -203,7 +203,10 @@ def clearLobby():
 @login_required
 def getPermissions():
     module_logger.info(f"{current_user.Username} trying get permissions")
-    perms = list(map(lambda x: x.Name, getUserPermissions(current_user)))
+    perms = getUserPermissions(current_user)
+    if perms is None:
+        return jsonify([])
+    perms = list(map(lambda x: x.Name, perms))
     return jsonify(perms)
 
 

@@ -2,7 +2,7 @@
 <div class="login_content">
     <div class="login_form">
         <div class="title">
-            <p>Authorisation</p>
+            <p>Registration</p>
         </div>
         <div class="form">
             <form action="" method="post">
@@ -21,17 +21,22 @@
                     </div>
                     {% endfor %}
                 </p>
-                <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+                <p>
+                    {{ form.password_again(class="field form-control custom_input" if not message else "field form-control error", type="password", placeholder=form.password_again.label.text) }}<br> {% for error in form.password_again.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+                </p>
                 <p>{{ form.submit(type="submit", class="btn btn-submit custom_input") }}</p>
+                <p class="register_form_error">{{ message }}</p>
             </form>
         </div>
     </div>
-    <a href="/register" class="reg_button">Registration</a>
     <div class="contacts">
         <p>Developers</p>
         <a href="https://discord.com/users/337577546168401920">Demon_Dimon#0347</a>
         <a href="https://discord.com/users/254608220880896010">Ivarys#2177</a>
     </div>
 </div>
-
 {% endblock content %}

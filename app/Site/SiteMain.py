@@ -1,16 +1,18 @@
 import app.DataBase.db as MainDB
 import app.DataBase.methods as DataBaseMethods
+import app.DataBase.RolesMethods as RolesMethods
 from flask import Flask, url_for, request, render_template, redirect, abort, send_file
 import datetime
 from flask_login import LoginManager, login_manager, login_required, login_user, logout_user, current_user
 from io import BytesIO
-from app.Site.forms.user import LoginForm
+from app.Site.forms.user import LoginForm, RegisterForm
 from peewee import fn
 from flask import jsonify
-from app.Site.api import api
+from app.Site.api import api, createPlayer
 import logging
- 
+
 module_logger = logging.getLogger("site")
+
 
 class FlaskSite:
     class ParamsManager:
@@ -57,7 +59,6 @@ class FlaskSite:
         def load_user(user_id):
             return MainDB.Profile.get(MainDB.Profile.ID == user_id)
 
-
         @self.app.route("/")
         @self.app.route("/index")
         def MainPage():
@@ -65,20 +66,17 @@ class FlaskSite:
                 return redirect("/login")
             return render_template('mainPage.html', **self.ParamsManagerObject.getParams())
 
-
         @self.app.route("/settings")
         def Setting():
             if not current_user.is_authenticated:
-                return redirect("/settings")
+                return redirect("/login")
             return render_template('settings.html', **self.ParamsManagerObject.getParams())
-
 
         @self.app.route('/logout')
         @login_required
         def logout():
             logout_user()
             return redirect("/login")
-
 
         @self.app.route('/login', methods=['GET', 'POST'])
         def login():
@@ -95,3 +93,26 @@ class FlaskSite:
                                        message="Неправильный логин или пароль",
                                        form=form, **self.ParamsManagerObject.getParams())
             return render_template('login.html', form=form, **self.ParamsManagerObject.getParams())
+
+        @self.app.route('/register', methods=['GET', 'POST'])
+        def reqister():
+            form = RegisterForm()
+            if current_user.is_authenticated:
+                return redirect("/")
+            if form.validate_on_submit():
+                if form.password.data != form.password_again.data:
+                    return render_template('register.html', **self.ParamsManagerObject.getParams(),
+                                           form=form,
+                                           message="Пароли не совпадают")
+                if MainDB.Profile.select().where(fn.lower(MainDB.Profile.Username) == form.login.data.lower()):
+                    return render_template('register.html', **self.ParamsManagerObject.getParams(),
+                                           form=form,
+                                           message="Такой пользователь уже есть")
+                DataBaseMethods.createProfile(
+                    form.login.data, form.password.data)
+                RolesMethods.addRoleToProfile(
+                    MainDB.Profile.get(
+                        MainDB.Profile.Username == form.login.data),
+                    MainDB.Roles.get(MainDB.Roles.ID == 1))
+                return redirect('/login')
+            return render_template('register.html', **self.ParamsManagerObject.getParams(), form=form)
