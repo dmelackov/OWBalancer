@@ -50,9 +50,6 @@ def setFlex():
     return Response(status=200)
 
 
-@api.route('/createPlayer', methods=['POST'])
-@login_required
-def createPlayer():
     if not checkProfilePermission(current_user, "create_player"):
         return jsonify({"status": 403})
     data = request.get_json()

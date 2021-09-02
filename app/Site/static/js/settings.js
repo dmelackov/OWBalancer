@@ -19,7 +19,8 @@ document.addEventListener("DOMContentLoaded", async() => {
         computed: {
             ExtendedLobby: {
                 set(v) {
-                    console.log(v)
+                    sendPOST("/api/profile/settings/setExtendedLobby", { "setting": v })
+                    this.updateSettings()
                 },
                 get() {
                     return this.ExtendedLobbySet;
@@ -27,7 +28,8 @@ document.addEventListener("DOMContentLoaded", async() => {
             },
             CustomAutoChoice: {
                 set(v) {
-                    console.log(v)
+                    sendPOST("/api/profile/settings/setAutoCustom", { "setting": v })
+                    this.updateSettings()
                 },
                 get() {
                     return this.CustomAutoChoiceSet;
@@ -35,7 +37,9 @@ document.addEventListener("DOMContentLoaded", async() => {
             },
             TeamTCount: {
                 set(v) {
-                    console.log(v)
+                    if (v < 0) return
+                    sendPOST("/api/profile/settings/setTanksCount", { "setting": v })
+                    this.updateSettings()
                 },
                 get() {
                     return this.TeamTCountSet;
@@ -43,7 +47,9 @@ document.addEventListener("DOMContentLoaded", async() => {
             },
             TeamDCount: {
                 set(v) {
-                    console.log(v)
+                    if (v < 0) return
+                    sendPOST("/api/profile/settings/setDamageCount", { "setting": v })
+                    this.updateSettings()
                 },
                 get() {
                     return this.TeamDCountSet;
@@ -51,7 +57,9 @@ document.addEventListener("DOMContentLoaded", async() => {
             },
             TeamHCount: {
                 set(v) {
-                    console.log(v)
+                    if (v < 0) return
+                    sendPOST("/api/profile/settings/setHealsCount", { "setting": v })
+                    this.updateSettings()
                 },
                 get() {
                     return this.TeamHCountSet;
@@ -59,7 +67,8 @@ document.addEventListener("DOMContentLoaded", async() => {
             },
             Team1Name: {
                 set(v) {
-                    console.log(v)
+                    sendPOST("/api/profile/settings/setTeamName1", { "setting": v })
+                    this.updateSettings()
                 },
                 get() {
                     return this.Team1NameSet;
@@ -67,7 +76,8 @@ document.addEventListener("DOMContentLoaded", async() => {
             },
             Team2Name: {
                 set(v) {
-                    console.log(v)
+                    sendPOST("/api/profile/settings/setTeamName2", { "setting": v })
+                    this.updateSettings()
                 },
                 get() {
                     return this.Team2NameSet;
@@ -76,10 +86,28 @@ document.addEventListener("DOMContentLoaded", async() => {
         },
         methods: {
             updateSettings() {
-                fetch('/api/getPlayers/')
+                fetch('/api/profile/settings/getSettings')
                     .then(response => response.json())
-                    .then(data => (this.playerList = data));
+                    .then(data => {
+                        this.ExtendedLobbySet = data.ExtendedLobby
+                        this.CustomAutoChoiceSet = data.AutoCustom
+                        this.TeamTCountSet = data.Amount.T
+                        this.TeamDCountSet = data.Amount.D
+                        this.TeamHCountSet = data.Amount.H
+                        this.Team1NameSet = data.TeamNames["1"]
+                        this.Team2NameSet = data.TeamNames["2"]
+                    });
             }
+        },
+        async created() {
+            this.updateSettings()
         }
     });
+
+    function sendPOST(url, params) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', url, false);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+        xhr.send(JSON.stringify(params));
+    }
 });

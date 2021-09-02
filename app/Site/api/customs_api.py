@@ -18,7 +18,7 @@ api = Blueprint('customs_api', __name__, template_folder='templates',
 def getCustoms(id):
     module_logger.info(f"{current_user.Username} trying to get customs")
     custom = DataBaseMethods.getCustomID(current_user.ID, id)
-    if custom:
+    if custom and current_user.getUserSettings()["AutoCustom"]:
         data = MainDB.Custom.get(MainDB.Custom.ID == custom).getJsonInfo()
         data = {'data': data}
         data['type'] = 'custom'

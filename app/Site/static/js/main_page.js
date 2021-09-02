@@ -161,8 +161,8 @@ document.addEventListener("DOMContentLoaded", async() => {
 
             createCustom() {
                 sendPOST("/api/customs/createCustom", { "id": this.target.player.id });
-                app.updateLobby();
                 this.close();
+                app.updateLobby();
             }
         },
         computed: {
@@ -188,8 +188,8 @@ document.addEventListener("DOMContentLoaded", async() => {
         props: ["custom"],
         methods: {
             addToLobby() {
-                app.$refs.CustomMenu.customMenuVisible = false;
-                sendPOST('/api/lobby/addToLobby', { 'id': this.custom.id })
+                app.$refs.CustomMenu.close();
+                sendPOST('/api/lobby/addToLobby', { 'id': this.custom.CustomID })
                 app.updateLobby();
             }
         },
