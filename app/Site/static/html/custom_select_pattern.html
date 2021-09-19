@@ -7,6 +7,6 @@
                 </template>
             </div>
         </div>
-        <button class="create_container" @click="createCustom">+ Create custom</button>
+        <button :class="{create_container: true, opacity_disable: !isPerm('create_custom')}" @click="createCustom">+ Create custom</button>
     </div>
 </div>

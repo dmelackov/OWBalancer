@@ -19,7 +19,7 @@
                     <sr-input v-if="player.editable" :role="role" :CustomID="player.CustomID"/>
                     <p v-if="!player.editable">{{ role.sr }}</p>
                 </div>
-                <p class="switch_button" v-if="index != 2" @click="swapRoles(index)">⇆</p>
+                <p :class="{switch_button: true, opacity_disable: !isPerm('change_player_roles')}"v-if="index != 2" @click="swapRoles(index)">⇆</p>
             </template>
             <img src="/static/img/flex.svg" alt="" width="30" :class="{role_icon: true, flex: true, innactive: !player.isFlex}" @click="toggleFlex">
         </div>

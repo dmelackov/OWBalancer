@@ -3,7 +3,7 @@
         <p class="column_title">
             Players
         </p>
-        <div class="user_create_container">
+        <div :class="{opacity_disable: !isPerm('create_player'), user_create_container: true}">
             <input type="text" id="UserNickname" placeholder="Username" class="custom_input" v-model="createPlayerNickname" @keydown="createPlayerEnter">
             <button class="btn btn-submit custom_input" id="UserCreateButton" @click="createPlayer">Create</button>
         </div>
@@ -27,7 +27,7 @@
     </p>
     <div class="players_count">
         <p id="lobby_count">Players in lobby: {{lobbyPlayerCount}}</p>
-        <p class="clear" id="clear_button" @click="clearLobby">Clear</p>
+        <p :class="{opacity_disable: !isPerm('add_customs_tolobby'), clear: true}" id="clear_button" @click="clearLobby">Clear</p>
     </div>
 
     <hr>
@@ -41,7 +41,7 @@
 </div>
 <div class="balance_container">
     <img :src="imageSrc" alt="" id="balance_image">
-    <div class="balance_controlls">
+    <div :class="{balance_controlls: true, opacity_disable: !isPerm('do_balance')}">
         <div class="balance_controlls_left">
             <button class="btn balance_button" id="balance_button" @click="getBalances">Balance teams</button>
         </div>

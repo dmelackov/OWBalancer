@@ -1,5 +1,5 @@
-let app = null;
-document.addEventListener("DOMContentLoaded", async() => {
+let app = {};
+document.addEventListener("DOMContentLoaded", async () => {
     let res = await fetch("/static/html/main_page_content.html");
     document.getElementById("app_content").innerHTML = await res.text();
 
@@ -20,7 +20,10 @@ document.addEventListener("DOMContentLoaded", async() => {
             ratingSet(value) {
                 sendPOST("/api/customs/changeRoleSr", { "role": this.role.role, "rating": value, "customId": this.CustomID })
                 app.updateLobby()
-            }
+            },
+            isPerm(perm) {
+                return app.isPerm(perm)
+             }
         },
         computed: {
             sr: {
@@ -51,9 +54,13 @@ document.addEventListener("DOMContentLoaded", async() => {
 
         methods: {
             openCustomsMenu() {
+                if (!this.isPerm("add_customs_tolobby")) return;
                 this.active = true;
                 app.$refs.CustomMenu.open(this);
-            }
+            },
+            isPerm(perm) {
+                return app.isPerm(perm)
+             }
         }
     });
 
@@ -112,13 +119,16 @@ document.addEventListener("DOMContentLoaded", async() => {
             toggleFlex() {
                 sendPOST("/api/players/setFlex", { "id": this.player.CustomID, "status": !this.player.isFlex })
                 app.updateLobby();
-            }
+            },
+            isPerm(perm) {
+                return app.isPerm(perm)
+             }
         },
         created() {
             this.menuOpened = this.opened;
         },
         computed: {
-            styleObj: function() {
+            styleObj: function () {
                 return {
                     display: this.menuOpened ? "block" : "none"
                 }
@@ -163,10 +173,13 @@ document.addEventListener("DOMContentLoaded", async() => {
                 sendPOST("/api/customs/createCustom", { "id": this.target.player.id });
                 this.close();
                 app.updateLobby();
-            }
+            },
+            isPerm(perm) {
+                return app.isPerm(perm)
+             }
         },
         computed: {
-            styleObj: function() {
+            styleObj: function () {
                 if (!this.customMenuVisible) return { "display": "none" }
                 let lineRect = this.target.$el.getBoundingClientRect();
                 let customerRect = this.$el.getBoundingClientRect();
@@ -191,11 +204,15 @@ document.addEventListener("DOMContentLoaded", async() => {
                 app.$refs.CustomMenu.close();
                 sendPOST('/api/lobby/addToLobby', { 'id': this.custom.CustomID })
                 app.updateLobby();
+            },
+            isPerm(perm) {
+                return app.isPerm(perm)
             }
         },
         template: await (await fetch('static/html/custom_pattern.html')).text()
     });
 
+    app.isPerm = (perm) => {}
     app = new Vue({
         el: "#app_content",
 
@@ -321,7 +338,7 @@ document.addEventListener("DOMContentLoaded", async() => {
             filteredPlayerList() {
                 let player = this.playersNicknameFilter.toLowerCase();
                 let players = this.playerList;
-                let filteredPlayers = players.filter(function(elem) {
+                let filteredPlayers = players.filter(function (elem) {
                     if (player === '') return true;
                     else return elem.Username.toLowerCase().indexOf(player) > -1;
                 })

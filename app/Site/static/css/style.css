@@ -50,7 +50,9 @@ button {
     opacity: 0.3;
     top: 2em;
 }
-
+.opacity_disable {
+    opacity: 0;
+}
 .custom_input {
     box-sizing: border-box;
     width: 100%;
