@@ -171,8 +171,8 @@ document.addEventListener("DOMContentLoaded", async() => {
                 let lineRect = this.target.$el.getBoundingClientRect();
                 let customerRect = this.$el.getBoundingClientRect();
                 let totalHeight = lineRect.y;
-                if (lineRect.y + customerRect.height > document.documentElement.clientHeight - 20) {
-                    totalHeight -= lineRect.y + customerRect.height - document.documentElement.clientHeight + 20;
+                if (lineRect.y + 200 > document.documentElement.clientHeight - 20) {
+                    totalHeight -= lineRect.y + 200 - document.documentElement.clientHeight + 20;
                 }
                 return {
                     top: totalHeight + 'px',
@@ -310,6 +310,10 @@ document.addEventListener("DOMContentLoaded", async() => {
                 let urlCreator = window.URL || window.webkitURL;
                 let imageUrl = urlCreator.createObjectURL(image);
                 this.imageSrc = imageUrl
+            },
+
+            isPerm(perm) {
+                return this.perms.includes(perm)
             }
         },
 
