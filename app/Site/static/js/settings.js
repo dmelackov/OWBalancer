@@ -1,5 +1,5 @@
 let app = null;
-document.addEventListener("DOMContentLoaded", async() => {
+document.addEventListener("DOMContentLoaded", async () => {
     let res = await fetch("/static/html/settings_page_content.html");
     document.getElementById("app_content").innerHTML = await res.text();
 
@@ -13,9 +13,11 @@ document.addEventListener("DOMContentLoaded", async() => {
                 TeamDCountSet: 0,
                 TeamHCountSet: 0,
                 Team1NameSet: "",
-                Team2NameSet: ""
+                Team2NameSet: "",
+                themeID: 0
             }
         },
+
         computed: {
             ExtendedLobby: {
                 set(v) {
@@ -83,6 +85,20 @@ document.addEventListener("DOMContentLoaded", async() => {
                     return this.Team2NameSet;
                 }
             },
+            theme: {
+                set(v) {
+                    localStorage.setItem("theme", v)
+                    this.themeID = v
+                },
+                get() {
+                    return this.themeID
+                }
+            },
+            themeImgSrc: {
+                get() {
+                    return '/static/img/theme' + this.themeID + '.jpg'
+                }
+            }
         },
         methods: {
             updateSettings() {
@@ -97,10 +113,15 @@ document.addEventListener("DOMContentLoaded", async() => {
                         this.Team1NameSet = data.TeamNames["1"]
                         this.Team2NameSet = data.TeamNames["2"]
                     });
+            },
+            getTheme() {
+                return localStorage.getItem("theme") != null ? parseInt(localStorage.getItem("theme")) : 0
             }
+
         },
         async created() {
             this.updateSettings()
+            this.themeID = this.getTheme()
         }
     });
 

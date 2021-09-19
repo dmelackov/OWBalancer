@@ -43,4 +43,13 @@
             <input type="text" class="custom_input settings_team_input" v-model="Team2Name">
         </div>
     </div>
+    <hr>
+    <p class="column_title">
+        Balance Design
+    </p>
+    <select name="theme" v-model="theme">
+        <option value="0">Design 1</option>
+        <option value="1">Design 2</option>
+    </select>
+    <img :src="themeImgSrc" alt="">
 </div>

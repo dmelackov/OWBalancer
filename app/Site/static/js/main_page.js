@@ -211,7 +211,6 @@ document.addEventListener("DOMContentLoaded", async() => {
                 balanceLenght: 0,
                 currentImageIndex: 0,
                 perms: []
-
             }
         },
 
@@ -305,7 +304,7 @@ document.addEventListener("DOMContentLoaded", async() => {
                     headers: {
                         'Content-Type': 'application/json;charset=utf-8'
                     },
-                    body: JSON.stringify(current_balance)
+                    body: JSON.stringify({ "playersData": current_balance, "theme": localStorage.getItem("theme") != null ? parseInt(localStorage.getItem("theme")) : 0 })
                 })).blob()
                 imageBlob = image
                 let urlCreator = window.URL || window.webkitURL;

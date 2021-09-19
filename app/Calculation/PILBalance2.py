@@ -189,10 +189,10 @@ def createImage(d, U):
 
     return image
 
+if __name__ == '__main__':
+    d = {'pareTeamAVG': 900, 'first': {'AVG': 3050, 'RolePoints': 17, '0': [6, 8], '1': [9, 22], '2': [10, 11]},
+        'second': {'AVG': 3033, 'RolePoints': 16, '0': [1, 7], '1': [3, 21], '2': [4, 5]}, 'rangeTeam': 862.9481656538007}
 
-d = {'pareTeamAVG': 900, 'first': {'AVG': 3050, 'RolePoints': 17, '0': [6, 8], '1': [9, 22], '2': [10, 11]},
-     'second': {'AVG': 3033, 'RolePoints': 16, '0': [1, 7], '1': [3, 21], '2': [4, 5]}, 'rangeTeam': 862.9481656538007}
 
-
-img = createImage(d, Profile.select().where(Profile.Username == "Ivarys")[0])
-img.save('IMAGE.jpg')
+    img = createImage(d, Profile.select().where(Profile.Username == "Ivarys")[0])
+    img.save('IMAGE2.jpg')
