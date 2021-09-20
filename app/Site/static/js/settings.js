@@ -39,8 +39,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             },
             TeamTCount: {
                 set(v) {
-                    if (v < 0) return
-                    sendPOST("/api/profile/settings/setTanksCount", { "setting": v })
+                    if (parseInt(v) < 0) return
+                    sendPOST("/api/profile/settings/setTanksCount", { "setting": parseInt(v) })
                     this.updateSettings()
                 },
                 get() {
@@ -49,8 +49,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             },
             TeamDCount: {
                 set(v) {
-                    if (v < 0) return
-                    sendPOST("/api/profile/settings/setDamageCount", { "setting": v })
+                    if (parseInt(v) < 0) return
+                    sendPOST("/api/profile/settings/setDamageCount", { "setting": parseInt(v) })
                     this.updateSettings()
                 },
                 get() {
@@ -59,8 +59,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             },
             TeamHCount: {
                 set(v) {
-                    if (v < 0) return
-                    sendPOST("/api/profile/settings/setHealsCount", { "setting": v })
+                    if (parseInt(v) < 0) return
+                    sendPOST("/api/profile/settings/setHealsCount", { "setting": parseInt(v) })
                     this.updateSettings()
                 },
                 get() {
