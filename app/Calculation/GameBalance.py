@@ -3,6 +3,45 @@ from app.DataBase.LobbyСollector import GetLobby, GetUserSettings
 import random
 import datetime
 from functools import cmp_to_key
+import torch
+
+
+def minmaxscaler(data):
+    mass = []
+    for ind, el in enumerate(data):
+        mass.append(el / 5000)
+    return mass
+
+
+class Network(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.Sigm = torch.nn.Sigmoid()
+        self.fc1 = torch.nn.Linear(6, 12)
+        self.Act1 = torch.nn.LeakyReLU()
+        self.fc2 = torch.nn.Linear(12, 6)
+        self.Act2 = torch.nn.LeakyReLU()
+        self.Last = torch.nn.Linear(12, 1)
+
+    def forward(self, x):
+        t1 = self.fc1(torch.tensor(minmaxscaler(x[1])))
+        t2 = self.fc1(torch.tensor(minmaxscaler(x[0])))
+        t1 = self.Act1(t1)
+        t2 = self.Act1(t2)
+        t1 = self.fc2(t1)
+        t2 = self.fc2(t2)
+        x = self.Act2(torch.cat((t1, t2), 0))
+        x = self.Last(x)
+        x = self.Sigm(x)
+        return x
+
+
+def doPredict(main_net, data):
+    prepared_mass = [data["NeuroPredict"][0][0] + data["NeuroPredict"][0][1] + data["NeuroPredict"][0][2]]
+    prepared_mass += [data["NeuroPredict"][1][0] + data["NeuroPredict"][1][1] + data["NeuroPredict"][1][2]]
+    tensor_data = torch.FloatTensor(prepared_mass)
+    predict = main_net.forward(tensor_data)
+    return int((float(predict) - 0.5) * 200)
 
 
 def preGenerate(RolesAmount, PlayersInTeam):
@@ -42,8 +81,8 @@ def formPlayersData(Lobby):
     return Ps
 
 
-def formGoodBal(first, second, fMask, sMask, fAVG, sAVG, fTeamRolePrior, sTeamRolePrior):
-    data = {"pareTeamAVG": 0,
+def formGoodBal(first, second, fMask, sMask, fAVG, sAVG, fTeamRolePrior, sTeamRolePrior, main_net):
+    data = {"pareTeamAVG": 0, "NeuroPredict": 0,
             "first": {"AVG": fAVG, "RolePoints": fTeamRolePrior, 0: [], 1: [], 2: []},
             "second": {"AVG": sAVG, "RolePoints": sTeamRolePrior, 0: [], 1: [], 2: []}}
     T_Range = 0
@@ -51,30 +90,38 @@ def formGoodBal(first, second, fMask, sMask, fAVG, sAVG, fTeamRolePrior, sTeamRo
     H_Range = 0
     FTSquare = 0
     STSquare = 0
+    dsr = {0: {0: [], 1: [], 2: []}, 1: {0: [], 1: [], 2: []}}
     for i in range(len(fMask)):
         data["first"][fMask[i]].append(first[i].ID)
         if fMask[i] == 0:
             T_Range += first[i].TSR
+            dsr[0][0].append(first[i].TSR)
             FTSquare += (first[i].TSR - data["first"]["AVG"]) ** 2
         elif fMask[i] == 1:
             D_Range += first[i].DSR
+            dsr[0][1].append(first[i].DSR)
             FTSquare += (first[i].DSR - data["first"]["AVG"]) ** 2
         elif fMask[i] == 2:
             H_Range += first[i].HSR
+            dsr[0][2].append(first[i].HSR)
             FTSquare += (first[i].HSR - data["first"]["AVG"]) ** 2
     for i in range(len(sMask)):
         data["second"][sMask[i]].append(second[i].ID)
         if sMask[i] == 0:
             T_Range -= second[i].TSR
+            dsr[1][0].append(second[i].TSR)
             STSquare += (first[i].TSR - data["second"]["AVG"]) ** 2
         elif sMask[i] == 1:
             D_Range -= second[i].DSR
+            dsr[1][1].append(second[i].DSR)
             STSquare += (first[i].DSR - data["second"]["AVG"]) ** 2
         elif sMask[i] == 2:
             H_Range -= second[i].HSR
+            dsr[1][2].append(second[i].HSR)
             STSquare += (first[i].HSR - data["second"]["AVG"]) ** 2
     data["pareTeamAVG"] = abs(T_Range) + abs(D_Range) + abs(H_Range)
     data["rangeTeam"] = abs((FTSquare // len(fMask)) ** 0.5 - (STSquare // len(sMask)) ** 0.5)
+    data["NeuroPredict"] = dsr
     return data
 
 
@@ -133,7 +180,7 @@ def tryRoleMask(team, roleMask, PlayersInTeam):
     return goodMask
 
 
-def tryTeamMask(TM, roleMask, Ps, PlayersInTeam, pareTeam):
+def tryTeamMask(TM, roleMask, Ps, PlayersInTeam, pareTeam, main_net):
     first_team = []
     second_team = []
     for i in range(len(TM)):
@@ -149,7 +196,7 @@ def tryTeamMask(TM, roleMask, Ps, PlayersInTeam, pareTeam):
     for f in ft_gm:
         for s in st_gm:
             if abs(s[0] - f[0]) <= 50:
-                gd_bl = formGoodBal(first_team, second_team, f[1], s[1], f[0], s[0], f[2], s[2])
+                gd_bl = formGoodBal(first_team, second_team, f[1], s[1], f[0], s[0], f[2], s[2], main_net)
                 if gd_bl["pareTeamAVG"] <= pareTeam:
                     good_balance.append(gd_bl)
     return good_balance
@@ -166,6 +213,7 @@ def randLobby(Lobby, PlayersInTeam):
 
 
 def createGame(Profile_ID, pareTeam=1000):
+    main_net = torch.load("app/Calculation/NeuroBalance/Data.txt")
     UserSettings = GetUserSettings(Profile_ID)
     PlayersInTeam = UserSettings["Amount"]["T"] + UserSettings["Amount"]["D"] + UserSettings["Amount"]["H"]
 
@@ -177,15 +225,19 @@ def createGame(Profile_ID, pareTeam=1000):
         Ps = formPlayersData(Lobby)
         s = []
         for TM in teamMask:
-            tTM = tryTeamMask(TM, roleMask, Ps, PlayersInTeam, pareTeam)
+            tTM = tryTeamMask(TM, roleMask, Ps, PlayersInTeam, pareTeam, main_net)
             if tTM:
                 s += tTM
-        #print(*sorted(s, key=cmp_to_key(sort_comparator))[0:100], sep="\n")
-        return ExtendedLobby, sorted(s, key=cmp_to_key(sort_comparator))
+        linear_sort = sorted(s, key=cmp_to_key(sort_comparator))[0:1000]
+        for ind, el in enumerate(linear_sort):
+            linear_sort[ind]['NeuroPredict'] = doPredict(main_net, el)
+        neuro_sorted = sorted(linear_sort, key=lambda item: abs(item['NeuroPredict']))
+        # print(*neuro_sorted[:600], sep="\n")
+        return ExtendedLobby, neuro_sorted
     return False
 
 
-#d1 = datetime.datetime.now()
-#print(len(createGame(1)[1]))
-#d2 = datetime.datetime.now()
-#print("Весь метод:", str(d2 - d1))
+# d1 = datetime.datetime.now()
+# print(len(createGame(1)[1]))
+# d2 = datetime.datetime.now()
+# print("Весь метод:", str(d2 - d1))

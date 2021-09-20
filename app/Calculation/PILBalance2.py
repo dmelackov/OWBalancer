@@ -109,7 +109,7 @@ def foo(draw, width, image, text_role, color, k, icon, Cs, Ranks, team):
 
 
 def createImage(d, U):
-    width = 1980
+    width = 1920
     height = 1080
     image = Image.new('RGB', (width, height), '#090C10')
     draw = ImageDraw.Draw(image)
@@ -139,6 +139,31 @@ def createImage(d, U):
     TDiff = f"Evaluation: {d['pareTeamAVG']}"
     w, h = avg_font.getsize(TDiff)
     draw.text((width // 2 - w // 2, 30), TDiff, font=avg_font, fill="#46494D")
+
+    # предсказание победителя
+    if d["NeuroPredict"] > 13.4:
+        percent_color = "#ff6347"
+    elif d["NeuroPredict"] < -13.4:
+        percent_color = "#1e90ff"
+    else:
+        percent_color = "#505459"
+    prediction = int(d["NeuroPredict"] * 5.2) + 960
+    draw.line((prediction, 120, prediction, 140), fill=percent_color, width=8)
+    percent = str(d["NeuroPredict"]) + "%"
+    w, h = percent_font.getsize(percent)
+    draw.text((prediction - w // 2, 115 - h), percent, font=percent_font, fill=percent_color)
+
+    draw.line((width // 2 + 70, 140, 1450, 140), fill="#ff6347", width=10)
+    draw.line((1450, 120, 1450, 145), fill="#ff6347", width=10)
+    draw.text((1460, 115), "100%", font=percent_font, fill="#ff6347")
+
+    draw.line((width // 2 - 70, 141, 470, 141), fill="#1e90ff", width=10)
+    draw.line((470, 120, 470, 145), fill="#1e90ff", width=10)
+    w, h = percent_font.getsize("-100%")
+    draw.text((460 - w, 115), "-100%", font=percent_font, fill="#1e90ff")
+
+    draw.line((width // 2 - 69, 140, width // 2 + 69, 140), fill="#505459", width=10)
+
 
     # баланс
     RedColor = "#ff6347"
@@ -189,10 +214,12 @@ def createImage(d, U):
 
     return image
 
-if __name__ == '__main__':
-    d = {'pareTeamAVG': 900, 'first': {'AVG': 3050, 'RolePoints': 17, '0': [6, 8], '1': [9, 22], '2': [10, 11]},
-        'second': {'AVG': 3033, 'RolePoints': 16, '0': [1, 7], '1': [3, 21], '2': [4, 5]}, 'rangeTeam': 862.9481656538007}
 
-
-    img = createImage(d, Profile.select().where(Profile.Username == "Ivarys")[0])
-    img.save('IMAGE2.jpg')
+# if __name__ == '__main__':
+#     d = {'pareTeamAVG': 900, 'NeuroPredict': 0,
+#          'first': {'AVG': 3100, 'RolePoints': 16, "0": [7, 8], "1": [10, 22], "2": [5, 21]},
+#          'second': {'AVG': 3083, 'RolePoints': 16, "0": [1, 9], "1": [3, 6], "2": [4, 11]},
+#          'rangeTeam': 1824.814471757034}
+#
+#     img = createImage(d, Profile.select().where(Profile.Username == "Ivarys")[0])
+#     img.save('IMAGE.jpg')

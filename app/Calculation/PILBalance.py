@@ -12,6 +12,7 @@ vs_font = ImageFont.truetype("app/Calculation/VS_font.otf", 84)
 avg_font = ImageFont.truetype("app/Calculation/font.ttf", 48)
 text_font = ImageFont.truetype("app/Calculation/font.ttf", 68)
 text_ranknum = ImageFont.truetype("app/Calculation/font.ttf", 32)
+percent_font = ImageFont.truetype("app/Calculation/font.ttf", 30)
 bheal_icon = Image.open("app/icons/PIL1/Roles/BlueHeal2.png").resize((100, 100))
 bdps_icon = Image.open("app/icons/PIL1/Roles/BlueDps2.png").resize((100, 100))
 btank_icon = Image.open("app/icons/PIL1/Roles/BlueTank2.png").resize((100, 100))
@@ -119,6 +120,30 @@ def createImage(gameData, U):
     w, h = avg_font.getsize(TDiff)
     draw.text((width // 2 - w // 2, 10), TDiff, font=avg_font, fill="#46494D")
 
+    # предсказание победителя
+    if gameData["NeuroPredict"] > 13.4:
+        percent_color = "#ff6347"
+    elif gameData["NeuroPredict"] < -13.4:
+        percent_color = "#1e90ff"
+    else:
+        percent_color = "#505459"
+    prediction = int(gameData["NeuroPredict"] * 5.2) + 960
+    draw.line((prediction, 120, prediction, 140), fill=percent_color, width=8)
+    percent = str(gameData["NeuroPredict"]) + "%"
+    w, h = percent_font.getsize(percent)
+    draw.text((prediction - w // 2, 115 - h), percent, font=percent_font, fill=percent_color)
+
+    draw.line((width // 2 + 70, 140, 1450, 140), fill="#ff6347", width=10)
+    draw.line((1450, 120, 1450, 145), fill="#ff6347", width=10)
+    draw.text((1460, 115), "100%", font=percent_font, fill="#ff6347")
+
+    draw.line((width // 2 - 70, 141, 470, 141), fill="#1e90ff", width=10)
+    draw.line((470, 120, 470, 145), fill="#1e90ff", width=10)
+    w, h = percent_font.getsize("-100%")
+    draw.text((460 - w, 115), "-100%", font=percent_font, fill="#1e90ff")
+
+    draw.line((width // 2 - 69, 140, width // 2 + 69, 140), fill="#505459", width=10)
+
     # right team handler
     ind = len(gameData["second"]["0"])
     ite = 0
@@ -211,9 +236,12 @@ def createImage(gameData, U):
 
     return image
 
-if __name__ == '__main__':
-    d = {'pareTeamAVG': 500, 'first': {'AVG': 3016, 'RolePoints': 17, "0": [6, 8], "1": [21, 22], "2": [10, 11]}, 'second': {'AVG': 3033, 'RolePoints': 16, "0": [1, 3], "1": [7, 9], "2": [4, 5]}, 'rangeTeam': 0.3211380438195306}
 
-
-    img = createImage(d, Profile.select().where(Profile.Username == "Ivarys")[0])
-    img.save('IMAGE.jpg')
+# if __name__ == '__main__':
+#     d = {'pareTeamAVG': 900, 'NeuroPredict': 0,
+#          'first': {'AVG': 3100, 'RolePoints': 16, "0": [7, 8], "1": [10, 22], "2": [5, 21]},
+#          'second': {'AVG': 3083, 'RolePoints': 16, "0": [1, 9], "1": [3, 6], "2": [4, 11]},
+#          'rangeTeam': 1824.814471757034}
+#
+#     img = createImage(d, Profile.select().where(Profile.Username == "Ivarys")[0])
+#     img.save('IMAGE.jpg')

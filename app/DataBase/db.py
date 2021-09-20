@@ -28,6 +28,7 @@ class Profile(Model, UserMixin):
 
     def set_password(self, password):
         self.Password = generate_password_hash(password)
+        self.save()
 
     def check_password(self, password):
         return check_password_hash(self.Password, password)

@@ -43,8 +43,6 @@ def balanceImage():
         return serve_pil_image(createImageThemeOne(playersData, current_user))
 
 
-
-
 @api.route('/getBalances', methods=['GET'])
 @login_required
 def getBalances():
@@ -63,8 +61,6 @@ def getBalances():
         newBalance["ok"] = False
         module_logger.info(f"{current_user.Username} dont recieve balances")
     return json.dumps(newBalance)
-
-
 
 
 @api.route('/getPermissions', methods=['GET'])
