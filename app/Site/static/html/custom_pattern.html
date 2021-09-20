@@ -1,0 +1,21 @@
+<div class="player_container" @click="addToLobby">
+    <div class="player_inner_container">
+        <p class="player_username ">{{custom.Username}}</p>
+        <div class="sr">
+
+            <div class="sr_icon">
+                <img src="/static/img/T_icon.png" alt="" width="12" :class="{innactive: !custom.Roles.Tank, role_icon: true}">
+                <img src="/static/img/D_icon.png" alt="" width="12" :class="{innactive: !custom.Roles.Damage, role_icon: true}">
+                <img src="/static/img/H_icon.png" alt="" width="12" :class="{innactive: !custom.Roles.Heal, role_icon: true}">
+            </div>
+
+            <div class="sr_numbers">
+                <p>{{ custom.SR.Tank }}</p>
+                <p>{{ custom.SR.Damage }}</p>
+                <p>{{ custom.SR.Heal }}</p>
+            </div>
+
+        </div>
+        <p class="author-left">by {{ custom.Author.username }}</p>
+    </div>
+</div>
