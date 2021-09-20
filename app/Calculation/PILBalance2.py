@@ -141,28 +141,30 @@ def createImage(d, U):
     draw.text((width // 2 - w // 2, 30), TDiff, font=avg_font, fill="#46494D")
 
     # предсказание победителя
-    if d["NeuroPredict"] > 13.4:
-        percent_color = "#ff6347"
-    elif d["NeuroPredict"] < -13.4:
-        percent_color = "#1e90ff"
-    else:
-        percent_color = "#505459"
-    prediction = int(d["NeuroPredict"] * 5.2) + 960
-    draw.line((prediction, 120, prediction, 140), fill=percent_color, width=8)
-    percent = str(d["NeuroPredict"]) + "%"
-    w, h = percent_font.getsize(percent)
-    draw.text((prediction - w // 2, 115 - h), percent, font=percent_font, fill=percent_color)
 
-    draw.line((width // 2 + 70, 140, 1450, 140), fill="#ff6347", width=10)
-    draw.line((1450, 120, 1450, 145), fill="#ff6347", width=10)
-    draw.text((1460, 115), "100%", font=percent_font, fill="#ff6347")
+    if len(d["second"]["0"]) == len(d["second"]["1"]) == len(d["second"]["2"]) == 2:
+        if d["NeuroPredict"] > 13.4:
+            percent_color = "#ff6347"
+        elif d["NeuroPredict"] < -13.4:
+            percent_color = "#1e90ff"
+        else:
+            percent_color = "#505459"
+        prediction = int(d["NeuroPredict"] * 5.2) + 960
+        draw.line((prediction, 120, prediction, 140), fill=percent_color, width=8)
+        percent = str(d["NeuroPredict"]) + "%"
+        w, h = percent_font.getsize(percent)
+        draw.text((prediction - w // 2, 115 - h), percent, font=percent_font, fill=percent_color)
 
-    draw.line((width // 2 - 70, 141, 470, 141), fill="#1e90ff", width=10)
-    draw.line((470, 120, 470, 145), fill="#1e90ff", width=10)
-    w, h = percent_font.getsize("-100%")
-    draw.text((460 - w, 115), "-100%", font=percent_font, fill="#1e90ff")
+        draw.line((width // 2 + 70, 140, 1450, 140), fill="#ff6347", width=10)
+        draw.line((1450, 120, 1450, 145), fill="#ff6347", width=10)
+        draw.text((1460, 115), "100%", font=percent_font, fill="#ff6347")
 
-    draw.line((width // 2 - 69, 140, width // 2 + 69, 140), fill="#505459", width=10)
+        draw.line((width // 2 - 70, 141, 470, 141), fill="#1e90ff", width=10)
+        draw.line((470, 120, 470, 145), fill="#1e90ff", width=10)
+        w, h = percent_font.getsize("-100%")
+        draw.text((460 - w, 115), "-100%", font=percent_font, fill="#1e90ff")
+
+        draw.line((width // 2 - 69, 140, width // 2 + 69, 140), fill="#505459", width=10)
 
 
     # баланс
