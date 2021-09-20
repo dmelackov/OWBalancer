@@ -11,7 +11,7 @@ def GetLobby(Profile_ID):
         return [int(i) for i in CMass]
 
 
-def GetRolesAmount(Profile_ID):
+def GetUserSettings(Profile_ID):
     User = Profile.select().where(Profile.ID == Profile_ID)
     if User.exists():
         CMass = json.loads(User[0].LobbySettings)
@@ -19,28 +19,30 @@ def GetRolesAmount(Profile_ID):
 
 
 def AddToLobby(Profile_ID, Custom_ID):
-    User = Profile.select().where(Profile.ID == Profile_ID)
+    U = Profile.select().where(Profile.ID == Profile_ID)
     C = Custom.select().where(Custom.ID == Custom_ID)
-    if User.exists() and C.exists():
-        User, C = User[0], C[0]
+    if U.exists() and C.exists():
+        U, C = U[0], C[0]
 
-        CMass = User.Customers.split(".")
+        CMass = U.Customers.split(".")
 
         if "" in CMass:
             CMass.remove("")
+        USettings = U.getUserSettings()
+        TeamPlayers = USettings["Amount"]["T"] + USettings["Amount"]["D"] + USettings["Amount"]["H"]
+        if len(CMass) < TeamPlayers * 2 or USettings["ExtendedLobby"]:
+            cacheToChange = -1
+            for C_ID in CMass:
+                if Custom.get(Custom.ID == C_ID).Player == C.Player:
+                    cacheToChange = C_ID
+            if cacheToChange != -1:
+                CMass.remove(cacheToChange)
 
-        cacheToChange = -1
-        for C_ID in CMass:
-            if Custom.get(Custom.ID == C_ID).Player == C.Player:
-                cacheToChange = C_ID
-        if cacheToChange != -1:
-            CMass.remove(cacheToChange)
-
-        if not str(C.ID) in CMass:
-            CMass.append(str(C.ID))
-        User.Customers = ".".join(CMass)
-        User.save()
-        return True
+            if not str(C.ID) in CMass:
+                CMass.append(str(C.ID))
+            U.Customers = ".".join(CMass)
+            U.save()
+            return True
     return False
 
 

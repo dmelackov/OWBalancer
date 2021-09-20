@@ -2,8 +2,20 @@ from peewee import *
 from app.params import DB_NAME, port, password, user, host
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
+import json
 
-db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password)
+# db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password)
+db = SqliteDatabase(DB_NAME + ".db")
+ProfileDataConst = '{"Amount": {"T": 2, "D": 2, "H": 2}, "TeamNames": {"1": "Team 1", "2": "Team 2"},' \
+                   ' "AutoCustom": true, "ExtendedLobby": false}'
+
+
+class Roles(Model):
+    ID = PrimaryKeyField()
+    Name = TextField()
+
+    class Meta:
+        database = db
 
 
 class Profile(Model, UserMixin):
@@ -11,10 +23,12 @@ class Profile(Model, UserMixin):
     Username = TextField()
     Password = TextField(null=True)
     Customers = TextField(default="")
-    LobbySettings = TextField(default='{"Amount": {"T": 2, "D": 2, "H": 2}}')
+    LobbySettings = TextField(default=ProfileDataConst)
+    Role = ForeignKeyField(Roles, to_field="ID", null=True)
 
     def set_password(self, password):
         self.Password = generate_password_hash(password)
+        self.save()
 
     def check_password(self, password):
         return check_password_hash(self.Password, password)
@@ -25,24 +39,65 @@ class Profile(Model, UserMixin):
             'username': self.Username
         }
 
+    def getUserSettings(self):
+        return json.loads(self.LobbySettings)
+
+    def setUserSettings(self, USettings):
+        self.LobbySettings = json.dumps(USettings)
+        self.save()
+
+    def settingsChangeTanks(self, TanksCount):
+        USettings = json.loads(self.LobbySettings)
+        USettings["Amount"]["T"] = TanksCount
+        self.LobbySettings = json.dumps(USettings)
+        self.save()
+
+    def settingsChangeDps(self, DpsCount):
+        USettings = json.loads(self.LobbySettings)
+        USettings["Amount"]["D"] = DpsCount
+        self.LobbySettings = json.dumps(USettings)
+        self.save()
+
+    def settingsChangeHeal(self, HealCount):
+        USettings = json.loads(self.LobbySettings)
+        USettings["Amount"]["H"] = HealCount
+        self.LobbySettings = json.dumps(USettings)
+        self.save()
+
+    def settingsTeamOne(self, TeamName):
+        USettings = json.loads(self.LobbySettings)
+        USettings["TeamNames"]["1"] = TeamName
+        self.LobbySettings = json.dumps(USettings)
+        self.save()
+
+    def settingsTeamTwo(self, TeamName):
+        USettings = json.loads(self.LobbySettings)
+        USettings["TeamNames"]["2"] = TeamName
+        self.LobbySettings = json.dumps(USettings)
+        self.save()
+
+    def settingsAutoCustom(self, AutoCustom):
+        USettings = json.loads(self.LobbySettings)
+        USettings["AutoCustom"] = AutoCustom
+        self.LobbySettings = json.dumps(USettings)
+        self.save()
+
+    def settingsExtendedLobby(self, ExtendedLobby):
+        USettings = json.loads(self.LobbySettings)
+        USettings["ExtendedLobby"] = ExtendedLobby
+        self.LobbySettings = json.dumps(USettings)
+        self.save()
+
     class Meta:
         database = db
 
 
 class Player(Model):
     ID = PrimaryKeyField()
-    BattleTag = TextField(null=True)
     Username = TextField(null=True)
     Roles = TextField(null=True, default="")
     isFlex = BooleanField(default=False)
-    PlayedGamesData = TextField(
-        default='{"Win": {"T": {}, "D": {}, "H": {}}, "Lose": {"T": {}, "D": {}, "H": {}}}')
-    TWin = IntegerField(default=0)
-    DWin = IntegerField(default=0)
-    HWin = IntegerField(default=0)
-    TLose = IntegerField(default=0)
-    DLose = IntegerField(default=0)
-    HLose = IntegerField(default=0)
+    Creator = ForeignKeyField(Profile, to_field="ID")
 
     def getJsonInfo(self):
         priority = list(map(lambda x: {"role": x, "active": True}, list(self.Roles)))
@@ -58,7 +113,7 @@ class Player(Model):
 
         return {"id": self.ID,
                 "Username": self.Username,
-                "BattleTag": self.BattleTag,
+                "Creator": self.Creator.getJsonInfo(),
                 "Roles": {"Tank": ("T" in self.Roles or self.isFlex),
                           "Damage": ("D" in self.Roles or self.isFlex),
                           "Heal": ("H" in self.Roles or self.isFlex)},
@@ -98,22 +153,18 @@ class Custom(Model):
         database = db
 
 
-class Games(Model):
+class Perms(Model):
     ID = PrimaryKeyField()
-    Creator = ForeignKeyField(Profile, to_field="ID")
-    T1Tank1 = ForeignKeyField(Player, to_field="ID")
-    T1Tank2 = ForeignKeyField(Player, to_field="ID")
-    T1Dps1 = ForeignKeyField(Player, to_field="ID")
-    T1Dps2 = ForeignKeyField(Player, to_field="ID")
-    T1Heal1 = ForeignKeyField(Player, to_field="ID")
-    T1Heal2 = ForeignKeyField(Player, to_field="ID")
-    T2Tank1 = ForeignKeyField(Player, to_field="ID")
-    T2Tank2 = ForeignKeyField(Player, to_field="ID")
-    T2Dps1 = ForeignKeyField(Player, to_field="ID")
-    T2Dps2 = ForeignKeyField(Player, to_field="ID")
-    T2Heal1 = ForeignKeyField(Player, to_field="ID")
-    T2Heal2 = ForeignKeyField(Player, to_field="ID")
-    Win = IntegerField()
+    Name = TextField()
+
+    class Meta:
+        database = db
+
+
+class RolePerms(Model):
+    ID = PrimaryKeyField()
+    Role = ForeignKeyField(Roles, to_field="ID")
+    Perm = ForeignKeyField(Perms, to_field="ID")
 
     class Meta:
         database = db

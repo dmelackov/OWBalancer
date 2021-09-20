@@ -1,63 +1,6 @@
-{% extends 'base.html' %} {% block content %}
-<div class="header">
-    <nav class="menu">
-        <a href="/">Main page</a>
-        <div class="menu-right">
-            <a href="/logout" data-tooltip="Quit">{{current_user.Username}}</a>
-        </div>
-    </nav>
+{% extends 'base_with_header.html' %} {% block page_content %}
+<div id="app_content" class="content">
+
 </div>
-<div class="content">
-    <div class="column_widget players">
-        <div class="column_controlls">
-            <p class="column_title">
-                Players
-            </p>
-            <div class="user_create_container">
-                <input type="text" id="UserNickname" placeholder="Username" class="custom_input">
-                <button class="btn btn-submit custom_input" id="UserCreateButton">Create</button>
-            </div>
-            <hr>
-            <input type="text" id="PlayersSearch" placeholder="Search" class="custom_input">
-        </div>
-
-        <hr>
-        <div class="player_list">
-            <div id="players_list">
-            </div>
-        </div>
-
-    </div>
-    <div class="column_widget lobby">
-        <p class="column_title">
-            Lobby
-        </p>
-        <div class="players_count">
-            <p id="lobby_count">Players in lobby: </p>
-            <p class="clear" id="clear_button">Clear</p>
-        </div>
-
-        <hr>
-        <div class="lobby_list">
-            <div id="lobby_list"></div>
-        </div>
-    </div>
-    <div class="balance_container">
-        <img src="/static/img/balance_alt.png" alt="" id="balance_image">
-        <div class="balance_controlls">
-            <div class="balance_controlls_left">
-                <p class="btn balance_button" id="balance_button">Balance teams</p>
-            </div>
-            <div class="balance_controlls_right">
-                <!--<p id="copy_button" class="balance_button copy_button">Copy</p>-->
-                <p class="btn balance_button" id="balance_button_left">❮</p>
-                <p id="balance_count">0/0</p>
-                <p class="btn balance_button" id="balance_button_right">❱</p>
-            </div>
-        </div>
-    </div>
-    <div id="customSelect" class="customSelect">
-    </div>
-</div>
-<script src="static/js/players.js"></script>
-{% endblock content %}
+<script src="static/js/main_page.js"></script>
+{% endblock page_content %}

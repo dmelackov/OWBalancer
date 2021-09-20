@@ -1,26 +1,6 @@
-{% extends 'base.html' %} {% block content %}
-<header>
-    <nav class="menu">
-        <a href="/">Главная страница</a>
-        <a href="/settings">Настройки</a>
-        <div class="menu-right">
-            <a href="/logout">{{current_user.Username}}</a>
-        </div>
-    </nav>
-</header>
-<div class="content">
-    <div class="players">
-        <p class="title">
-            Игроки
-        </p>
-        <input type="text" id="PlayersSearch" placeholder="Поиск" class="custom_input">
-        <hr>
-        <div class="player_list">
-            <table id="players_list">
-                <col class="player_container" />
-            </table>
-        </div>
-    </div>
+{% extends 'base_with_header.html' %} {% block page_content %}
+<div id="app_content" class="content">
+
 </div>
 <script src="static/js/settings.js"></script>
-{% endblock content %}
+{% endblock page_content %}

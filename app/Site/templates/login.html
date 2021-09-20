@@ -1,33 +1,37 @@
 {% extends 'base.html' %} {% block content %}
-<div class="login_form">
-    <div class="title">
-        <p>Authorisation</p>
+<div class="login_content">
+    <div class="login_form">
+        <div class="title">
+            <p>Authorisation</p>
+        </div>
+        <div class="form">
+            <form action="" method="post">
+                {{ form.hidden_tag() }}
+                <p>
+                    {{ form.login(class="field form-control custom_input" if not message else "field form-control error", type="login", placeholder=form.login.label.text) }}<br> {% for error in form.login.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+                </p>
+                <p>
+                    {{ form.password(class="field form-control custom_input" if not message else "field form-control error", type="password", placeholder=form.password.label.text) }}<br> {% for error in form.password.errors %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+                </p>
+                <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
+                <p>{{ form.submit(type="submit", class="btn btn-submit custom_input") }}</p>
+            </form>
+        </div>
     </div>
-    <div class="form">
-        <form action="" method="post">
-            {{ form.hidden_tag() }}
-            <p>
-                {{ form.login(class="field form-control custom_input" if not message else "field form-control error", type="login", placeholder=form.login.label.text) }}<br> {% for error in form.login.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
-                </div>
-                {% endfor %}
-            </p>
-            <p>
-                {{ form.password(class="field form-control custom_input" if not message else "field form-control error", type="password", placeholder=form.password.label.text) }}<br> {% for error in form.password.errors %}
-                <div class="alert alert-danger" role="alert">
-                    {{ error }}
-                </div>
-                {% endfor %}
-            </p>
-            <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-            <p>{{ form.submit(type="submit", class="btn btn-submit custom_input") }}</p>
-        </form>
+    <a href="/register" class="reg_button">Registration</a>
+    <div class="contacts">
+        <p>Developers</p>
+        <a href="https://discord.com/users/337577546168401920">Demon_Dimon#0347</a>
+        <a href="https://discord.com/users/254608220880896010">Ivarys#2177</a>
     </div>
 </div>
-<div class="contacts">
-    <p>Developers</p>
-    <a href="https://discord.com/users/337577546168401920">Demon_Dimon#0347</a>
-    <a href="https://discord.com/users/254608220880896010">Ivarys#2177</a>
-</div>
+
 {% endblock content %}
