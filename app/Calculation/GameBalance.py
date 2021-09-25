@@ -232,10 +232,10 @@ def createGame(Profile_ID, pareTeam=1000):
         if UserSettings["Amount"]["T"] == UserSettings["Amount"]["D"] == UserSettings["Amount"]["H"] == 2:
             for ind, el in enumerate(linear_sort):
                 linear_sort[ind]['NeuroPredict'] = doPredict(main_net, el)
-            neuro_sorted = sorted(linear_sort, key=lambda item: abs(item['NeuroPredict']))
+            # neuro_sorted = sorted(linear_sort, key=lambda item: abs(item['NeuroPredict']))
 
             # print(*neuro_sorted[:600], sep="\n")
-            return ExtendedLobby, neuro_sorted
+            return ExtendedLobby, linear_sort
         else:
             return ExtendedLobby, linear_sort
     return False
