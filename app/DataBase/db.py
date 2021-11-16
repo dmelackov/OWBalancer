@@ -4,25 +4,29 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
 import json
 
-db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password)
-# db = SqliteDatabase(DB_NAME + ".db")
+# db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password)
+db = SqliteDatabase(DB_NAME + ".db")
 ProfileDataConst = '{"Amount": {"T": 2, "D": 2, "H": 2}, "TeamNames": {"1": "Team 1", "2": "Team 2"},' \
-                   ' "AutoCustom": true, "ExtendedLobby": false}'
+                   ' "AutoCustom": true, "ExtendedLobby": false, "Autoincrement": false, "BalanceLimit": 1000,' \
+                   ' "Network": true}'
+LobbyDataConst = '{"Lobby": []}'
 
 
-class Roles(Model):
-    ID = PrimaryKeyField()
-    Name = TextField()
-
+class DefaultModel(Model):
     class Meta:
         database = db
 
 
-class Profile(Model, UserMixin):
+class Roles(DefaultModel):
+    ID = PrimaryKeyField()
+    Name = TextField()
+
+
+class Profile(DefaultModel, UserMixin):
     ID = PrimaryKeyField()
     Username = TextField()
     Password = TextField(null=True)
-    Customers = TextField(default="")
+    Customers = TextField(default=LobbyDataConst)
     LobbySettings = TextField(default=ProfileDataConst)
     Role = ForeignKeyField(Roles, to_field="ID", null=True)
 
@@ -41,6 +45,9 @@ class Profile(Model, UserMixin):
 
     def getUserSettings(self):
         return json.loads(self.LobbySettings)
+
+    def getLobbyInfo(self):
+        return json.loads(self.Customers)
 
     def setUserSettings(self, USettings):
         self.LobbySettings = json.dumps(USettings)
@@ -88,16 +95,19 @@ class Profile(Model, UserMixin):
         self.LobbySettings = json.dumps(USettings)
         self.save()
 
-    class Meta:
-        database = db
 
-
-class Player(Model):
+class Player(DefaultModel):
     ID = PrimaryKeyField()
     Username = TextField(null=True)
-    Roles = TextField(null=True, default="")
-    isFlex = BooleanField(default=False)
     Creator = ForeignKeyField(Profile, to_field="ID")
+
+
+class PLayerRoles(DefaultModel):
+    ID = PrimaryKeyField()
+    Creator = ForeignKeyField(Profile, to_field="ID")
+    Player = ForeignKeyField(Player, to_field="ID")
+    Roles = TextField(default="")
+    isFlex = BooleanField(default="False")
 
     def getJsonInfo(self):
         priority = list(map(lambda x: {"role": x, "active": True}, list(self.Roles)))
@@ -111,21 +121,19 @@ class Player(Model):
             for i in priority:
                 i["active"] = True
 
-        return {"id": self.ID,
-                "Username": self.Username,
-                "Creator": self.Creator.getJsonInfo(),
-                "Roles": {"Tank": ("T" in self.Roles or self.isFlex),
-                          "Damage": ("D" in self.Roles or self.isFlex),
-                          "Heal": ("H" in self.Roles or self.isFlex)},
-                "RolesPriority": priority,
-                "isFlex": self.isFlex
-                }
-
-    class Meta:
-        database = db
+        return {
+            "id": self.ID,
+            "Username": self.Username,
+            "Creator": self.Creator.getJsonInfo(),
+            "Roles": {"Tank": ("T" in self.Roles or self.isFlex),
+                      "Damage": ("D" in self.Roles or self.isFlex),
+                      "Heal": ("H" in self.Roles or self.isFlex)},
+            "RolesPriority": priority,
+            "isFlex": self.isFlex
+            }
 
 
-class Custom(Model):
+class Custom(DefaultModel):
     ID = PrimaryKeyField()
     Creator = ForeignKeyField(Profile, to_field="ID")
     Player = ForeignKeyField(Player, to_field="ID")
@@ -149,22 +157,38 @@ class Custom(Model):
         data['Author'] = self.Creator.getJsonInfo()
         return data
 
-    class Meta:
-        database = db
 
-
-class Perms(Model):
+class Perms(DefaultModel):
     ID = PrimaryKeyField()
     Name = TextField()
 
-    class Meta:
-        database = db
 
-
-class RolePerms(Model):
+class RolePerms(DefaultModel):
     ID = PrimaryKeyField()
     Role = ForeignKeyField(Roles, to_field="ID")
     Perm = ForeignKeyField(Perms, to_field="ID")
 
-    class Meta:
-        database = db
+
+class Games(DefaultModel):
+    ID = PrimaryKeyField()
+    Creator = ForeignKeyField(Profile, to_field="ID")
+    Timestamp = DateTimeField()
+    Winner = IntegerField(null=True)
+    GameData = TextField()
+    Active = BooleanField()
+
+    def activate(self):
+        self.Active = True
+        self.save()
+        return True
+
+    def deactivate(self):
+        self.Active = False
+        self.save()
+        return True
+
+    def finishGame(self, winner):
+        self.Winner = winner
+        self.Active = False
+        self.save()
+        return True

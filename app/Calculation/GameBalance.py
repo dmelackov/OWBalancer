@@ -212,7 +212,7 @@ def randLobby(Lobby, PlayersInTeam):
     return PlayersLobby, ExtendedLobby
 
 
-def createGame(Profile_ID, pareTeam=1000):
+def createGame(Profile_ID):
     main_net = torch.load("app/Calculation/NeuroBalance/Data.txt")
     UserSettings = GetUserSettings(Profile_ID)
     PlayersInTeam = UserSettings["Amount"]["T"] + UserSettings["Amount"]["D"] + UserSettings["Amount"]["H"]
@@ -225,11 +225,12 @@ def createGame(Profile_ID, pareTeam=1000):
         Ps = formPlayersData(Lobby)
         s = []
         for TM in teamMask:
-            tTM = tryTeamMask(TM, roleMask, Ps, PlayersInTeam, pareTeam, main_net)
+            tTM = tryTeamMask(TM, roleMask, Ps, PlayersInTeam, UserSettings["BalanceLimit"], main_net)
             if tTM:
                 s += tTM
         linear_sort = sorted(s, key=cmp_to_key(sort_comparator))[0:1000]
-        if UserSettings["Amount"]["T"] == UserSettings["Amount"]["D"] == UserSettings["Amount"]["H"] == 2:
+        if UserSettings["Amount"]["T"] == UserSettings["Amount"]["D"] == UserSettings["Amount"]["H"] == 2\
+                and UserSettings["Network"]:
             for ind, el in enumerate(linear_sort):
                 linear_sort[ind]['NeuroPredict'] = doPredict(main_net, el)
             # neuro_sorted = sorted(linear_sort, key=lambda item: abs(item['NeuroPredict']))
@@ -237,11 +238,13 @@ def createGame(Profile_ID, pareTeam=1000):
             # print(*neuro_sorted[:600], sep="\n")
             return ExtendedLobby, linear_sort
         else:
+            for ind, el in enumerate(linear_sort):
+                linear_sort[ind]['NeuroPredict'] = 0
             return ExtendedLobby, linear_sort
     return False
 
 
 # d1 = datetime.datetime.now()
-# print(len(createGame(1)[1]))
+# print(*createGame(1)[1], sep="\n")
 # d2 = datetime.datetime.now()
 # print("Весь метод:", str(d2 - d1))

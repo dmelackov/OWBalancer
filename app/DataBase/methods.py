@@ -2,7 +2,7 @@ from app.DataBase.db import *
 
 
 def createDB():
-    db.create_tables([Profile, Custom, Player, Perms, Roles, RolePerms])
+    db.create_tables([Profile, Custom, Player, Perms, Roles, RolePerms, Games])
 
 
 # create things
@@ -42,6 +42,11 @@ def createCustom(Profile_ID, Player_ID):
             C = Custom.create(Creator=User[0], Player=P[0])
             return C
     return False
+
+
+def createGame(Creator, GameData):
+    G = Games.create(Creator=Creator, GameData=GameData, Active=False)
+    return G
 # -----------------------------------------
 
 
@@ -158,6 +163,9 @@ def getRoles(Player_ID):
     else:
         return []
 
+
+# def getGames(Profile_ID):
+#     U = Profile.select().where(Pro)
 # -----------------------------------------
 # Full Creation
 
