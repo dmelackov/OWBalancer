@@ -1,7 +1,7 @@
 let app = {};
 document.addEventListener("DOMContentLoaded", async () => {
-    let res = await fetch("/static/html/main_page_content.html");
-    document.getElementById("app_content").innerHTML = await res.text();
+    let res = (await axios.get("/static/html/main_page_content.html")).data;
+    document.getElementById("app_content").innerHTML = res;
 
     document.body.addEventListener("mousedown", (e) => {
         if (!e.target.closest(".customSelect")) {
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             },
             isPerm(perm) {
                 return app.isPerm(perm)
-             }
+            }
         },
         computed: {
             sr: {
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 active: false
             }
         },
-        template: await (await fetch('static/html/player_pattern.html')).text(),
+        template: (await axios.get('static/html/player_pattern.html')).data,
 
         methods: {
             openCustomsMenu() {
@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             },
             isPerm(perm) {
                 return app.isPerm(perm)
-             }
+            }
         }
     });
 
@@ -88,11 +88,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 app.activeLobbyMenu = null;
                 app.activeLobbyId = null;
             },
-            deleteFromLobby() {
-                sendPOST("/api/lobby/deleteFromLobby", { 'id': this.player.CustomID })
+            async deleteFromLobby() {
+                await sendPOST("/api/lobby/deleteFromLobby", { 'id': this.player.CustomID })
                 app.updateLobby();
             },
-            toggleRole(ARGrole) {
+            async toggleRole(ARGrole) {
                 let newRoleStr = "";
                 for (roleIndex in this.player.RolesPriority) {
                     let role = this.player.RolesPriority[roleIndex]
@@ -100,10 +100,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                     if (role.role == ARGrole) tempActive = !tempActive;
                     if (tempActive) newRoleStr += role.role;
                 }
-                sendPOST("/api/players/setRoles", { "id": this.player.CustomID, "roles": newRoleStr })
+                await sendPOST("/api/players/setRoles", { "id": this.player.CustomID, "roles": newRoleStr })
                 app.updateLobby()
             },
-            swapRoles(index) {
+            async swapRoles(index) {
                 let newRoleStr = "";
                 for (roleIndex in this.player.RolesPriority) {
                     let role = this.player.RolesPriority[roleIndex]
@@ -113,16 +113,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 let tempChar = tempMass[index]
                 tempMass[index] = tempMass[index + 1]
                 tempMass[index + 1] = tempChar
-                sendPOST("/api/players/setRoles", { "id": this.player.CustomID, "roles": tempMass.join("") })
+                await sendPOST("/api/players/setRoles", { "id": this.player.CustomID, "roles": tempMass.join("") })
                 app.updateLobby()
             },
-            toggleFlex() {
-                sendPOST("/api/players/setFlex", { "id": this.player.CustomID, "status": !this.player.isFlex })
+            async toggleFlex() {
+                await sendPOST("/api/players/setFlex", { "id": this.player.CustomID, "status": !this.player.isFlex })
                 app.updateLobby();
             },
             isPerm(perm) {
                 return app.isPerm(perm)
-             }
+            }
         },
         created() {
             this.menuOpened = this.opened;
@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             }
         },
-        template: await (await fetch('static/html/lobby_pattern.html')).text()
+        template:  (await axios.get('static/html/lobby_pattern.html')).data
     });
 
     Vue.component('custom-select-container', {
@@ -148,11 +148,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         methods: {
             async open(target) {
                 this.target = target;
-                const res = await fetch('/api/customs/getCustoms/' + target.player.id);
-                const resData = await res.json();
+                const res = await axios.get('/api/customs/getCustoms/' + target.player.id);
+                const resData = res.data;
                 if (resData.type == 'custom') {
                     this.close();
-                    sendPOST('/api/lobby/addToLobby', { 'id': resData.data.CustomID });
+                    await sendPOST('/api/lobby/addToLobby', { 'id': resData.data.CustomID });
                     app.updateLobby();
                     return;
                 }
@@ -169,14 +169,14 @@ document.addEventListener("DOMContentLoaded", async () => {
                 this.customMenuVisible = false;
             },
 
-            createCustom() {
-                sendPOST("/api/customs/createCustom", { "id": this.target.player.id });
+            async createCustom() {
+                await sendPOST("/api/customs/createCustom", { "id": this.target.player.id });
                 this.close();
                 app.updateLobby();
             },
             isPerm(perm) {
                 return app.isPerm(perm)
-             }
+            }
         },
         computed: {
             styleObj: function () {
@@ -194,25 +194,25 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             }
         },
-        template: await (await fetch('static/html/custom_select_pattern.html')).text()
+        template:  (await axios.get('static/html/custom_select_pattern.html')).data
     });
 
     Vue.component("custom-pattern", {
         props: ["custom"],
         methods: {
-            addToLobby() {
+            async addToLobby() {
                 app.$refs.CustomMenu.close();
-                sendPOST('/api/lobby/addToLobby', { 'id': this.custom.CustomID })
+                await sendPOST('/api/lobby/addToLobby', { 'id': this.custom.CustomID })
                 app.updateLobby();
             },
             isPerm(perm) {
                 return app.isPerm(perm)
             }
         },
-        template: await (await fetch('static/html/custom_pattern.html')).text()
+        template:  (await axios.get('static/html/custom_pattern.html')).data
     });
 
-    app.isPerm = (perm) => {}
+    app.isPerm = (perm) => { }
     app = new Vue({
         el: "#app_content",
 
@@ -233,8 +233,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         methods: {
 
-            createPlayer() {
-                sendPOST("/api/players/createPlayer", { "Username": this.createPlayerNickname });
+            async createPlayer() {
+                await sendPOST("/api/players/createPlayer", { "Username": this.createPlayerNickname });
                 this.createPlayerNickname = "";
                 this.updatePlayers();
             },
@@ -244,25 +244,22 @@ document.addEventListener("DOMContentLoaded", async () => {
             },
 
             updatePlayers() {
-                fetch('/api/players/getPlayers/')
-                    .then(response => response.json())
-                    .then(data => (this.playerList = data));
+                axios.get('/api/players/getPlayers/')
+                    .then(response => (this.playerList = response.data));
             },
 
             updateLobby() {
-                fetch('/api/lobby/getLobby')
-                    .then(response => response.json())
-                    .then(data => (this.lobbyPlayerList = data));
+                axios.get('/api/lobby/getLobby')
+                    .then(response => (this.lobbyPlayerList = response.data));
             },
 
             getPermissions() {
-                fetch('/api/profile/getPermissions')
-                    .then(response => response.json())
-                    .then(data => (this.perms = data));
+                axios.get('/api/profile/getPermissions')
+                    .then(response => (this.perms = response.data));
             },
 
-            clearLobby() {
-                sendPOST("/api/lobby/clearLobby", {})
+            async clearLobby() {
+                await sendPOST("/api/lobby/clearLobby", {})
                 this.updateLobby();
             },
 
@@ -278,8 +275,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             async getBalances() {
                 this.imageSrc = "/static/img/balance_load.png"
-                let res = await fetch('/api/profile/getBalances');
-                let balance = await res.json();
+                let res = await axios.get('/api/profile/getBalances');
+                let balance = res.data;
                 if (balance["ok"] && balance.Balances.length > 0) {
                     localStorage.setItem("balance", JSON.stringify(balance))
                     localStorage.setItem("balance_index", 0)
@@ -316,16 +313,10 @@ document.addEventListener("DOMContentLoaded", async () => {
                 let balances = JSON.parse(localStorage.getItem("balance"))
                 if (!balances) return;
                 current_balance = balances["Balances"][index]
-                let image = await (await fetch('/api/profile/balanceImage', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json;charset=utf-8'
-                    },
-                    body: JSON.stringify({ "playersData": current_balance, "theme": localStorage.getItem("theme") != null ? parseInt(localStorage.getItem("theme")) : 0 })
-                })).blob()
-                imageBlob = image
+                let image = await axios.post('/api/profile/balanceImage', { "playersData": current_balance, "theme": localStorage.getItem("theme") != null ? parseInt(localStorage.getItem("theme")) : 0 }, { responseType: 'blob' })
+                imageBlob = image.data
                 let urlCreator = window.URL || window.webkitURL;
-                let imageUrl = urlCreator.createObjectURL(image);
+                let imageUrl = urlCreator.createObjectURL(imageBlob);
                 this.imageSrc = imageUrl
             },
 
@@ -360,11 +351,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    function sendPOST(url, params) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', url, false);
-        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-        xhr.send(JSON.stringify(params));
+    async function sendPOST(url, params) {
+        await axios.post(url, params)
     }
-
 })

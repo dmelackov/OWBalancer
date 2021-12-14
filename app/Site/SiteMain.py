@@ -5,9 +5,10 @@ from flask import Flask, render_template, redirect
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from app.Site.forms.user import LoginForm, RegisterForm
 from peewee import fn
-from flask import jsonify
+from flask import jsonify, request
 from app.Site.api.api import api
 import logging
+from flask_wtf.csrf import CSRFProtect
 
 module_logger = logging.getLogger("site")
 
@@ -44,6 +45,9 @@ class FlaskSite:
         self.login_manager = LoginManager()
         self.login_manager.init_app(self.app)
 
+        self.csrf = CSRFProtect()
+        self.csrf.init_app(self.app)
+
         self.app.jinja_env.auto_reload = True
         self.app.config['TEMPLATES_AUTO_RELOAD'] = True
 
@@ -70,26 +74,11 @@ class FlaskSite:
                 return redirect("/login")
             return render_template('settings.html', **self.ParamsManagerObject.getParams())
 
-        @self.app.route('/logout')
-        @login_required
-        def logout():
-            logout_user()
-            return redirect("/login")
-
-        @self.app.route('/login', methods=['GET', 'POST'])
+        @self.app.route('/login', methods=['GET'])
         def login():
+            if current_user.is_authenticated:
+                return redirect("/")
             form = LoginForm()
-            if form.validate_on_submit():
-                user = MainDB.Profile.select().where(
-                    fn.lower(MainDB.Profile.Username) == form.login.data.lower())
-                if len(user) and user[0].check_password(form.password.data):
-                    module_logger.info(f"Sucefful log in {form.login.data}")
-                    login_user(user[0], remember=form.remember_me.data)
-                    return redirect("/")
-                module_logger.info(f"Incorrect log in {form.login.data}")
-                return render_template('login.html',
-                                       message="Неправильный логин или пароль",
-                                       form=form, **self.ParamsManagerObject.getParams())
             return render_template('login.html', form=form, **self.ParamsManagerObject.getParams())
 
         @self.app.route('/register', methods=['GET', 'POST'])
