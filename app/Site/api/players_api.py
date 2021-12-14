@@ -45,7 +45,7 @@ def setFlex():
     data = request.get_json()
     module_logger.info(
         f"{current_user.Username} trying to set flex {data['id']} to '{data['status']}'")
-    DataBaseMethods.confirmFlex(MainDB.Custom.get(
+    DataBaseMethods.changeFlex(MainDB.Custom.get(
         MainDB.Custom.ID == data['id']).Player.ID, bool(data['status']))
     return Response(status=200)
 

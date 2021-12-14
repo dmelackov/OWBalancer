@@ -25,7 +25,6 @@ gheal_icon = Image.open("app/icons/PIL1/Roles/GrayHeal.png")
 gdps_icon = Image.open("app/icons/PIL1/Roles/GrayDps.png")
 gtank_icon = Image.open("app/icons/PIL1/Roles/GrayTank.png")
 
-
 wheal_icon = Image.open("app/icons/PIL1/Roles/heal_icon.png").resize((60, 60))
 wdps_icon = Image.open("app/icons/PIL1/Roles/dps_icon.png").resize((60, 60))
 wtank_icon = Image.open("app/icons/PIL1/Roles/tank_icon.png").resize((60, 60))

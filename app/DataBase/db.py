@@ -30,6 +30,8 @@ class Profile(DefaultModel, UserMixin):
     LobbySettings = TextField(default=ProfileDataConst)
     Role = ForeignKeyField(Roles, to_field="ID", null=True)
 
+    # login methods
+    # -------------------
     def set_password(self, password):
         self.Password = generate_password_hash(password)
         self.save()
@@ -43,12 +45,24 @@ class Profile(DefaultModel, UserMixin):
             'username': self.Username
         }
 
+    # -------------------
+    # Lobby methods
+    # -------------------
     def getUserSettings(self):
         return json.loads(self.LobbySettings)
 
     def getLobbyInfo(self):
-        return json.loads(self.Customers)
+        LobbyData = json.loads(self.Customers)
+        return LobbyData["Lobby"]
 
+    def updateLobbyInfo(self, mass):
+        d = {"Lobby": mass}
+        self.Customers = json.dumps(d)
+        self.save()
+
+    # -------------------
+    # Settings methods
+    # -------------------
     def setUserSettings(self, USettings):
         self.LobbySettings = json.dumps(USettings)
         self.save()
@@ -94,6 +108,7 @@ class Profile(DefaultModel, UserMixin):
         USettings["ExtendedLobby"] = ExtendedLobby
         self.LobbySettings = json.dumps(USettings)
         self.save()
+    # -------------------
 
 
 class Player(DefaultModel):
@@ -102,12 +117,12 @@ class Player(DefaultModel):
     Creator = ForeignKeyField(Profile, to_field="ID")
 
 
-class PLayerRoles(DefaultModel):
+class PlayerRoles(DefaultModel):
     ID = PrimaryKeyField()
     Creator = ForeignKeyField(Profile, to_field="ID")
     Player = ForeignKeyField(Player, to_field="ID")
     Roles = TextField(default="")
-    isFlex = BooleanField(default="False")
+    isFlex = BooleanField(default=False)
 
     def getJsonInfo(self):
         priority = list(map(lambda x: {"role": x, "active": True}, list(self.Roles)))

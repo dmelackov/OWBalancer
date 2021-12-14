@@ -6,6 +6,29 @@ from functools import cmp_to_key
 import torch
 
 
+class Member:
+    def __init__(self, C, P):
+        self.Player = P
+        self.Custom = C
+        self.Rating = [C.TSR, C.DSR, C.HSR]
+        self.Roles = ""
+        self.isFlex = False
+
+    def setRoles(self, R, isFlex):
+        self.Roles = [0 if j == "T" else 1 if j == "D" else 2 if j == "H" else -1 for j in R]
+        self.isFlex = isFlex
+
+
+class Balance:
+    def __init__(self, AVG, Mask, PriorityPoints):
+        self.AVG = AVG
+        self.Mask = Mask
+        self.PriorityPoints = PriorityPoints
+
+    def __sub__(self, other):
+        return abs(self.AVG - other.AVG)
+
+
 def minmaxscaler(data):
     mass = []
     for ind, el in enumerate(data):
@@ -45,7 +68,7 @@ def doPredict(main_net, data):
 
 
 def preGenerate(RolesAmount, PlayersInTeam):
-    teamMask = [0 for i in range(PlayersInTeam * 2)]
+    teamMask = [0 for _ in range(PlayersInTeam * 2)]
     teamMaskfilled = []
     for i in range(2 ** (PlayersInTeam * 2) - 1):
         teamMask[0] += 1
@@ -57,7 +80,7 @@ def preGenerate(RolesAmount, PlayersInTeam):
                 not [0 if i else 1 for i in teamMask] in teamMaskfilled:
             teamMaskfilled.append(teamMask.copy())
 
-    roleMask = [0 for i in range(PlayersInTeam)]
+    roleMask = [0 for _ in range(PlayersInTeam)]
     roleMaskFilled = []
     for i in range(3 ** PlayersInTeam - 1):
         roleMask[0] += 1
@@ -72,55 +95,48 @@ def preGenerate(RolesAmount, PlayersInTeam):
     return teamMaskfilled, roleMaskFilled
 
 
-def formPlayersData(Lobby):
-    Ps = []
+def formPlayersData(Lobby, Creator):
+    Members = []
+    accord = {}
     C = Custom.select().where(Custom.ID << Lobby)
+    PlayersList = []
     if C.exists():
         for CustomIterator in C:
-            Ps.append(CustomIterator)
-    return Ps
+            P = CustomIterator.Player
+            PlayersList.append(P)
+            M = Member(CustomIterator, P)
+            Members.append(M)
+            accord[CustomIterator.Player] = M
+    PR = PlayerRoles.select().where(PlayerRoles.Player << PlayersList, PlayerRoles.Creator == Creator)
+    if PR.exists():
+        for PRIterator in PR:
+            accord[PRIterator.Player].setRoles(PRIterator.Roles, PRIterator.isFlex)
+    return Members
 
 
-def formGoodBal(first, second, fMask, sMask, fAVG, sAVG, fTeamRolePrior, sTeamRolePrior, main_net):
+def formGoodBal(first, second, fBalance, sBalance):
     data = {"pareTeamAVG": 0, "NeuroPredict": 0,
-            "first": {"AVG": fAVG, "RolePoints": fTeamRolePrior, 0: [], 1: [], 2: []},
-            "second": {"AVG": sAVG, "RolePoints": sTeamRolePrior, 0: [], 1: [], 2: []}}
-    T_Range = 0
-    D_Range = 0
-    H_Range = 0
+            "first": {"AVG": fBalance.AVG, "RolePoints": fBalance.PriorityPoints, 0: [], 1: [], 2: []},
+            "second": {"AVG": sBalance.AVG, "RolePoints": sBalance.PriorityPoints, 0: [], 1: [], 2: []}}
+    Range = 0
     FTSquare = 0
     STSquare = 0
     dsr = {0: {0: [], 1: [], 2: []}, 1: {0: [], 1: [], 2: []}}
-    for i in range(len(fMask)):
-        data["first"][fMask[i]].append(first[i].ID)
-        if fMask[i] == 0:
-            T_Range += first[i].TSR
-            dsr[0][0].append(first[i].TSR)
-            FTSquare += (first[i].TSR - data["first"]["AVG"]) ** 2
-        elif fMask[i] == 1:
-            D_Range += first[i].DSR
-            dsr[0][1].append(first[i].DSR)
-            FTSquare += (first[i].DSR - data["first"]["AVG"]) ** 2
-        elif fMask[i] == 2:
-            H_Range += first[i].HSR
-            dsr[0][2].append(first[i].HSR)
-            FTSquare += (first[i].HSR - data["first"]["AVG"]) ** 2
-    for i in range(len(sMask)):
-        data["second"][sMask[i]].append(second[i].ID)
-        if sMask[i] == 0:
-            T_Range -= second[i].TSR
-            dsr[1][0].append(second[i].TSR)
-            STSquare += (first[i].TSR - data["second"]["AVG"]) ** 2
-        elif sMask[i] == 1:
-            D_Range -= second[i].DSR
-            dsr[1][1].append(second[i].DSR)
-            STSquare += (first[i].DSR - data["second"]["AVG"]) ** 2
-        elif sMask[i] == 2:
-            H_Range -= second[i].HSR
-            dsr[1][2].append(second[i].HSR)
-            STSquare += (first[i].HSR - data["second"]["AVG"]) ** 2
-    data["pareTeamAVG"] = abs(T_Range) + abs(D_Range) + abs(H_Range)
-    data["rangeTeam"] = abs((FTSquare // len(fMask)) ** 0.5 - (STSquare // len(sMask)) ** 0.5)
+    for i in range(len(fBalance.Mask)):
+        data["first"][fBalance.Mask[i]].append(first[i].Custom.ID)
+        RoleRating = first[i].Rating[fBalance.Mask[i]]
+        Range += RoleRating
+        dsr[0][fBalance.Mask[i]].append(RoleRating)
+        FTSquare += (RoleRating - fBalance.AVG) ** 2
+
+    for i in range(len(sBalance.Mask)):
+        data["second"][sBalance.Mask[i]].append(second[i].Custom.ID)
+        RoleRating = second[i].Rating[sBalance.Mask[i]]
+        Range -= RoleRating
+        dsr[1][sBalance.Mask[i]].append(RoleRating)
+        STSquare += (RoleRating - sBalance.AVG) ** 2
+    data["pareTeamAVG"] = abs(Range)
+    data["rangeTeam"] = abs((FTSquare // len(fBalance.Mask)) ** 0.5 - (STSquare // len(sBalance.Mask)) ** 0.5)
     data["NeuroPredict"] = dsr
     return data
 
@@ -137,11 +153,13 @@ def sort_comparator(left, right):
         return -1
     elif lf + ls < rf + rs:
         return 1
-    elif abs(left_arg - right_arg) <= 100:
+    elif 0 < abs(left_arg - right_arg) <= 100:
         if abs(left["rangeTeam"]) < abs(right["rangeTeam"]):
             return -1
-        else:
+        elif abs(left["rangeTeam"]) > abs(right["rangeTeam"]):
             return 1
+        else:
+            return 0
     elif left_arg < right_arg:
         return -1
     elif left_arg > right_arg:
@@ -154,62 +172,52 @@ def sort_comparator(left, right):
         return 0
 
 
-def tryRoleMask(team, roleMask, PlayersInTeam):
+def tryRoleMask(team, roleMask):
     goodMask = []
     for RM in roleMask:
-        tr = True
+        accord = True
         AVG = 0
-        TeamRolePrior = 0
+        PriorityPoints = 0
         for i in range(len(RM)):
-            P = team[i].Player
-            if not RM[i] in [0 if j == "T" else 1 if j == "D" else 2 if j == "H" else -1
-                             for j in P.Roles]:
-                tr = False
+            P = team[i]
+            if RM[i] not in P.Roles or not accord:
+                accord = False
             else:
-                if RM[i] == 0:
-                    AVG += team[i].TSR
-                    TeamRolePrior += (3 - P.Roles.index("T")) if not P.isFlex else 3
-                elif RM[i] == 1:
-                    AVG += team[i].DSR
-                    TeamRolePrior += (3 - P.Roles.index("D")) if not P.isFlex else 3
-                elif RM[i] == 2:
-                    AVG += team[i].HSR
-                    TeamRolePrior += (3 - P.Roles.index("H")) if not P.isFlex else 3
-        if tr:
-            goodMask.append([AVG // PlayersInTeam, RM, TeamRolePrior])
+                PriorityPoints += (3 - P.Roles.index(RM[i])) if not P.isFlex else 3
+                AVG += team[i].Rating[RM[i]]
+        if accord:
+            goodMask.append(Balance(AVG // len(RM), RM, PriorityPoints))
     return goodMask
 
 
-def tryTeamMask(TM, roleMask, Ps, PlayersInTeam, pareTeam, main_net):
+def tryTeamMask(TM, roleMask, Members, pareTeam):
     first_team = []
     second_team = []
     for i in range(len(TM)):
         if TM[i]:
-            second_team.append(Ps[i])
+            second_team.append(Members[i])
         else:
-            first_team.append(Ps[i])
+            first_team.append(Members[i])
 
-    ft_gm = tryRoleMask(first_team, roleMask, PlayersInTeam)
-    st_gm = tryRoleMask(second_team, roleMask, PlayersInTeam)
+    ft_gm = tryRoleMask(first_team, roleMask)
+    st_gm = tryRoleMask(second_team, roleMask)
 
-    good_balance = []
+    final_balance = []
     for f in ft_gm:
         for s in st_gm:
-            if abs(s[0] - f[0]) <= 50:
-                gd_bl = formGoodBal(first_team, second_team, f[1], s[1], f[0], s[0], f[2], s[2], main_net)
+            if f - s <= 50:
+                gd_bl = formGoodBal(first_team, second_team, f, s)
                 if gd_bl["pareTeamAVG"] <= pareTeam:
-                    good_balance.append(gd_bl)
-    return good_balance
+                    final_balance.append(gd_bl)
+    return final_balance
 
 
 def randLobby(Lobby, PlayersInTeam):
-    ExtendedLobby = False
     if PlayersInTeam * 2 < len(Lobby):
         PlayersLobby = random.sample(Lobby, PlayersInTeam * 2)
-        ExtendedLobby = True
     else:
         PlayersLobby = Lobby
-    return PlayersLobby, ExtendedLobby
+    return PlayersLobby
 
 
 def createGame(Profile_ID):
@@ -219,32 +227,32 @@ def createGame(Profile_ID):
 
     teamMask, roleMask = preGenerate(UserSettings, PlayersInTeam)
     Lobby = GetLobby(Profile_ID)
-    Lobby, ExtendedLobby = randLobby(Lobby, PlayersInTeam)
+    Lobby = randLobby(Lobby, PlayersInTeam)
 
     if len(Lobby) == PlayersInTeam * 2:
-        Ps = formPlayersData(Lobby)
+        Members = formPlayersData(Lobby, Profile_ID)
         s = []
         for TM in teamMask:
-            tTM = tryTeamMask(TM, roleMask, Ps, PlayersInTeam, UserSettings["BalanceLimit"], main_net)
+            tTM = tryTeamMask(TM, roleMask, Members, UserSettings["BalanceLimit"])
             if tTM:
                 s += tTM
         linear_sort = sorted(s, key=cmp_to_key(sort_comparator))[0:1000]
-        if UserSettings["Amount"]["T"] == UserSettings["Amount"]["D"] == UserSettings["Amount"]["H"] == 2\
+        if UserSettings["Amount"]["T"] == UserSettings["Amount"]["D"] == UserSettings["Amount"]["H"] == 2 \
                 and UserSettings["Network"]:
             for ind, el in enumerate(linear_sort):
                 linear_sort[ind]['NeuroPredict'] = doPredict(main_net, el)
             # neuro_sorted = sorted(linear_sort, key=lambda item: abs(item['NeuroPredict']))
 
             # print(*neuro_sorted[:600], sep="\n")
-            return ExtendedLobby, linear_sort
+            return linear_sort
         else:
             for ind, el in enumerate(linear_sort):
                 linear_sort[ind]['NeuroPredict'] = 0
-            return ExtendedLobby, linear_sort
+            return linear_sort
     return False
 
 
 # d1 = datetime.datetime.now()
-# print(*createGame(1)[1], sep="\n")
+# print(*createGame(1), sep="\n")
 # d2 = datetime.datetime.now()
 # print("Весь метод:", str(d2 - d1))
