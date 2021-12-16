@@ -16,9 +16,9 @@ api = Blueprint('lobby_api', __name__, template_folder='templates',
 @login_required
 def getLobby():
     module_logger.info(f"{current_user.Username} trying to get lobby")
-    players = LobbyMethods.GetLobby(current_user.ID)
-    data = list(map(lambda x: MainDB.Custom.get(
-        MainDB.Custom.ID == x).getJsonInfo(), players))
+    players = current_user.getLobbyInfo()
+    Cs = MainDB.Custom.select().where(MainDB.Custom.ID << players)
+    data = [Cs[i].getJsonInfo() for i in range(len(players))]
     for i in data:
         if i['Author']['id'] == current_user.ID:
             i['editable'] = True

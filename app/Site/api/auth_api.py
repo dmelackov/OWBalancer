@@ -12,6 +12,7 @@ module_logger = logging.getLogger("api")
 api = Blueprint('auth_api', __name__, template_folder='templates',
                 static_folder='static')
 
+
 @api.route('/login', methods=['POST'])
 def loginPost():
     if current_user.is_authenticated:
@@ -28,17 +29,20 @@ def loginPost():
         module_logger.info(f"Incorrect log in {form.login.data}")
     return jsonify({"status": 400, "message": "Неправильный логин или пароль"})
 
+
 @api.route('/registration', methods=['POST'])
 def registration():
     if current_user.is_authenticated:
         return Response(status=403)
     return Response(status=200)
 
+
 @login_required
 @api.route('/logout', methods=['GET'])
 def logout():
     logout_user()
     return redirect("/")
+
 
 @api.route('/getCSRF', methods=['GET'])
 def getCSRF():

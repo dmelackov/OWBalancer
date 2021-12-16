@@ -13,11 +13,10 @@ def GetUserSettings(Profile_ID):
         return User[0].getUserSettings()
 
 
-def AddToLobby(Profile_ID, Custom_ID):
-    U = Profile.select().where(Profile.ID == Profile_ID)
+def AddToLobby(U, Custom_ID):
     C = Custom.select().where(Custom.ID == Custom_ID)
-    if U.exists() and C.exists():
-        U, C = U[0], C[0]
+    if C.exists():
+        C = C[0]
 
         CMass = U.getLobbyInfo()
         USettings = U.getUserSettings()

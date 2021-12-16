@@ -30,10 +30,11 @@ def setRoles():
     data = request.get_json()
     module_logger.info(
         f"{current_user.Username} trying to set custom {data['id']} roles '{data['roles']}'")
-    if(not re.fullmatch("[TDH]?[TDH]?[TDH]?", data['roles'])):
+    if not re.fullmatch("[TDH]?[TDH]?[TDH]?", data['roles']):
         return Response(status=200)
-    DataBaseMethods.changeRoles(MainDB.Custom.get(
-        MainDB.Custom.ID == data['id']).Player.ID, data['roles'])
+    DataBaseMethods.changeRoles(current_user.ID,
+                                MainDB.Custom.get(MainDB.Custom.ID == data['id']).Player.ID,
+                                data['roles'])
     return Response(status=200)
 
 
@@ -45,9 +46,11 @@ def setFlex():
     data = request.get_json()
     module_logger.info(
         f"{current_user.Username} trying to set flex {data['id']} to '{data['status']}'")
-    DataBaseMethods.changeFlex(MainDB.Custom.get(
-        MainDB.Custom.ID == data['id']).Player.ID, bool(data['status']))
+    DataBaseMethods.changeFlex(current_user.ID,
+                               MainDB.Custom.get(MainDB.Custom.ID == data['id']).Player.ID,
+                               bool(data['status']))
     return Response(status=200)
+
 
 @api.route('/createPlayer', methods=['POST'])
 @login_required

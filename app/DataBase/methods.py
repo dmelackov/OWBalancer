@@ -40,13 +40,12 @@ def createPlayer(Profile_ID, Username):
     return False
 
 
-def createCustom(Profile_ID, Player_ID):
+def createCustom(U, Player_ID):
     P = Player.select().where(Player.ID == Player_ID)
-    U = Profile.select().where(Profile.ID == Profile_ID)
-    if P.exists() and U.exists():
+    if P.exists():
         C = Custom.select().where(Custom.Creator == U, Custom.Player == P)
         if not C.exists():
-            C = Custom.create(Creator=U[0], Player=P[0])
+            C = Custom.create(Creator=U, Player=P[0])
             return C
     return False
 
