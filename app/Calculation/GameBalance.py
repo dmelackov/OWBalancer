@@ -1,32 +1,9 @@
-from app.DataBase.db import *
 from app.DataBase.LobbyСollector import GetLobby, GetUserSettings
 import random
 import datetime
 from functools import cmp_to_key
 import torch
-
-
-class Member:
-    def __init__(self, C, P):
-        self.Player = P
-        self.Custom = C
-        self.Rating = [C.TSR, C.DSR, C.HSR]
-        self.Roles = ""
-        self.isFlex = False
-
-    def setRoles(self, R, isFlex):
-        self.Roles = [0 if j == "T" else 1 if j == "D" else 2 if j == "H" else -1 for j in R]
-        self.isFlex = isFlex
-
-
-class Balance:
-    def __init__(self, AVG, Mask, PriorityPoints):
-        self.AVG = AVG
-        self.Mask = Mask
-        self.PriorityPoints = PriorityPoints
-
-    def __sub__(self, other):
-        return abs(self.AVG - other.AVG)
+from app.Static.globalClasses import *
 
 
 def minmaxscaler(data):
@@ -104,7 +81,8 @@ def formPlayersData(Lobby, Creator):
         for CustomIterator in C:
             P = CustomIterator.Player
             PlayersList.append(P)
-            M = Member(CustomIterator, P)
+            M = Member()
+            M.setData(P, CustomIterator)
             Members.append(M)
             accord[CustomIterator.Player] = M
     PR = PlayerRoles.select().where(PlayerRoles.Player << PlayersList, PlayerRoles.Creator == Creator)
@@ -123,14 +101,14 @@ def formGoodBal(first, second, fBalance, sBalance):
     STSquare = 0
     dsr = {0: {0: [], 1: [], 2: []}, 1: {0: [], 1: [], 2: []}}
     for i in range(len(fBalance.Mask)):
-        data["first"][fBalance.Mask[i]].append(first[i].Custom.ID)
+        data["first"][fBalance.Mask[i]].append(first[i].serialization())
         RoleRating = first[i].Rating[fBalance.Mask[i]]
         Range += RoleRating
         dsr[0][fBalance.Mask[i]].append(RoleRating)
         FTSquare += (RoleRating - fBalance.AVG) ** 2
 
     for i in range(len(sBalance.Mask)):
-        data["second"][sBalance.Mask[i]].append(second[i].Custom.ID)
+        data["second"][sBalance.Mask[i]].append(second[i].serialization())
         RoleRating = second[i].Rating[sBalance.Mask[i]]
         Range -= RoleRating
         dsr[1][sBalance.Mask[i]].append(RoleRating)

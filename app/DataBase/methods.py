@@ -35,7 +35,7 @@ def createPlayer(Profile_ID, Username):
             P = P[0]
         PR = getPlayerRoles(P, U)
         if not PR:
-            PR = PlayerRoles.create(Creator=U, Player=P)
+            PlayerRoles.create(Creator=U, Player=P)
         return P
     return False
 

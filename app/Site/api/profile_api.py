@@ -2,8 +2,8 @@ from flask import Blueprint, request, send_file
 from flask.wrappers import Response
 from flask_login import login_required, current_user
 from flask import jsonify
-from app.Calculation.PILBalance import createImage as createImageThemeOne
-from app.Calculation.PILBalance2 import createImage as createImageThemeTwo
+from app.PIL.PILBalance import createImage as createImageThemeOne
+from app.PIL.PILBalance2 import createImage as createImageThemeTwo
 from app.Calculation.GameBalance import createGame
 from io import BytesIO
 import json
