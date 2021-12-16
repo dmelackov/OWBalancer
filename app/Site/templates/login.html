@@ -1,28 +1,31 @@
 {% extends 'base.html' %} {% block content %}
+
 <div class="login_content">
     <div class="login_form">
         <div class="title">
             <p>Authorisation</p>
         </div>
         <div class="form">
-            <form action="" method="post">
-                {{ form.hidden_tag() }}
+            <form action="" name="login_form">
+                <input id="csrf" type="hidden" name="csrf_token" value="" />
+                <script>
+                    document.getElementById("csrf").value = getCSRF();
+                </script>
                 <p>
-                    {{ form.login(class="field form-control custom_input" if not message else "field form-control error", type="login", placeholder=form.login.label.text) }}<br> {% for error in form.login.errors %}
-                    <div class="alert alert-danger" role="alert">
-                        {{ error }}
-                    </div>
-                    {% endfor %}
+                    <input class="field form-control custom_input" id="login" name="login" placeholder="Login"
+                        required="" type="text" value="">
                 </p>
                 <p>
-                    {{ form.password(class="field form-control custom_input" if not message else "field form-control error", type="password", placeholder=form.password.label.text) }}<br> {% for error in form.password.errors %}
-                    <div class="alert alert-danger" role="alert">
-                        {{ error }}
-                    </div>
-                    {% endfor %}
+                    <input class="field form-control custom_input" id="password" name="password" placeholder="Password"
+                        required="" type="password" value="">
                 </p>
-                <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-                <p>{{ form.submit(type="submit", class="btn btn-submit custom_input") }}</p>
+                <p>
+                    <input id="remember_me" name="remember_me" type="checkbox" value="y">
+                    <label for="remember_me">Remember me</label>
+                </p>
+                <p>
+                    <input class="btn btn-submit custom_input" id="submit" name="submit" type="submit" value="Enter">
+                </p>
             </form>
         </div>
     </div>
@@ -33,5 +36,5 @@
         <a href="https://discord.com/users/254608220880896010">Ivarys#2177</a>
     </div>
 </div>
-
+<script src="/static/js/login_form.js"></script>
 {% endblock content %}

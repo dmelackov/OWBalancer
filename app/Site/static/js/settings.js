@@ -20,8 +20,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         computed: {
             ExtendedLobby: {
-                set(v) {
-                    sendPOST("/api/profile/settings/setExtendedLobby", { "setting": v })
+                async set(v) {
+                    await sendPOST("/api/profile/settings/setExtendedLobby", { "setting": v })
                     this.updateSettings()
                 },
                 get() {
@@ -29,8 +29,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             },
             CustomAutoChoice: {
-                set(v) {
-                    sendPOST("/api/profile/settings/setAutoCustom", { "setting": v })
+                async set(v) {
+                    await sendPOST("/api/profile/settings/setAutoCustom", { "setting": v })
                     this.updateSettings()
                 },
                 get() {
@@ -38,9 +38,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             },
             TeamTCount: {
-                set(v) {
+                async set(v) {
                     if (parseInt(v) < 0) return
-                    sendPOST("/api/profile/settings/setTanksCount", { "setting": parseInt(v) })
+                    await sendPOST("/api/profile/settings/setTanksCount", { "setting": parseInt(v) })
                     this.updateSettings()
                 },
                 get() {
@@ -48,9 +48,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             },
             TeamDCount: {
-                set(v) {
+                async set(v) {
                     if (parseInt(v) < 0) return
-                    sendPOST("/api/profile/settings/setDamageCount", { "setting": parseInt(v) })
+                    await sendPOST("/api/profile/settings/setDamageCount", { "setting": parseInt(v) })
                     this.updateSettings()
                 },
                 get() {
@@ -58,9 +58,9 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             },
             TeamHCount: {
-                set(v) {
+                async set(v) {
                     if (parseInt(v) < 0) return
-                    sendPOST("/api/profile/settings/setHealsCount", { "setting": parseInt(v) })
+                    await sendPOST("/api/profile/settings/setHealsCount", { "setting": parseInt(v) })
                     this.updateSettings()
                 },
                 get() {
@@ -68,8 +68,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             },
             Team1Name: {
-                set(v) {
-                    sendPOST("/api/profile/settings/setTeamName1", { "setting": v })
+                async set(v) {
+                    await sendPOST("/api/profile/settings/setTeamName1", { "setting": v })
                     this.updateSettings()
                 },
                 get() {
@@ -77,8 +77,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 }
             },
             Team2Name: {
-                set(v) {
-                    sendPOST("/api/profile/settings/setTeamName2", { "setting": v })
+                async set(v) {
+                    await sendPOST("/api/profile/settings/setTeamName2", { "setting": v })
                     this.updateSettings()
                 },
                 get() {
@@ -102,9 +102,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         },
         methods: {
             updateSettings() {
-                fetch('/api/profile/settings/getSettings')
-                    .then(response => response.json())
-                    .then(data => {
+                axios.get('/api/profile/settings/getSettings')
+                    .then(response => {
+                        let data = response.data
                         this.ExtendedLobbySet = data.ExtendedLobby
                         this.CustomAutoChoiceSet = data.AutoCustom
                         this.TeamTCountSet = data.Amount.T
@@ -125,10 +125,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    function sendPOST(url, params) {
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', url, false);
-        xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
-        xhr.send(JSON.stringify(params));
+    async function sendPOST(url, params) {
+        await axios.post(url, params)
     }
 });

@@ -6,9 +6,12 @@
         </div>
         <div class="form">
             <form action="" method="post">
-                {{ form.hidden_tag() }}
+                <input id="csrf" type="hidden" name="csrf_token" value=""/>
+                <script>
+                    document.getElementById("csrf").value = getCSRF();
+                </script>
                 <p>
-                    {{ form.login(class="field form-control custom_input" if not message else "field form-control error", type="login", placeholder=form.login.label.text) }}<br> {% for error in form.login.errors %}
+                    {{ form.login(class="field form-control custom_input" if not message else "field form-control error", type="text", placeholder=form.login.label.text) }}<br> {% for error in form.login.errors %}
                     <div class="alert alert-danger" role="alert">
                         {{ error }}
                     </div>

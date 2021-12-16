@@ -5,7 +5,7 @@ import app.DataBase.methods as DataBaseMethods
 from flask import jsonify
 import logging
 import re
-from app.DataBase.RolesMethods import checkProfilePermission
+from app.DataBase.RolesMethods import checkProfilePermission, getUserPermissions
 
 module_logger = logging.getLogger("api")
 

@@ -10,6 +10,7 @@ import json
 import logging
 from app.DataBase.RolesMethods import checkProfilePermission, getUserPermissions
 from app.Site.api.settings_api import api as settings_api
+from app.Site.api.auth_api import api as auth_api
 
 module_logger = logging.getLogger("api")
 
@@ -17,7 +18,7 @@ api = Blueprint('profile_api', __name__, template_folder='templates',
                 static_folder='static')
 
 api.register_blueprint(settings_api, url_prefix='/settings')
-
+api.register_blueprint(auth_api, url_prefix='/auth')
 
 def serve_pil_image(pil_img):
     img_io = BytesIO()
@@ -72,3 +73,12 @@ def getPermissions():
         return jsonify([])
     perms = list(map(lambda x: x.Name, perms))
     return jsonify(perms)
+
+@api.route('/getCurrentUserInfo', methods=['GET'])
+def getCurrentUserInfo():
+    info = {}
+    if not current_user.is_authenticated:
+        info["Username"] = None
+    else:
+        info["Username"] = current_user.Username
+    return jsonify(info)
