@@ -2,9 +2,7 @@ from flask import Blueprint, Response, jsonify, redirect, current_app, session
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 import logging
 from app.Site.forms.user import LoginForm, RegisterForm
-import app.DataBase.db as MainDB
-import app.DataBase.methods as DataBaseMethods
-import app.DataBase.RolesMethods as RolesMethods
+import app.DataBase.db as db
 from peewee import fn
 from flask_wtf import csrf
 module_logger = logging.getLogger("api")
@@ -20,8 +18,8 @@ def loginPost():
     module_logger.info(f"Trying log in")
     form = LoginForm()
     if form.validate_on_submit():
-        user = MainDB.Profile.select().where(
-                    fn.lower(MainDB.Profile.Username) == form.login.data.lower())
+        user = db.Profile.select().where(
+            fn.lower(db.Profile.Username) == form.login.data.lower())
         if len(user) and user[0].check_password(form.password.data):
             module_logger.info(f"Sucefful log in {form.login.data}")
             login_user(user[0], remember=form.remember_me.data)

@@ -1,7 +1,7 @@
 from flask import Blueprint, request, Response
 from flask_login import login_required, current_user
-import app.DataBase.db as MainDB
-import app.DataBase.methods as DataBaseMethods
+import app.DataBase.db as db
+import app.DataBase.methods as db_methods
 from flask import jsonify
 import logging
 import re
@@ -18,8 +18,8 @@ api = Blueprint('players_api', __name__, template_folder='templates',
 @login_required
 def getPlayers(searchStr=""):
     module_logger.info(f"{current_user.Username} trying to get players")
-    players = DataBaseMethods.searchPlayer(searchStr)
-    return jsonify(list(map(lambda x: x.getJsonInfo(), players)))
+    players = db_methods.searchPlayer(searchStr)
+    return jsonify(list(map(lambda x: x.getJson(), players)))
 
 
 @api.route('/setRoles', methods=['POST'])
@@ -32,9 +32,9 @@ def setRoles():
         f"{current_user.Username} trying to set custom {data['id']} roles '{data['roles']}'")
     if not re.fullmatch("[TDH]?[TDH]?[TDH]?", data['roles']):
         return Response(status=200)
-    DataBaseMethods.changeRoles(current_user.ID,
-                                MainDB.Custom.get(MainDB.Custom.ID == data['id']).Player.ID,
-                                data['roles'])
+    db_methods.changeRoles(current_user,
+                           db.Custom.get(db.Custom.ID == data['id']).Player.ID,
+                           data['roles'])
     return Response(status=200)
 
 
@@ -46,9 +46,9 @@ def setFlex():
     data = request.get_json()
     module_logger.info(
         f"{current_user.Username} trying to set flex {data['id']} to '{data['status']}'")
-    DataBaseMethods.changeFlex(current_user.ID,
-                               MainDB.Custom.get(MainDB.Custom.ID == data['id']).Player.ID,
-                               bool(data['status']))
+    db_methods.changeFlex(current_user,
+                          db.Custom.get(db.Custom.ID == data['id']).Player.ID,
+                          bool(data['status']))
     return Response(status=200)
 
 
@@ -60,5 +60,5 @@ def createPlayer():
     data = request.get_json()
     module_logger.info(
         f"{current_user.Username} trying create player {data['Username']}")
-    DataBaseMethods.createPlayer(data["Username"], current_user)
+    db_methods.createPlayer(current_user, data["Username"])
     return Response(status=200)
