@@ -2,22 +2,21 @@ from app.DataBase.db import *
 
 
 def GetLobby(Profile_ID):
-    User = Profile.select().where(Profile.ID == Profile_ID)
-    if User.exists():
-        return User[0].getLobbyInfo()
+    U = Profile.select().where(Profile.ID == Profile_ID)
+    if U.exists():
+        return U[0].getLobbyInfo()
 
 
 def GetUserSettings(Profile_ID):
-    User = Profile.select().where(Profile.ID == Profile_ID)
-    if User.exists():
-        return User[0].getUserSettings()
-
-
-def AddToLobby(Profile_ID, Custom_ID):
     U = Profile.select().where(Profile.ID == Profile_ID)
+    if U.exists():
+        return U[0].getUserSettings()
+
+
+def AddToLobby(U, Custom_ID):
     C = Custom.select().where(Custom.ID == Custom_ID)
-    if U.exists() and C.exists():
-        U, C = U[0], C[0]
+    if C.exists():
+        C = C[0]
 
         CMass = U.getLobbyInfo()
         USettings = U.getUserSettings()
@@ -37,11 +36,10 @@ def AddToLobby(Profile_ID, Custom_ID):
     return False
 
 
-def DeleteFromLobby(Profile_ID, Custom_ID):
-    U = Profile.select().where(Profile.ID == Profile_ID)
+def DeleteFromLobby(U, Custom_ID):
     C = Custom.select().where(Custom.ID == Custom_ID)
-    if U.exists() and C.exists():
-        U, C = U[0], C[0]
+    if C.exists():
+        C = C[0]
         CMass = U.getLobbyInfo()
 
         if C.ID in CMass:

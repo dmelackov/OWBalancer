@@ -198,17 +198,17 @@ def randLobby(Lobby, PlayersInTeam):
     return PlayersLobby
 
 
-def createGame(Profile_ID):
+def createGame(U):
     main_net = torch.load("app/Calculation/NeuroBalance/Data.txt")
-    UserSettings = GetUserSettings(Profile_ID)
+    UserSettings = U.getUserSettings()
     PlayersInTeam = UserSettings["Amount"]["T"] + UserSettings["Amount"]["D"] + UserSettings["Amount"]["H"]
 
     teamMask, roleMask = preGenerate(UserSettings, PlayersInTeam)
-    Lobby = GetLobby(Profile_ID)
+    Lobby = U.getLobbyInfo()
     Lobby = randLobby(Lobby, PlayersInTeam)
 
     if len(Lobby) == PlayersInTeam * 2:
-        Members = formPlayersData(Lobby, Profile_ID)
+        Members = formPlayersData(Lobby, U.ID)
         s = []
         for TM in teamMask:
             tTM = tryTeamMask(TM, roleMask, Members, UserSettings["BalanceLimit"])
@@ -231,6 +231,7 @@ def createGame(Profile_ID):
 
 
 # d1 = datetime.datetime.now()
-# print(*createGame(1), sep="\n")
+# User = Profile.get(Profile.ID == 1)
+# print(*createGame(User), sep="\n")
 # d2 = datetime.datetime.now()
 # print("Весь метод:", str(d2 - d1))

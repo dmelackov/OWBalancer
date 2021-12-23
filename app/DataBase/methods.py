@@ -25,9 +25,8 @@ def checkProfile(Username, Password):
         return False
 
 
-def createPlayer(Profile_ID, Username):
-    U = Profile.select().where(Profile.ID == Profile_ID)
-    if Username and U.exists():
+def createPlayer(U, Username):
+    if Username:
         P = Player.select().where(Player.Username == Username)
         if not P.exists():
             P = Player.create(Username=Username, Creator=U)
@@ -40,13 +39,12 @@ def createPlayer(Profile_ID, Username):
     return False
 
 
-def createCustom(Profile_ID, Player_ID):
+def createCustom(U, Player_ID):
     P = Player.select().where(Player.ID == Player_ID)
-    U = Profile.select().where(Profile.ID == Profile_ID)
-    if P.exists() and U.exists():
+    if P.exists():
         C = Custom.select().where(Custom.Creator == U, Custom.Player == P)
         if not C.exists():
-            C = Custom.create(Creator=U[0], Player=P[0])
+            C = Custom.create(Creator=U, Player=P[0])
             return C
     return False
 
@@ -62,28 +60,26 @@ def createGame(Profile_ID, GameData):
 
 # Change custom / roles
 # -----------------------------------------
-def changeRoles(Profile_ID, Player_ID, NewRoles):
-    U = Profile.select().where(Profile.ID == Profile_ID)
+def changeRoles(U, Player_ID, NewRoles):
     P = Player.select().where(Player.ID == Player_ID)
-    PR = getPlayerRoles(P, U)
-    if PR is not False:
-        PR.Roles = NewRoles
-        PR.save()
-        return PR
-    else:
-        return False
+    if P.exists():
+        PR = getPlayerRoles(P[0], U)
+        if PR is not False:
+            PR.Roles = NewRoles
+            PR.save()
+            return PR
+    return False
 
 
-def changeFlex(Profile_ID, Player_ID, isFlex):
-    U = Profile.select().where(Profile.ID == Profile_ID)
+def changeFlex(U, Player_ID, isFlex):
     P = Player.select().where(Player.ID == Player_ID)
-    PR = getPlayerRoles(P, U)
-    if PR is not False:
-        PR.isFlex = isFlex
-        PR.save()
-        return PR
-    else:
-        return False
+    if P.exists():
+        PR = getPlayerRoles(P[0], U)
+        if PR is not False:
+            PR.isFlex = isFlex
+            PR.save()
+            return PR
+    return False
 
 
 def changeCustomSR_Tank(Custom_ID, New_SR):
@@ -204,6 +200,7 @@ def getRoles(Profile_ID, Player_ID):
 # print(getRoles(1, 1))
 # createDB()
 # print(createPlayer(1, "Ivarys4"))
+print(Custom.get(Custom.ID == 1).getJson(Profile.select().where(Profile.Username == "Ivarys")[0]))
 # print(Profile.select().where(Profile.Username == "Ivarys")[0].getUserSettings())
 # ProfileDataConst = {"Amount": {"T": 2, "D": 2, "H": 2},
 #                     "TeamNames": {"1": "Team 1", "2": "Team 2"}, "AutoCustom": True,

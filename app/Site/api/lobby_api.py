@@ -1,6 +1,6 @@
 from flask import Blueprint, request, Response
 from flask_login import login_required, current_user
-import app.DataBase.db as MainDB
+import app.DataBase.db as db
 import app.DataBase.LobbyСollector as LobbyMethods
 from flask import jsonify
 import logging
@@ -16,19 +16,18 @@ api = Blueprint('lobby_api', __name__, template_folder='templates',
 @login_required
 def getLobby():
     module_logger.info(f"{current_user.Username} trying to get lobby")
-    players = LobbyMethods.GetLobby(current_user.ID)
-    data = list(map(lambda x: MainDB.Custom.get(
-        MainDB.Custom.ID == x).getJsonInfo(), players))
-    for i in data:
-        if i['Author']['id'] == current_user.ID:
-            i['editable'] = True
+    players = current_user.getLobbyInfo()
+    data = [i.getJson(current_user) for i in db.Custom.select().where(db.Custom.ID << players)]
+    for PData in data:
+        if PData['Creator']['ID'] == current_user.ID:
+            PData['editable'] = True
         else:
-            i['editable'] = False
-        if (i["SR"]["Damage"] == 0 and i["SR"]["Heal"] == 0 and i["SR"]["Tank"] == 0) \
-                or (not i["Roles"]["Damage"] and not i["Roles"]["Heal"] and not i["Roles"]["Tank"]):
-            i["warn"] = True
+            PData['editable'] = False
+        if not sum([1 if PData["Roles"][i]["sr"] else 0 for i in range(3)]) or \
+                not sum([PData["Roles"][i]["active"] for i in range(3)]):
+            PData["warn"] = True
         else:
-            i["warn"] = False
+            PData["warn"] = False
     return jsonify(data)
 
 
@@ -40,7 +39,7 @@ def addToLobby():
     data = request.get_json()
     module_logger.info(
         f"{current_user.Username} trying add to lobby custom with id {data['id']}")
-    LobbyMethods.AddToLobby(current_user.ID, data['id'])
+    LobbyMethods.AddToLobby(current_user, data['id'])
     return jsonify({"status": 200})
 
 
@@ -52,7 +51,7 @@ def deleteFromLobby():
     data = request.get_json()
     module_logger.info(
         f"{current_user.Username} trying delete from lobby custom with id {data['id']}")
-    LobbyMethods.DeleteFromLobby(current_user.ID, data['id'])
+    LobbyMethods.DeleteFromLobby(current_user, data['id'])
     return Response(status=200)
 
 
@@ -62,5 +61,6 @@ def clearLobby():
     if not checkProfilePermission(current_user, "add_customs_tolobby"):
         return jsonify({"status": 403})
     module_logger.info(f"{current_user.Username} trying clear lobby")
-    LobbyMethods.ClearLobby(current_user.ID)
+    current_user.updateLobbyInfo([])
+    # LobbyMethods.ClearLobby(current_user.ID)
     return Response(status=200)

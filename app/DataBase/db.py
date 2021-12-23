@@ -4,7 +4,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
 import json
 
-#db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password)
+# db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password)
 db = SqliteDatabase(DB_NAME + ".db")
 ProfileDataConst = '{"Amount": {"T": 2, "D": 2, "H": 2}, "TeamNames": {"1": "Team 1", "2": "Team 2"},' \
                    ' "AutoCustom": true, "ExtendedLobby": false, "Autoincrement": false, "BalanceLimit": 1000,' \
@@ -39,7 +39,7 @@ class Profile(DefaultModel, UserMixin):
     def check_password(self, password):
         return check_password_hash(self.Password, password)
 
-    def getJsonInfo(self):
+    def getJson(self):
         return {
             'id': self.ID,
             'username': self.Username
@@ -116,6 +116,22 @@ class Player(DefaultModel):
     Username = TextField(null=True)
     Creator = ForeignKeyField(Profile, to_field="ID")
 
+    # return {
+    #             "id": self.ID,
+    #             "Username": self.Username,
+    #             "Creator": self.Creator.getJsonInfo(),
+    #             "Roles": {"Tank": ("T" in self.Roles or self.isFlex),
+    #                       "Damage": ("D" in self.Roles or self.isFlex),
+    #                       "Heal": ("H" in self.Roles or self.isFlex)},
+    #             "RolesPriority": priority,
+    #             "isFlex": self.isFlex
+    #         }
+
+    def getJson(self):
+        return {"ID": self.ID,
+                "Creator": self.Creator.getJson(),
+                "Username": self.Username}
+
 
 class PlayerRoles(DefaultModel):
     ID = PrimaryKeyField()
@@ -124,28 +140,10 @@ class PlayerRoles(DefaultModel):
     Roles = TextField(default="")
     isFlex = BooleanField(default=False)
 
-    def getJsonInfo(self):
-        priority = list(map(lambda x: {"role": x, "active": True}, list(self.Roles)))
-        if "T" not in self.Roles:
-            priority.append({"role": "T", "active": False})
-        if "D" not in self.Roles:
-            priority.append({"role": "D", "active": False})
-        if "H" not in self.Roles:
-            priority.append({"role": "H", "active": False})
-        if self.isFlex:
-            for i in priority:
-                i["active"] = True
-
-        return {
-            "id": self.ID,
-            "Username": self.Username,
-            "Creator": self.Creator.getJsonInfo(),
-            "Roles": {"Tank": ("T" in self.Roles or self.isFlex),
-                      "Damage": ("D" in self.Roles or self.isFlex),
-                      "Heal": ("H" in self.Roles or self.isFlex)},
-            "RolesPriority": priority,
-            "isFlex": self.isFlex
-            }
+    def getJsonRoles(self):
+        priority = [{"role": i, "active": True} for i in self.Roles] + \
+                   [{"role": i, "active": bool(self.isFlex)} for i in "TDH" if i not in self.Roles]
+        return priority
 
 
 class Custom(DefaultModel):
@@ -156,20 +154,35 @@ class Custom(DefaultModel):
     DSR = IntegerField(default=0)
     HSR = IntegerField(default=0)
 
-    def getJsonInfo(self):
-        data = self.Player.getJsonInfo()
+    # returning json data with whole information about this custom
+    # {
+    #     "RolesPriority":
+    #         [
+    #             {"role": SR, "active": True}, {"role": SR, "active": True}, {"role": SR, "active": False}
+    #          ],
+    #     "CustomID": ID
+    # }
+    def getJson(self, U):
+        P = self.Player
+        PR = PlayerRoles.select().where(PlayerRoles.Player == P, PlayerRoles.Creator == U)
+        if not PR.exists():
+            PR = PlayerRoles.create(Creator=U, Player=P)
+        else:
+            PR = PR[0]
+        data = {
+            "Player": P.getJson(),
+            "Roles": PR.getJsonRoles(),
+            "isFlex": PR.isFlex,
+            "ID": self.ID,
+            "Creator": self.Creator.getJson()}
+
         for i in range(3):
-            if data["RolesPriority"][i]["role"] == "T":
-                data["RolesPriority"][i]["sr"] = self.TSR
-            elif data["RolesPriority"][i]["role"] == "D":
-                data["RolesPriority"][i]["sr"] = self.DSR
-            elif data["RolesPriority"][i]["role"] == "H":
-                data["RolesPriority"][i]["sr"] = self.HSR
-        data['CustomID'] = self.ID
-        data['SR'] = {"Tank": self.TSR,
-                      "Damage": self.DSR,
-                      "Heal": self.HSR}
-        data['Author'] = self.Creator.getJsonInfo()
+            if data["Roles"][i]["role"] == "T":
+                data["Roles"][i]["sr"] = self.TSR
+            elif data["Roles"][i]["role"] == "D":
+                data["Roles"][i]["sr"] = self.DSR
+            elif data["Roles"][i]["role"] == "H":
+                data["Roles"][i]["sr"] = self.HSR
         return data
 
 

@@ -20,6 +20,7 @@ api = Blueprint('profile_api', __name__, template_folder='templates',
 api.register_blueprint(settings_api, url_prefix='/settings')
 api.register_blueprint(auth_api, url_prefix='/auth')
 
+
 def serve_pil_image(pil_img):
     img_io = BytesIO()
     pil_img.save(img_io, format='JPEG', quality=70)
@@ -36,9 +37,7 @@ def balanceImage():
     playersData = data.get("playersData", None)
     if playersData is None:
         return Response(status=400)
-    if theme == 0:
-        return serve_pil_image(createImageThemeOne(playersData, current_user))
-    elif theme == 1:
+    if theme == 1:
         return serve_pil_image(createImageThemeTwo(playersData, current_user))
     else:
         return serve_pil_image(createImageThemeOne(playersData, current_user))
@@ -50,11 +49,10 @@ def getBalances():
     if not checkProfilePermission(current_user, "do_balance"):
         return jsonify({"status": 403})
     module_logger.info(f"{current_user.Username} trying get balance")
-    balance = createGame(current_user.ID)
+    balance = createGame(current_user)
     newBalance = {}
     if balance:
-        newBalance["External"] = balance[0]
-        newBalance["Balances"] = balance[1][:5000]
+        newBalance["Balances"] = balance
         newBalance["ok"] = True
         module_logger.info(
             f"{current_user.Username} recieve balance with size {len(newBalance['Balances'])}")
@@ -73,6 +71,7 @@ def getPermissions():
         return jsonify([])
     perms = list(map(lambda x: x.Name, perms))
     return jsonify(perms)
+
 
 @api.route('/getCurrentUserInfo', methods=['GET'])
 def getCurrentUserInfo():
