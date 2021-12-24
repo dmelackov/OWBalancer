@@ -5,6 +5,9 @@ from app.Site.forms.user import LoginForm, RegisterForm
 import app.DataBase.db as db
 from peewee import fn
 from flask_wtf import csrf
+import app.DataBase.methods as DataBaseMethods
+import app.DataBase.RolesMethods as RolesMethods
+
 module_logger = logging.getLogger("api")
 
 api = Blueprint('auth_api', __name__, template_folder='templates',
@@ -37,15 +40,15 @@ def registration():
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
             return jsonify({"status": 400, "message": "Passwords don't match"})
-        if MainDB.Profile.select().where(fn.lower(MainDB.Profile.Username) == form.login.data.lower()):
+        if db.Profile.select().where(fn.lower(db.Profile.Username) == form.login.data.lower()):
             return jsonify({"status": 400, "message": "User already exist"})
         DataBaseMethods.createProfile(
             form.login.data, form.password.data)
         RolesMethods.addRoleToProfile(
-            MainDB.Profile.get(
-                MainDB.Profile.Username == form.login.data),
-            MainDB.Roles.get(MainDB.Roles.ID == 1))
-        return Response(status=200)
+            db.Profile.get(
+                db.Profile.Username == form.login.data),
+            db.Roles.get(db.Roles.ID == 1))
+        return jsonify({"status": 200, "message": "OK"})
     return jsonify({"status": 400})
 
 

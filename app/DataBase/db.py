@@ -41,7 +41,7 @@ class Profile(DefaultModel, UserMixin):
 
     def getJson(self):
         return {
-            'id': self.ID,
+            'ID': self.ID,
             'username': self.Username
         }
 

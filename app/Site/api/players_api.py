@@ -60,7 +60,7 @@ def createPlayer():
     data = request.get_json()
     module_logger.info(
         f"{current_user.Username} trying create player {data['Username']}")
-    if DataBaseMethods.createPlayer(current_user, data["Username"]):
+    if db_methods.createPlayer(current_user, data["Username"]):
         return Response(status=200)
     else:
         return Response(status=500)

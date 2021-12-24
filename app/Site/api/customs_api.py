@@ -13,7 +13,7 @@ api = Blueprint('customs_api', __name__, template_folder='templates',
                 static_folder='static')
 
 
-@api.route('/getCustoms/<int:id>')
+@api.route('/getCustoms/<int:Pid>')
 @login_required
 def getCustoms(Pid):
     module_logger.info(f"{current_user.Username} trying to get customs")
@@ -28,7 +28,7 @@ def getCustoms(Pid):
     else:
         customs = db_methods.getCustoms_byPlayer(Pid)
         if customs:
-            data = {'data': customs, 'type': 'list'}
+            data = {'data': list(map(lambda x: x.getJson(current_user), customs)), 'type': 'list'}
             module_logger.info(
                 f"{current_user.Username}: Custom returning type '{data['type']}'")
             return jsonify(data)

@@ -200,7 +200,7 @@ def getRoles(Profile_ID, Player_ID):
 # print(getRoles(1, 1))
 # createDB()
 # print(createPlayer(1, "Ivarys4"))
-print(Custom.get(Custom.ID == 1).getJson(Profile.select().where(Profile.Username == "Ivarys")[0]))
+# print(Custom.get(Custom.ID == 1).getJson(Profile.select().where(Profile.Username == "Ivarys")[0]))
 # print(Profile.select().where(Profile.Username == "Ivarys")[0].getUserSettings())
 # ProfileDataConst = {"Amount": {"T": 2, "D": 2, "H": 2},
 #                     "TeamNames": {"1": "Team 1", "2": "Team 2"}, "AutoCustom": True,
