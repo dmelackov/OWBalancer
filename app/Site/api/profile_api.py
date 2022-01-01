@@ -80,4 +80,5 @@ def getCurrentUserInfo():
         info["Username"] = None
     else:
         info["Username"] = current_user.Username
+        info["ID"] = current_user.ID
     return jsonify(info)

@@ -141,8 +141,11 @@ class PlayerRoles(DefaultModel):
     isFlex = BooleanField(default=False)
 
     def getJsonRoles(self):
-        priority = [{"role": i, "active": True} for i in self.Roles] + \
-                   [{"role": i, "active": bool(self.isFlex)} for i in "TDH" if i not in self.Roles]
+        if self.isFlex:
+            return [{"role": i, "active": True} for i in "TDH"]
+        else:
+            priority = [{"role": i, "active": True} for i in self.Roles] + \
+                    [{"role": i, "active": False} for i in "TDH" if i not in self.Roles]
         return priority
 
 
