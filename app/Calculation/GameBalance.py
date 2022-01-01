@@ -158,7 +158,7 @@ def tryRoleMask(team, roleMask):
         PriorityPoints = 0
         for i in range(len(RM)):
             P = team[i]
-            if RM[i] not in P.Roles or not accord:
+            if (RM[i] not in P.Roles and not P.isFlex) or not accord:
                 accord = False
             else:
                 PriorityPoints += (3 - P.Roles.index(RM[i])) if not P.isFlex else 3

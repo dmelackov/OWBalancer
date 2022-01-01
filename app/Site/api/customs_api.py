@@ -25,13 +25,13 @@ def getCustoms(Pid):
             module_logger.info(
                 f"{current_user.Username}: Custom returning type '{data['type']}'")
             return jsonify(data)
-    else:
-        customs = db_methods.getCustoms_byPlayer(Pid)
-        if customs:
-            data = {'data': list(map(lambda x: x.getJson(current_user), customs)), 'type': 'list'}
-            module_logger.info(
-                f"{current_user.Username}: Custom returning type '{data['type']}'")
-            return jsonify(data)
+    customs = db_methods.getCustoms_byPlayer(Pid)
+    if customs:
+        data = {'data': list(map(lambda x: x.getJson(
+            current_user), customs)), 'type': 'list'}
+        module_logger.info(
+            f"{current_user.Username}: Custom returning type '{data['type']}'")
+        return jsonify(data)
     module_logger.info(
         f"{current_user.Username}: Custom returning type 'none'")
     return jsonify({'status': 200, 'message': 'Customs not found', 'type': 'none'})
