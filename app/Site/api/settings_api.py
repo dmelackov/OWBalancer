@@ -13,6 +13,24 @@ api = Blueprint('settings_api', __name__, template_folder='templates',
 def getSettings():
     return jsonify(current_user.getUserSettings())
 
+@api.route('/setSettings', methods=['POST'])
+@login_required
+def setSetting():
+    data = request.get_json()
+    if data.get("setting", None) is None:
+        return Response(status=400)
+    if data.get("value", None) is None:
+        return Response(status=400)
+    if type(data["setting"]) != str:
+        module_logger.debug(f"{current_user.Username} set invalid settings data {str(data)}")
+        return Response(status=400)
+    if data["setting"] == "AutoCustom":
+        if type(data["value"]) != bool:
+            module_logger.debug(f"{current_user.Username} set invalid settings data {str(data)}")
+            return Response(status=400)
+        current_user.settingsAutoCustom(data["value"])
+    return Response(status=200)
+
 
 @api.route('/setTanksCount', methods=['POST'])
 @login_required

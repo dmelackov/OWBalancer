@@ -31,6 +31,11 @@ class FlaskSite:
             self.params['title'] = "OWBalancer"
             self.params['description'] = "Сайт для балансировки игроков между командами в Overwatch"
 
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(FlaskSite, cls).__new__(cls)
+        return cls.instance
+
     def __init__(self):
         module_logger.info("Site init")
         self.initFlaskConfig()
