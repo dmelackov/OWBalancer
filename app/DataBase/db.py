@@ -1,11 +1,13 @@
 from peewee import *
-from app.params import DB_NAME, port, password, user, host
+from app.params import DB_NAME, port, password, user, host, db_type
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
 import json
 
-# db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password)
-db = SqliteDatabase(DB_NAME + ".db")
+if db_type == "mysql":
+    db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password)
+else:
+    db = SqliteDatabase(DB_NAME + ".db")
 ProfileDataConst = '{"Amount": {"T": 2, "D": 2, "H": 2}, "TeamNames": {"1": "Team 1", "2": "Team 2"},' \
                    ' "AutoCustom": true, "ExtendedLobby": false, "Autoincrement": false, "BalanceLimit": 1000,' \
                    ' "Network": true}'
@@ -64,48 +66,6 @@ class Profile(DefaultModel, UserMixin):
     # Settings methods
     # -------------------
     def setUserSettings(self, USettings):
-        self.LobbySettings = json.dumps(USettings)
-        self.save()
-
-    def settingsChangeTanks(self, TanksCount):
-        USettings = json.loads(self.LobbySettings)
-        USettings["Amount"]["T"] = TanksCount
-        self.LobbySettings = json.dumps(USettings)
-        self.save()
-
-    def settingsChangeDps(self, DpsCount):
-        USettings = json.loads(self.LobbySettings)
-        USettings["Amount"]["D"] = DpsCount
-        self.LobbySettings = json.dumps(USettings)
-        self.save()
-
-    def settingsChangeHeal(self, HealCount):
-        USettings = json.loads(self.LobbySettings)
-        USettings["Amount"]["H"] = HealCount
-        self.LobbySettings = json.dumps(USettings)
-        self.save()
-
-    def settingsTeamOne(self, TeamName):
-        USettings = json.loads(self.LobbySettings)
-        USettings["TeamNames"]["1"] = TeamName
-        self.LobbySettings = json.dumps(USettings)
-        self.save()
-
-    def settingsTeamTwo(self, TeamName):
-        USettings = json.loads(self.LobbySettings)
-        USettings["TeamNames"]["2"] = TeamName
-        self.LobbySettings = json.dumps(USettings)
-        self.save()
-
-    def settingsAutoCustom(self, AutoCustom):
-        USettings = json.loads(self.LobbySettings)
-        USettings["AutoCustom"] = AutoCustom
-        self.LobbySettings = json.dumps(USettings)
-        self.save()
-
-    def settingsExtendedLobby(self, ExtendedLobby):
-        USettings = json.loads(self.LobbySettings)
-        USettings["ExtendedLobby"] = ExtendedLobby
         self.LobbySettings = json.dumps(USettings)
         self.save()
     # -------------------

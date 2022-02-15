@@ -9,6 +9,7 @@ from flask import jsonify, request
 from app.Site.api.api import api
 import logging
 from flask_wtf.csrf import CSRFProtect
+from app.params import site_port
 
 module_logger = logging.getLogger("site")
 
@@ -56,55 +57,11 @@ class FlaskSite:
         self.app.jinja_env.auto_reload = True
         self.app.config['TEMPLATES_AUTO_RELOAD'] = True
 
-        self.app.register_blueprint(api, url_prefix='/api')
-
     def startFlask(self):
-        self.app.run(port=5000, host="0.0.0.0")
+        self.app.run(port=site_port, host="0.0.0.0")
 
     def initRouters(self):
         @self.login_manager.user_loader
         def load_user(user_id):
             return MainDB.Profile.get(MainDB.Profile.ID == user_id)
-
-        @self.app.route("/")
-        @self.app.route("/index")
-        def MainPage():
-            if not current_user.is_authenticated:
-                return redirect("/login")
-            return render_template('mainPage.html', **self.ParamsManagerObject.getParams())
-
-        @self.app.route("/settings")
-        def Setting():
-            if not current_user.is_authenticated:
-                return redirect("/login")
-            return render_template('settings.html', **self.ParamsManagerObject.getParams())
-
-        @self.app.route('/login', methods=['GET'])
-        def login():
-            if current_user.is_authenticated:
-                return redirect("/")
-            form = LoginForm()
-            return render_template('login.html', form=form, **self.ParamsManagerObject.getParams())
-
-        @self.app.route('/register', methods=['GET', 'POST'])
-        def reqister():
-            form = RegisterForm()
-            if current_user.is_authenticated:
-                return redirect("/")
-            if form.validate_on_submit():
-                if form.password.data != form.password_again.data:
-                    return render_template('register.html', **self.ParamsManagerObject.getParams(),
-                                           form=form,
-                                           message="Пароли не совпадают")
-                if MainDB.Profile.select().where(fn.lower(MainDB.Profile.Username) == form.login.data.lower()):
-                    return render_template('register.html', **self.ParamsManagerObject.getParams(),
-                                           form=form,
-                                           message="Такой пользователь уже есть")
-                DataBaseMethods.createProfile(
-                    form.login.data, form.password.data)
-                RolesMethods.addRoleToProfile(
-                    MainDB.Profile.get(
-                        MainDB.Profile.Username == form.login.data),
-                    MainDB.Roles.get(MainDB.Roles.ID == 1))
-                return redirect('/login')
-            return render_template('register.html', **self.ParamsManagerObject.getParams(), form=form)
+        self.app.register_blueprint(api, url_prefix='/api')
