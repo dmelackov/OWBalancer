@@ -2,9 +2,9 @@ name: Frontend Docker Image
 
 on:
   push:
-    branches: [ VueRewrite ]
+    branches: [ ValorantUpdate ]
   pull_request:
-    branches: [ VueRewrite ]
+    branches: [ ValorantUpdate ]
 
 jobs:
 
@@ -30,6 +30,6 @@ jobs:
           file: ./Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: owbalancer.ddns.net/${{ secrets.DOCKER_HUB_USERNAME }}/owbalancer-backend:latest
-          cache-from: type=registry,ref=owbalancer.ddns.net/${{ secrets.DOCKER_HUB_USERNAME }}/owbalancer-backend:buildcache
-          cache-to: type=registry,ref=owbalancer.ddns.net/${{ secrets.DOCKER_HUB_USERNAME }}/owbalancer-backend:buildcache,mode=max
+          tags: owbalancer.ddns.net/${{ secrets.DOCKER_HUB_USERNAME }}/Valorant-backend:latest
+          cache-from: type=registry,ref=owbalancer.ddns.net/${{ secrets.DOCKER_HUB_USERNAME }}/Valorant-backend:buildcache
+          cache-to: type=registry,ref=owbalancer.ddns.net/${{ secrets.DOCKER_HUB_USERNAME }}/Valorant-backend:buildcache,mode=max
