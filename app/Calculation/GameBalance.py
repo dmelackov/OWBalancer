@@ -1,75 +1,32 @@
 from app.DataBase.LobbyСollector import GetLobby, GetUserSettings
 import random
+import itertools
 import datetime
 from functools import cmp_to_key
-import torch
+from app.DataBase.db import *
 from app.Static.globalClasses import *
 
 
-def minmaxscaler(data):
-    mass = []
-    for ind, el in enumerate(data):
-        mass.append(el / 5000)
-    return mass
+def generateMask(countPlayers):
+    teamMask = []
+    roleMask = []
+
+    for i in itertools.product(range(2), repeat=countPlayers * 2):
+        if i.count(0) == countPlayers:
+            teamMask.append(i)
+
+    for i in itertools.product(range(4), repeat=countPlayers):
+        if 0 in i and 2 in i:
+            roleMask.append(i)
+
+    return teamMask, roleMask
 
 
-class Network(torch.nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.Sigm = torch.nn.Sigmoid()
-        self.fc1 = torch.nn.Linear(6, 12)
-        self.Act1 = torch.nn.LeakyReLU()
-        self.fc2 = torch.nn.Linear(12, 6)
-        self.Act2 = torch.nn.LeakyReLU()
-        self.Last = torch.nn.Linear(12, 1)
+def groupTeamMask(teamMask):
+    groups = []
+    points = {2: []}
 
-    def forward(self, x):
-        t1 = self.fc1(torch.tensor(minmaxscaler(x[1])))
-        t2 = self.fc1(torch.tensor(minmaxscaler(x[0])))
-        t1 = self.Act1(t1)
-        t2 = self.Act1(t2)
-        t1 = self.fc2(t1)
-        t2 = self.fc2(t2)
-        x = self.Act2(torch.cat((t1, t2), 0))
-        x = self.Last(x)
-        x = self.Sigm(x)
-        return x
-
-
-def doPredict(main_net, data):
-    prepared_mass = [data["NeuroPredict"][0][0] + data["NeuroPredict"][0][1] + data["NeuroPredict"][0][2]]
-    prepared_mass += [data["NeuroPredict"][1][0] + data["NeuroPredict"][1][1] + data["NeuroPredict"][1][2]]
-    tensor_data = torch.FloatTensor(prepared_mass)
-    predict = main_net.forward(tensor_data)
-    return int((float(predict) - 0.5) * 200)
-
-
-def preGenerate(RolesAmount, PlayersInTeam):
-    teamMask = [0 for _ in range(PlayersInTeam * 2)]
-    teamMaskfilled = []
-    for i in range(2 ** (PlayersInTeam * 2) - 1):
-        teamMask[0] += 1
-        for j in range(PlayersInTeam * 2 - 1):
-            if teamMask[j] > 1:
-                teamMask[j + 1] += 1
-                teamMask[j] -= 2
-        if teamMask.count(0) == teamMask.count(1) == PlayersInTeam and \
-                not [0 if i else 1 for i in teamMask] in teamMaskfilled:
-            teamMaskfilled.append(teamMask.copy())
-
-    roleMask = [0 for _ in range(PlayersInTeam)]
-    roleMaskFilled = []
-    for i in range(3 ** PlayersInTeam - 1):
-        roleMask[0] += 1
-        for j in range(PlayersInTeam - 1):
-            if roleMask[j] > 2:
-                roleMask[j + 1] += 1
-                roleMask[j] -= 3
-        if roleMask.count(0) == RolesAmount["Amount"]["T"] and \
-                roleMask.count(1) == RolesAmount["Amount"]["D"] and \
-                roleMask.count(2) == RolesAmount["Amount"]["H"]:
-            roleMaskFilled.append(roleMask.copy())
-    return teamMaskfilled, roleMaskFilled
+    for i in
 
 
 def formPlayersData(Lobby, Creator):
@@ -81,8 +38,7 @@ def formPlayersData(Lobby, Creator):
         for CustomIterator in C:
             P = CustomIterator.Player
             PlayersList.append(P)
-            M = Member()
-            M.setData(P, CustomIterator)
+            M = ClassPlayer(CustomIterator.SR)
             Members.append(M)
             accord[CustomIterator.Player] = M
     PR = PlayerRoles.select().where(PlayerRoles.Player << PlayersList, PlayerRoles.Creator == Creator)
@@ -119,38 +75,7 @@ def formGoodBal(first, second, fBalance, sBalance):
     return data
 
 
-def sort_comparator(left, right):
-    left_arg = left["pareTeamAVG"]
-    right_arg = right["pareTeamAVG"]
-
-    lf = left["first"]["RolePoints"]
-    ls = left["second"]["RolePoints"]
-    rf = right["first"]["RolePoints"]
-    rs = right["second"]["RolePoints"]
-    if lf + ls > rf + rs:
-        return -1
-    elif lf + ls < rf + rs:
-        return 1
-    elif 0 < abs(left_arg - right_arg) <= 100:
-        if abs(left["rangeTeam"]) < abs(right["rangeTeam"]):
-            return -1
-        elif abs(left["rangeTeam"]) > abs(right["rangeTeam"]):
-            return 1
-        else:
-            return 0
-    elif left_arg < right_arg:
-        return -1
-    elif left_arg > right_arg:
-        return 1
-    elif abs(lf - ls) < abs(rf - rs):
-        return -1
-    elif abs(lf - ls) > abs(rf - rs):
-        return 1
-    else:
-        return 0
-
-
-def tryRoleMask(team, roleMask):
+def tryRoleMask(Balance, roleMask):
     goodMask = []
     for RM in roleMask:
         accord = True
@@ -168,7 +93,7 @@ def tryRoleMask(team, roleMask):
     return goodMask
 
 
-def tryTeamMask(TM, roleMask, Members, pareTeam):
+def tryTeamMask(TM, Members):
     first_team = []
     second_team = []
     for i in range(len(TM)):
@@ -176,18 +101,20 @@ def tryTeamMask(TM, roleMask, Members, pareTeam):
             second_team.append(Members[i])
         else:
             first_team.append(Members[i])
+    Balance = ClassGameBalance(first_team, second_team)
+    return Balance.calcSR(), Balance
 
-    ft_gm = tryRoleMask(first_team, roleMask)
-    st_gm = tryRoleMask(second_team, roleMask)
-
-    final_balance = []
-    for f in ft_gm:
-        for s in st_gm:
-            if f - s <= 50:
-                gd_bl = formGoodBal(first_team, second_team, f, s)
-                if gd_bl["pareTeamAVG"] <= pareTeam:
-                    final_balance.append(gd_bl)
-    return final_balance
+    # ft_gm = tryRoleMask(first_team, roleMask)
+    # st_gm = tryRoleMask(second_team, roleMask)
+    #
+    # final_balance = []
+    # for f in ft_gm:
+    #     for s in st_gm:
+    #         if f - s <= 50:
+    #             gd_bl = formGoodBal(first_team, second_team, f, s)
+    #             if gd_bl["pareTeamAVG"] <= pareTeam:
+    #                 final_balance.append(gd_bl)
+    # return final_balance
 
 
 def randLobby(Lobby, PlayersInTeam):
@@ -199,11 +126,10 @@ def randLobby(Lobby, PlayersInTeam):
 
 
 def createGame(U):
-    main_net = torch.load("app/Calculation/NeuroBalance/Data.txt")
     UserSettings = U.getUserSettings()
-    PlayersInTeam = UserSettings["Amount"]["T"] + UserSettings["Amount"]["D"] + UserSettings["Amount"]["H"]
+    PlayersInTeam = UserSettings["PlayersIn"]
 
-    teamMask, roleMask = preGenerate(UserSettings, PlayersInTeam)
+    teamMask, roleMask = generateMask(PlayersInTeam)
     Lobby = U.getLobbyInfo()
     Lobby = randLobby(Lobby, PlayersInTeam)
 
@@ -211,27 +137,29 @@ def createGame(U):
         Members = formPlayersData(Lobby, U.ID)
         s = []
         for TM in teamMask:
-            tTM = tryTeamMask(TM, roleMask, Members, UserSettings["BalanceLimit"])
-            if tTM:
-                s += tTM
-        linear_sort = sorted(s, key=cmp_to_key(sort_comparator))[0:1000]
-        if UserSettings["Amount"]["T"] == UserSettings["Amount"]["D"] == UserSettings["Amount"]["H"] == 2 \
-                and UserSettings["Network"]:
-            for ind, el in enumerate(linear_sort):
-                linear_sort[ind]['NeuroPredict'] = doPredict(main_net, el)
-            # neuro_sorted = sorted(linear_sort, key=lambda item: abs(item['NeuroPredict']))
-
-            # print(*neuro_sorted[:600], sep="\n")
-            return linear_sort
-        else:
-            for ind, el in enumerate(linear_sort):
-                linear_sort[ind]['NeuroPredict'] = 0
-            return linear_sort
-    return False
+            CBalance = tryTeamMask(TM, Members)
+            s.append(CBalance)
+        for TM in sorted(s)[:50]:
 
 
-# d1 = datetime.datetime.now()
-# User = Profile.get(Profile.ID == 1)
-# print(*createGame(User), sep="\n")
-# d2 = datetime.datetime.now()
-# print("Весь метод:", str(d2 - d1))
+    #     linear_sort = sorted(s, key=cmp_to_key(sort_comparator))[0:1000]
+    #     if UserSettings["Amount"]["T"] == UserSettings["Amount"]["D"] == UserSettings["Amount"]["H"] == 2 \
+    #             and UserSettings["Network"]:
+    #         for ind, el in enumerate(linear_sort):
+    #             linear_sort[ind]['NeuroPredict'] = doPredict(main_net, el)
+    #         # neuro_sorted = sorted(linear_sort, key=lambda item: abs(item['NeuroPredict']))
+    #
+    #         # print(*neuro_sorted[:600], sep="\n")
+    #         return linear_sort
+    #     else:
+    #         for ind, el in enumerate(linear_sort):
+    #             linear_sort[ind]['NeuroPredict'] = 0
+    #         return linear_sort
+    # return False
+
+
+d1 = datetime.datetime.now()
+User = Profile.get(Profile.ID == 1)
+print(*createGame(User), sep="\n")
+d2 = datetime.datetime.now()
+print("Весь метод:", str(d2 - d1))

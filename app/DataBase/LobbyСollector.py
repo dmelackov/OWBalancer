@@ -20,7 +20,7 @@ def AddToLobby(U, Custom_ID):
 
         CMass = U.getLobbyInfo()
         USettings = U.getUserSettings()
-        TeamPlayers = USettings["Amount"]["T"] + USettings["Amount"]["D"] + USettings["Amount"]["H"]
+        TeamPlayers = USettings["PlayersIn"]
         if len(CMass) < TeamPlayers * 2 or USettings["ExtendedLobby"]:
             cacheToChange = -1
             for C_ID in CMass:
@@ -60,6 +60,6 @@ def ClearLobby(Profile_ID):
 # print(GetRolesAmount(1))
 # print(DeleteFromLobby(1, 16))
 # for i in range(1, 13):
-#     print(AddToLobby(1, i))
+#     print(AddToLobby(Profile.get(Profile.ID == 1), i))
 # print(GetLobby(1))
 # AddToLobby(1, 16)

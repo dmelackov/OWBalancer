@@ -82,33 +82,11 @@ def changeFlex(U, Player_ID, isFlex):
     return False
 
 
-def changeCustomSR_Tank(Custom_ID, New_SR):
+def changeCustomSR(Custom_ID, New_SR):
     C = Custom.select().where(Custom.ID == Custom_ID)
     if C.exists():
         C = C[0]
-        C.TSR = New_SR
-        C.save()
-        return True
-    else:
-        return False
-
-
-def changeCustomSR_Dps(Custom_ID, New_SR):
-    C = Custom.select().where(Custom.ID == Custom_ID)
-    if C.exists():
-        C = C[0]
-        C.DSR = New_SR
-        C.save()
-        return True
-    else:
-        return False
-
-
-def changeCustomSR_Heal(Custom_ID, New_SR):
-    C = Custom.select().where(Custom.ID == Custom_ID)
-    if C.exists():
-        C = C[0]
-        C.HSR = New_SR
+        C.SR = New_SR
         C.save()
         return True
     else:
@@ -194,12 +172,15 @@ def getRoles(Profile_ID, Player_ID):
 # print(changeCustomSR_Tank(1, 3200))
 # print(changeCustomSR_Heal(1, 3000))
 # print(changeCustomSR_Dps(1, 3200))
-# print(createCustom(1, i))
+# for i in range(12):
+#     x = "Player" + str(i)
+# print(createCustom(1, 12))
 # print(checkProfile("Ivar", "Ivar"))
 # print(createProfile("Ivarys", "123"))
 # print(getRoles(1, 1))
 # createDB()
-# print(createPlayer(1, "Ivarys4"))
+# for i in range(12):
+#     print(createPlayer(1, "Player" + str(i)))
 # print(Custom.get(Custom.ID == 1).getJson(Profile.select().where(Profile.Username == "Ivarys")[0]))
 # print(Profile.select().where(Profile.Username == "Ivarys")[0].getUserSettings())
 # ProfileDataConst = {"Amount": {"T": 2, "D": 2, "H": 2},

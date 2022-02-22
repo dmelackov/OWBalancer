@@ -8,7 +8,7 @@ if db_type == "mysql":
     db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password)
 else:
     db = SqliteDatabase(DB_NAME + ".db")
-ProfileDataConst = '{"Amount": {"T": 2, "D": 2, "H": 2}, "TeamNames": {"1": "Team 1", "2": "Team 2"},' \
+ProfileDataConst = '{"Amount": {"S": 1, "D": 1}, "PlayersIn": 5, "TeamNames": {"1": "Team 1", "2": "Team 2"},' \
                    ' "AutoCustom": true, "ExtendedLobby": false, "Autoincrement": false, "BalanceLimit": 1000,' \
                    ' "Network": true}'
 LobbyDataConst = '{"Lobby": []}'
@@ -102,10 +102,10 @@ class PlayerRoles(DefaultModel):
 
     def getJsonRoles(self):
         if self.isFlex:
-            return [{"role": i, "active": True} for i in "TDH"]
+            return [{"role": i, "active": True} for i in "SICD"]
         else:
             priority = [{"role": i, "active": True} for i in self.Roles] + \
-                    [{"role": i, "active": False} for i in "TDH" if i not in self.Roles]
+                    [{"role": i, "active": False} for i in "SICD" if i not in self.Roles]
         return priority
 
 
@@ -113,9 +113,7 @@ class Custom(DefaultModel):
     ID = PrimaryKeyField()
     Creator = ForeignKeyField(Profile, to_field="ID")
     Player = ForeignKeyField(Player, to_field="ID")
-    TSR = IntegerField(default=0)
-    DSR = IntegerField(default=0)
-    HSR = IntegerField(default=0)
+    SR = IntegerField(default=0)
 
     # returning json data with whole information about this custom
     # {
@@ -137,15 +135,9 @@ class Custom(DefaultModel):
             "Roles": PR.getJsonRoles(),
             "isFlex": PR.isFlex,
             "ID": self.ID,
-            "Creator": self.Creator.getJson()}
-
-        for i in range(3):
-            if data["Roles"][i]["role"] == "T":
-                data["Roles"][i]["sr"] = self.TSR
-            elif data["Roles"][i]["role"] == "D":
-                data["Roles"][i]["sr"] = self.DSR
-            elif data["Roles"][i]["role"] == "H":
-                data["Roles"][i]["sr"] = self.HSR
+            "Creator": self.Creator.getJson(),
+            "SR": self.SR
+        }
         return data
 
 
