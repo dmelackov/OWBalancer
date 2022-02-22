@@ -1,0 +1,41 @@
+{
+  "name": "owbalancer",
+  "version": "1.0.0",
+  "description": "A Vue.js project",
+  "author": "dmelackov <dm.elackov@gmail.com>",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve --port=8082",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "axios": "^0.26.0",
+    "core-js": "^3.21.0",
+    "vue": "^2.6.14",
+    "vue-scrolly": "^0.9.3"
+  },
+  "devDependencies": {
+    "@vue/cli-service": "~4.5.15",
+    "vue-template-compiler": "^2.6.14"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ]
+}
