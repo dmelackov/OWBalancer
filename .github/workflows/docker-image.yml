@@ -30,6 +30,6 @@ jobs:
           file: ./Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           push: true
-          tags: owbalancer.ddns.net/${{ secrets.DOCKER_HUB_USERNAME }}/Valorant-frontend:latest
-          cache-from: type=registry,ref=owbalancer.ddns.net/${{ secrets.DOCKER_HUB_USERNAME }}/Valorant-frontend:buildcache
-          cache-to: type=registry,ref=owbalancer.ddns.net/${{ secrets.DOCKER_HUB_USERNAME }}/Valorant-frontend:buildcache,mode=max
+          tags: owbalancer.ddns.net/${{ secrets.DOCKER_HUB_USERNAME }}/valorant-frontend:latest
+          cache-from: type=registry,ref=owbalancer.ddns.net/${{ secrets.DOCKER_HUB_USERNAME }}/valorant-frontend:buildcache
+          cache-to: type=registry,ref=owbalancer.ddns.net/${{ secrets.DOCKER_HUB_USERNAME }}/valorant-frontend:buildcache,mode=max
