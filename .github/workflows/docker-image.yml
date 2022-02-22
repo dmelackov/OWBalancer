@@ -2,9 +2,9 @@ name: Frontend Docker Image
 
 on:
   push:
-    branches: [ frontend ]
+    branches: [ ValorantFrontEnd ]
   pull_request:
-    branches: [ frontend ]
+    branches: [ ValorantFrontEnd ]
 
 jobs:
 
@@ -31,5 +31,5 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           push: true
           tags: owbalancer.ddns.net/${{ secrets.DOCKER_HUB_USERNAME }}/owbalancer-frontend:latest
-          cache-from: type=registry,ref=owbalancer.ddns.net/${{ secrets.DOCKER_HUB_USERNAME }}/owbalancer-frontend:buildcache
-          cache-to: type=registry,ref=owbalancer.ddns.net/${{ secrets.DOCKER_HUB_USERNAME }}/owbalancer-frontend:buildcache,mode=max
+          cache-from: type=registry,ref=owbalancer.ddns.net/${{ secrets.DOCKER_HUB_USERNAME }}/Valorant-frontend:buildcache
+          cache-to: type=registry,ref=owbalancer.ddns.net/${{ secrets.DOCKER_HUB_USERNAME }}/Valorant-frontend:buildcache,mode=max
