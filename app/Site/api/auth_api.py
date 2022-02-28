@@ -15,7 +15,7 @@ api = Blueprint('auth_api', __name__, template_folder='templates',
 
 
 @api.route('/login', methods=['POST'])
-def loginPost():
+def login():
     if current_user.is_authenticated:
         return Response(status=403)
     module_logger.info(f"Trying log in")
