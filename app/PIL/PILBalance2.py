@@ -17,11 +17,11 @@ BDiamond = Image.open("app/icons/PIL2/Rank/BDiamond.png").resize((80, 80))
 BMaster = Image.open("app/icons/PIL2/Rank/BMaster.png").resize((80, 80))
 BGm = Image.open("app/icons/PIL2/Rank/BGm.png").resize((80, 80))
 
-team_font = ImageFont.truetype("app/Calculation/font.ttf", 84)
-vs_font = ImageFont.truetype("app/Calculation/VS_font.otf", 84)
-avg_font = ImageFont.truetype("app/Calculation/font.ttf", 42)
-text_font = ImageFont.truetype("app/Calculation/font.ttf", 68)
-text_ranknum = ImageFont.truetype("app/Calculation/font.ttf", 28)
+team_font = ImageFont.truetype("app/icons/font.ttf", 84)
+vs_font = ImageFont.truetype("app/icons/VS_font.otf", 84)
+avg_font = ImageFont.truetype("app/icons/font.ttf", 42)
+text_font = ImageFont.truetype("app/icons/font.ttf", 68)
+text_ranknum = ImageFont.truetype("app/icons/font.ttf", 28)
 
 bheal_icon = Image.open("app/icons/PIL2/Roles/bheal_icon2.png").resize((80, 80))
 bdps_icon = Image.open("app/icons/PIL2/Roles/bdps_icon2.png").resize((80, 80))
@@ -41,8 +41,8 @@ wheal_icon = Image.open("app/icons/PIL1/Roles/heal_icon.png").resize((60, 60))
 wdps_icon = Image.open("app/icons/PIL1/Roles/dps_icon.png").resize((60, 60))
 wtank_icon = Image.open("app/icons/PIL1/Roles/tank_icon.png").resize((60, 60))
 wflex = Image.open("app/icons/PIL1/Roles/flex.png").resize((60, 60))
-role_font = ImageFont.truetype("app/Calculation/font.ttf", 84)
-percent_font = ImageFont.truetype("app/Calculation/font.ttf", 30)
+role_font = ImageFont.truetype("app/icons/font.ttf", 84)
+percent_font = ImageFont.truetype("app/icons/font.ttf", 30)
 
 
 def get_rank_icon(rank, team):
