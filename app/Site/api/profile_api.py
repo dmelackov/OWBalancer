@@ -51,11 +51,12 @@ def getBalances():
     module_logger.info(f"{current_user.Username} trying get balance")
     balance = createGame(current_user)
     newBalance = {}
-    if balance:
-        newBalance["Balances"] = balance
+    if balance["active"]:
+        newBalance["active"] = balance["active"]
+        newBalance["static"] = balance["static"]
         newBalance["ok"] = True
         module_logger.info(
-            f"{current_user.Username} recieve balance with size {len(newBalance['Balances'])}")
+            f"{current_user.Username} recieve balance with size {len(newBalance['active'])}")
     else:
         newBalance["ok"] = False
         module_logger.info(f"{current_user.Username} dont recieve balances")
@@ -63,8 +64,8 @@ def getBalances():
 
 
 @api.route('/getPermissions', methods=['GET'])
-@login_required
 def getPermissions():
+    if not current_user.is_authenticated: return jsonify([])
     module_logger.info(f"{current_user.Username} trying get permissions")
     perms = getUserPermissions(current_user)
     if perms is None:
@@ -78,7 +79,9 @@ def getCurrentUserInfo():
     info = {}
     if not current_user.is_authenticated:
         info["Username"] = None
+        info["Auth"] = False
     else:
         info["Username"] = current_user.Username
+        info["Auth"] = True
         info["ID"] = current_user.ID
     return jsonify(info)
