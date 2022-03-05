@@ -15,6 +15,7 @@ pycodestyle==2.8.0
 pycparser==2.21
 PyMySQL==1.0.2
 toml==0.10.2
+typing-extensions==3.10.0.2
+waitress==2.0.0
 Werkzeug==2.0.2
 WTForms==3.0.1
-torch==1.10.1
