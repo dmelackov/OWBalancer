@@ -200,8 +200,7 @@ class ClassGameBalance:
         self.result = self.fairness + self.rolesFairness + self.teamRolePriority + self.uniformity
 
     def dict(self):
-        return json.dumps(
-            {
+        return {
                 'TeamMask': self.TeamMask,
                 'fMask': self.fMask,
                 'sMask': self.sMask,
@@ -211,7 +210,6 @@ class ClassGameBalance:
                 'vqUniformity': round(self.uniformity, 2),
                 'result': round(self.result, 2)
             }
-        )
 
     def __eq__(self, other):
         if self.result == other.result:

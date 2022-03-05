@@ -50,7 +50,7 @@ def generateLobby(Lobby, PlayersInTeam):
         return False
 
 
-def checkMask(tm, roleMask, Members):
+def checkMask(tm, roleMask, Members, UserSettings):
     fTeam = ClassTeam(Members, tm, 0)
     sTeam = ClassTeam(Members, tm, 1)
 
@@ -68,7 +68,7 @@ def checkMask(tm, roleMask, Members):
         for sMask in sGoodMask:
             Balance = ClassGameBalance(fTeam, sTeam, tm, fMask, sMask)
             Balance.calcResult()
-            if Balance.result <= 1000:
+            if Balance.result <= UserSettings["BalanceLimit"]:
                 mass.append(Balance)
     return mass
 
@@ -76,7 +76,7 @@ def checkMask(tm, roleMask, Members):
 def createGame(U):
     UserSettings = U.getUserSettings()
     PlayersInTeam = UserSettings["Amount"]["T"] + UserSettings["Amount"]["D"] + UserSettings["Amount"]["H"]
-    teamMask, roleMask = generateMask(6, 2, 2)
+    teamMask, roleMask = generateMask(PlayersInTeam, UserSettings["Amount"]["T"], UserSettings["Amount"]["D"])
 
     Lobby = U.getLobbyInfo()
     Lobby = generateLobby(Lobby, PlayersInTeam)
@@ -88,11 +88,11 @@ def createGame(U):
             PlayersDict.append(M.dict())
         s = []
         for tm in teamMask:
-            s += checkMask(tm, roleMask, Members)
+            s += checkMask(tm, roleMask, Members, UserSettings)
         s.sort()
         # s[0].calcResult()
-        response = {'static': json.dumps(PlayersDict),
-                    'active': [i.dict() for i in s][:1000]}
+        response = {'static': PlayersDict,
+                    'active': [i.dict() for i in s[:1000]]}
         return response
 
 
@@ -100,5 +100,3 @@ def createGame(U):
 # print(createGame(Profile.select().where(Profile.ID == 1)[0]))
 # d2 = datetime.datetime.now()
 # print("Весь метод:", str(d2 - d1))
-
-
