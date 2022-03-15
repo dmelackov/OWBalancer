@@ -61,14 +61,17 @@ def teamRolePriority(fPlayers, sPlayers, fMask, sMask):
     return Points
 
 
-def imbalanceFunc(X, Y, fMask, sMask, fPlayers, sPlayers):
+def imbalanceFunc(X, Y, fMask, sMask, fPlayers, sPlayers, USettings):
     # const init
-    tWeight, dWeight, hWeight = 1.1, 1, 0.9
-    alpha = 3
-    beta = 1
-    gamma = 80
-    p = 2
-    q = 2
+    MathSettings = USettings["Math"]
+    tWeight = MathSettings["tWeight"]
+    dWeight = MathSettings["dWeight"]
+    hWeight = MathSettings["hWeight"]
+    alpha = MathSettings["alpha"]
+    beta = MathSettings["beta"]
+    gamma = MathSettings["gamma"]
+    p = MathSettings["p"]
+    q = MathSettings["q"]
     return (
         alpha * dpFairness(X, Y, p),
         beta * rgRolesFairness(X, Y, fMask, sMask, p, tWeight, dWeight, hWeight),
@@ -194,9 +197,9 @@ class ClassGameBalance:
         for i, y in enumerate(self.sTeam.Players):
             self.sTeamSR.append(y.getRoleSR(int(sMask[i])))
 
-    def calcResult(self):
+    def calcResult(self, USettings):
         self.fairness, self.rolesFairness, self.teamRolePriority, self.uniformity = \
-            imbalanceFunc(self.fTeamSR, self.sTeamSR, self.fMask, self.sMask, self.fTeam, self.sTeam)
+            imbalanceFunc(self.fTeamSR, self.sTeamSR, self.fMask, self.sMask, self.fTeam, self.sTeam, USettings)
         self.result = self.fairness + self.rolesFairness + self.teamRolePriority + self.uniformity
 
     def dict(self):

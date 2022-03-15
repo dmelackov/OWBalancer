@@ -10,7 +10,8 @@ else:
     db = SqliteDatabase(DB_NAME + ".db")
 ProfileDataConst = '{"Amount": {"T": 2, "D": 2, "H": 2}, "TeamNames": {"1": "Team 1", "2": "Team 2"},' \
                    ' "AutoCustom": true, "ExtendedLobby": false, "Autoincrement": false, "BalanceLimit": 1000,' \
-                   '"fColor": "#1e90ff", "sColor": "#ff6347", "ExpandedResult": true}'
+                   '"fColor": "#1e90ff", "sColor": "#ff6347", "ExpandedResult": true, "Math":{"alpha": 3, "beta": 1,' \
+                   ' "gamma": 80, "p": 2, "q": 2, "tWeight": 1.1, "dWeight": 1, "hWeight": 0.9}}'
 LobbyDataConst = '{"Lobby": []}'
 
 

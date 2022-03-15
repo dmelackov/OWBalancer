@@ -29,21 +29,21 @@ def recountModel(static, active):
     return False
 
 
-static = {'static':
-              [{'Username': 'Artmagic', 'TSR': 3100, 'DSR': 2900, 'HSR': 2800, 'Flex': False, 'Roles': 'TD'},
-               {'Username': 'Ivarys', 'TSR': 2900, 'DSR': 2900, 'HSR': 2799, 'Flex': False, 'Roles': 'DT'},
-               {'Username': 'Honoka', 'TSR': 3200, 'DSR': 3200, 'HSR': 3200, 'Flex': False, 'Roles': 'HD'},
-               {'Username': 'Quru', 'TSR': 2700, 'DSR': 2800, 'HSR': 3300, 'Flex': False, 'Roles': 'DH'},
-               {'Username': 'Dima', 'TSR': 2800, 'DSR': 2900, 'HSR': 3100, 'Flex': False, 'Roles': 'TD'},
-               {'Username': 'S1lver', 'TSR': 2600, 'DSR': 2600, 'HSR': 2900, 'Flex': False, 'Roles': 'DT'},
-               {'Username': 'zMize', 'TSR': 2800, 'DSR': 2600, 'HSR': 2400, 'Flex': False, 'Roles': 'TD'},
-               {'Username': 'Konder', 'TSR': 3800, 'DSR': 3100, 'HSR': 3400, 'Flex': False, 'Roles': 'DT'},
-               {'Username': 'Svevoloch', 'TSR': 3000, 'DSR': 2900, 'HSR': 2850, 'Flex': False, 'Roles': 'DH'},
-               {'Username': 'AuntPetunia', 'TSR': 3200, 'DSR': 2700, 'HSR': 2800, 'Flex': False, 'Roles': 'HD'},
-               {'Username': 'Cherry', 'TSR': 3200, 'DSR': 2850, 'HSR': 3300, 'Flex': False, 'Roles': 'HT'},
-               {'Username': 'Tia_ti', 'TSR': 2000, 'DSR': 3200, 'HSR': 2500, 'Flex': False, 'Roles': 'HT'}]}
-active = {'active': {'TeamMask': '011001110100', 'fMask': '010122', 'sMask': '021012', 'dpFairness': 0,
-                     'rgRolesFairness': 0, 'teamRolePriority': 0, 'vqUniformity': 0, 'result': 0}}
-print(recountModel(
-    static["static"], active["active"]
-))
+# static = {'static':
+#               [{'Username': 'Artmagic', 'TSR': 3100, 'DSR': 2900, 'HSR': 2800, 'Flex': False, 'Roles': 'TD'},
+#                {'Username': 'Ivarys', 'TSR': 2900, 'DSR': 2900, 'HSR': 2799, 'Flex': False, 'Roles': 'DT'},
+#                {'Username': 'Honoka', 'TSR': 3200, 'DSR': 3200, 'HSR': 3200, 'Flex': False, 'Roles': 'HD'},
+#                {'Username': 'Quru', 'TSR': 2700, 'DSR': 2800, 'HSR': 3300, 'Flex': False, 'Roles': 'DH'},
+#                {'Username': 'Dima', 'TSR': 2800, 'DSR': 2900, 'HSR': 3100, 'Flex': False, 'Roles': 'TD'},
+#                {'Username': 'S1lver', 'TSR': 2600, 'DSR': 2600, 'HSR': 2900, 'Flex': False, 'Roles': 'DT'},
+#                {'Username': 'zMize', 'TSR': 2800, 'DSR': 2600, 'HSR': 2400, 'Flex': False, 'Roles': 'TD'},
+#                {'Username': 'Konder', 'TSR': 3800, 'DSR': 3100, 'HSR': 3400, 'Flex': False, 'Roles': 'DT'},
+#                {'Username': 'Svevoloch', 'TSR': 3000, 'DSR': 2900, 'HSR': 2850, 'Flex': False, 'Roles': 'DH'},
+#                {'Username': 'AuntPetunia', 'TSR': 3200, 'DSR': 2700, 'HSR': 2800, 'Flex': False, 'Roles': 'HD'},
+#                {'Username': 'Cherry', 'TSR': 3200, 'DSR': 2850, 'HSR': 3300, 'Flex': False, 'Roles': 'HT'},
+#                {'Username': 'Tia_ti', 'TSR': 2000, 'DSR': 3200, 'HSR': 2500, 'Flex': False, 'Roles': 'HT'}]}
+# active = {'active': {'TeamMask': '011001110100', 'fMask': '010122', 'sMask': '021012', 'dpFairness': 0,
+#                      'rgRolesFairness': 0, 'teamRolePriority': 0, 'vqUniformity': 0, 'result': 0}}
+# print(recountModel(
+#     static["static"], active["active"]
+# ))

@@ -9,10 +9,10 @@ diamond_icon = Image.open("app/icons/PIL1/diamond.png").resize((80, 80))
 masters_icon = Image.open("app/icons/PIL1/masters.png").resize((80, 80))
 gm_icon = Image.open("app/icons/PIL1/gm.png").resize((80, 80))
 
-heal_icon = Image.open("app/icons/Test/Heal1.png").resize((100, 100))
-dps_icon = Image.open("app/icons/Test/Dps1.png").resize((100, 100))
-tank_icon = Image.open("app/icons/Test/Tank1.png").resize((100, 100))
-flex_icon = Image.open("app/icons/Test/flex.png").resize((100, 100))
+heal_icon = Image.open("app/icons/PIL1/Roles/Heal1.png").resize((100, 100))
+dps_icon = Image.open("app/icons/PIL1/Roles/Dps1.png").resize((100, 100))
+tank_icon = Image.open("app/icons/PIL1/Roles/Tank1.png").resize((100, 100))
+flex_icon = Image.open("app/icons/PIL1/Roles/flex.png").resize((100, 100))
 
 team_font = ImageFont.truetype("app/icons/font.ttf", 96)
 vs_font = ImageFont.truetype("app/icons/VS_font.otf", 84)
@@ -45,10 +45,9 @@ def generatePlayer(d, role, color_hex):
     image = Image.new('RGB', (width, height), '#161B22')
     draw = ImageDraw.Draw(image)
     draw.rectangle((0, 0, 110, height), color_hex)
-    j = role
-    if j == 0:
+    if role == 0:
         role_ico = tank_icon
-    elif j == 1:
+    elif role == 1:
         role_ico = dps_icon
     else:
         role_ico = heal_icon
@@ -172,3 +171,4 @@ def generateWholeData(d, U):
 #                 "rgRolesFairness": 164.11, "teamRolePriority": 80.0, "vqUniformity": 51.66, "result": 325.25}
 #      }
 # print(generateWholeData(x, Profile.select().where(Profile.ID == 1)[0]))
+# print(ImageColor.getcolor('grey', 'RGB'))

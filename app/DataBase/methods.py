@@ -196,7 +196,7 @@ def getRoles(Profile_ID, Player_ID):
 # print(changeCustomSR_Dps(1, 3200))
 # print(createCustom(1, i))
 # print(checkProfile("Ivar", "Ivar"))
-# print(createProfile("Ivarys", "123"))
+# print(createProfile("Ivarysss", "123"))
 # print(getRoles(1, 1))
 # createDB()
 # print(createPlayer(1, "Ivarys4"))

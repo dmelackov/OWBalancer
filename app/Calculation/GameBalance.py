@@ -67,7 +67,7 @@ def checkMask(tm, roleMask, Members, UserSettings):
     for fMask in fGoodMask:
         for sMask in sGoodMask:
             Balance = ClassGameBalance(fTeam, sTeam, tm, fMask, sMask)
-            Balance.calcResult()
+            Balance.calcResult(UserSettings)
             if Balance.result <= UserSettings["BalanceLimit"]:
                 mass.append(Balance)
     return mass
