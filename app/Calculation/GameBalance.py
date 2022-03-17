@@ -130,7 +130,7 @@ def createGame(U):
         }
 
 
-d1 = datetime.datetime.now()
-print(createGame(Profile.select().where(Profile.ID == 1)[0]))
-d2 = datetime.datetime.now()
-print("Весь метод:", str(d2 - d1))
+# d1 = datetime.datetime.now()
+# print(createGame(Profile.select().where(Profile.ID == 1)[0]))
+# d2 = datetime.datetime.now()
+# print("Весь метод:", str(d2 - d1))
