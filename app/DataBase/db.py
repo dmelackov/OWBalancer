@@ -166,6 +166,7 @@ class Games(DefaultModel):
     Creator = ForeignKeyField(Profile, to_field="ID")
     Timestamp = DateTimeField()
     Winner = IntegerField(null=True)
+    # GameStatic =
     GameData = TextField()
     Active = BooleanField()
 

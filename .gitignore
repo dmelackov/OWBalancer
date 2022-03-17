@@ -141,3 +141,5 @@ app/params.py
 /BalanceImages/
 /app/PIL/PILRewrite.py
 /app/icons/Test/
+/app/icons/
+/app/PIL/

@@ -54,6 +54,8 @@ def checkMask(tm, roleMask, Members, UserSettings):
     fTeam = ClassTeam(Members, tm, 0)
     sTeam = ClassTeam(Members, tm, 1)
 
+    maskError = False
+    balanceError = False
     fGoodMask = []
     for mask in roleMask:
         if fTeam.checkMask(mask):
@@ -63,6 +65,9 @@ def checkMask(tm, roleMask, Members, UserSettings):
         if sTeam.checkMask(mask):
             sGoodMask.append(mask)
 
+    if not fGoodMask or not sGoodMask:
+        maskError = True
+
     mass = []
     for fMask in fGoodMask:
         for sMask in sGoodMask:
@@ -70,7 +75,9 @@ def checkMask(tm, roleMask, Members, UserSettings):
             Balance.calcResult(UserSettings)
             if Balance.result <= UserSettings["BalanceLimit"]:
                 mass.append(Balance)
-    return mass
+    if not mass:
+        balanceError = True
+    return mass, balanceError, maskError
 
 
 def createGame(U):
@@ -87,16 +94,43 @@ def createGame(U):
         for M in Members:
             PlayersDict.append(M.dict())
         s = []
+        balanceError = True
+        maskError = True
         for tm in teamMask:
-            s += checkMask(tm, roleMask, Members, UserSettings)
+            tempM, tempBalErr, tempMaskErr = checkMask(tm, roleMask, Members, UserSettings)
+            if not tempBalErr:
+                balanceError = False
+            if not tempMaskErr:
+                maskError = False
+            s += tempM
         s.sort()
         # s[0].calcResult()
-        response = {'static': PlayersDict,
-                    'active': [i.dict() for i in s[:1000]]}
+        if maskError:
+            response = {
+                'result': 500,
+                'status': "not enough players for each role"
+            }
+        elif balanceError:
+            response = {
+                'result': 500,
+                'status': "Cant shuffle players within balance limit"
+            }
+        else:
+            response = {
+                'result': 200,
+                'status': "ok",
+                'static': PlayersDict,
+                'active': [i.dict() for i in s[:1000]]
+            }
         return response
+    else:
+        return {
+            "result": 500,
+            "status": "Not enough players in lobby"
+        }
 
 
-# d1 = datetime.datetime.now()
-# print(createGame(Profile.select().where(Profile.ID == 1)[0]))
-# d2 = datetime.datetime.now()
-# print("Весь метод:", str(d2 - d1))
+d1 = datetime.datetime.now()
+print(createGame(Profile.select().where(Profile.ID == 1)[0]))
+d2 = datetime.datetime.now()
+print("Весь метод:", str(d2 - d1))
