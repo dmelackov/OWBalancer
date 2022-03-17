@@ -14,7 +14,8 @@ def checkRoleMask(fTeamMask, sTeamMask, PlayersOnline):
     )
 
 
-def recountModel(static, active):
+def recountModel(static, active, U):
+    UserSettings = U.getUserSettings()
     Members = [ClassPlayer(i["TSR"], i["DSR"], i["HSR"], i["Username"]) for i in static]
     for i in range(len(Members)):
         Members[i].selectRoles(static[i]["Roles"], static[i]["Flex"])
@@ -24,7 +25,7 @@ def recountModel(static, active):
         sTeam = ClassTeam(Members, active["TeamMask"], 1)
         if fTeam.checkMask(active["fMask"]) and sTeam.checkMask(active["sMask"]):
             Balance = ClassGameBalance(fTeam, sTeam, active["TeamMask"], active["fMask"], active["sMask"])
-            Balance.calcResult()
+            Balance.calcResult(UserSettings)
             return Balance.dict()
     return False
 
