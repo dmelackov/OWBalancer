@@ -156,9 +156,11 @@ class ClassPlayer:
 
     def rolePriorityPoints(self, R):
         R = "T" if R == 0 else "D" if R == 1 else "H" if R == 2 else R
+        if self.Flex:
+            return 3
         if R not in self.Roles:
             return 0
-        return (3 - self.Roles.index(R)) if not self.Flex else 3
+        return 3 - self.Roles.index(R)
 
 
 class ClassTeam:
