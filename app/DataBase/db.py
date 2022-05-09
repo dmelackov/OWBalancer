@@ -9,7 +9,7 @@ if db_type == "mysql":
 else:
     db = SqliteDatabase(DB_NAME + ".db")
 ProfileDataConst = '{"Amount": {"T": 2, "D": 2, "H": 2}, "TeamNames": {"1": "Team 1", "2": "Team 2"},' \
-                   ' "AutoCustom": true, "ExtendedLobby": false, "Autoincrement": false, "BalanceLimit": 1000,' \
+                   ' "AutoCustom": true, "ExtendedLobby": false, "Autoincrement": false, "BalanceLimit": 2500,' \
                    '"fColor": "#1e90ff", "sColor": "#ff6347", "ExpandedResult": true, "Math":{"alpha": 3.0, "beta": 1.0,' \
                    ' "gamma": 80.0, "p": 2.0, "q": 2.0, "tWeight": 1.1, "dWeight": 1.0, "hWeight": 0.9}}'
 LobbyDataConst = '{"Lobby": []}'
