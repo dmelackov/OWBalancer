@@ -167,11 +167,10 @@ class ClassTeam:
                 self.Players.append(Members[i])
 
     def checkMask(self, Mask):
-        checker = True
         for i, m in enumerate(Mask):
             if not self.Players[i].checkRole(int(m)):
-                checker = False
-        return checker
+                return False
+        return True
 
 
 class ClassGameBalance:

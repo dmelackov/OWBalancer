@@ -23,7 +23,7 @@ def calcBalance():
     balance["active"] = data.get("active", None)
     if balance["static"] is None or balance["active"] is None:
         return Response(status=400)
-    return jsonify(recountModel(balance["static"], balance["active"]))
+    return jsonify(recountModel(balance["static"], balance["active"], current_user))
 
 
 @api.route('/getBalances', methods=['GET'])
