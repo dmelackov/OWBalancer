@@ -108,12 +108,12 @@ def createGame(U):
         if maskError:
             response = {
                 'result': 500,
-                'status': "not enough players for each role"
+                'status': "Not enough players for each role"
             }
         elif balanceError:
             response = {
                 'result': 500,
-                'status': "Cant shuffle players within balance limit"
+                'status': "Can't shuffle players within balance limit"
             }
         else:
             response = {

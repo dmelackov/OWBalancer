@@ -170,7 +170,7 @@ class ClassTeam:
 
     def checkMask(self, Mask):
         for i, m in enumerate(Mask):
-            if not self.Players[i].checkRole(int(m)):
+            if not self.Players[i].checkRole(int(m)) and not self.Players[i].Flex:
                 return False
         return True
 
