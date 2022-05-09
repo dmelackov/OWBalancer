@@ -166,7 +166,7 @@ class Games(DefaultModel):
     Creator = ForeignKeyField(Profile, to_field="ID")
     Timestamp = DateTimeField()
     Winner = IntegerField(null=True)
-    # GameStatic =
+    GameStatic = TextField()
     GameData = TextField()
     Active = BooleanField()
 
@@ -185,3 +185,15 @@ class Games(DefaultModel):
         self.Active = False
         self.save()
         return True
+
+
+UserRolesConst = {""}
+
+
+class Workspace(DefaultModel):
+    ID = PrimaryKeyField()
+    Creator = ForeignKeyField(Profile, to_field="ID")
+    Name = TextField()
+    UserRoles = TextField()
+
+

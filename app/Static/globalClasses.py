@@ -6,7 +6,7 @@ def dpFairness(X, Y, p):
     # count p-Fairness of the game,
     # where s - skillRatings; X, Y - players for each team
     return abs(
-        pow(sum(map(lambda x: x ** p, X)), 1/p) - pow(sum(map(lambda y: y ** p, Y)), 1/p)
+        pow(sum(map(lambda x: x ** p, X)), 1 / p) - pow(sum(map(lambda y: y ** p, Y)), 1 / p)
     )
 
 
@@ -21,13 +21,13 @@ def rgRolesFairness(X, Y, fMask, sMask, g, tWeight, dWeight, hWeight):
     return abs(
         pow(
             (
-                (
-                    (abs(fRoles[0] - sRoles[0]) * tWeight) ** g +
-                    (abs(fRoles[1] - sRoles[1]) * dWeight) ** g +
-                    (abs(fRoles[2] - sRoles[2]) * hWeight) ** g
-                ) / 3
+                    (
+                            (abs(fRoles[0] - sRoles[0]) * tWeight) ** g +
+                            (abs(fRoles[1] - sRoles[1]) * dWeight) ** g +
+                            (abs(fRoles[2] - sRoles[2]) * hWeight) ** g
+                    ) / 3
             ),
-            1/g
+            1 / g
         )
     )
 
@@ -39,20 +39,20 @@ def vqUniformity(X, Y, q):
     Z = X + Y
     muz = sum(Z) / len(Z)
     return abs(
-        pow(sum(map(lambda x: abs(x - muz) ** q, X)) / len(X), 1/q) -
-        pow(sum(map(lambda y: abs(y - muz) ** q, Y)) / len(Y), 1/q)
+        pow(sum(map(lambda x: abs(x - muz) ** q, X)) / len(X), 1 / q) -
+        pow(sum(map(lambda y: abs(y - muz) ** q, Y)) / len(Y), 1 / q)
     )
 
 
 def teamRolePriority(fPlayers, sPlayers, fMask, sMask):
-    Points = 36
-    fTeamRoles = 18
+    Points = (len(fPlayers) + len(sPlayers)) * 3
+    fTeamRoles = len(fPlayers) * 3
     for i, role in enumerate(fMask):
         sub = fPlayers[i].rolePriorityPoints(int(role))
         Points -= sub
         fTeamRoles -= sub
 
-    sTeamRoles = 18
+    sTeamRoles = len(sPlayers) * 3
     for i, role in enumerate(sMask):
         sub = sPlayers[i].rolePriorityPoints(int(role))
         sTeamRoles -= sub
@@ -156,6 +156,8 @@ class ClassPlayer:
 
     def rolePriorityPoints(self, R):
         R = "T" if R == 0 else "D" if R == 1 else "H" if R == 2 else R
+        if R not in self.Roles:
+            return 0
         return (3 - self.Roles.index(R)) if not self.Flex else 3
 
 
@@ -203,15 +205,15 @@ class ClassGameBalance:
 
     def dict(self):
         return {
-                'TeamMask': self.TeamMask,
-                'fMask': self.fMask,
-                'sMask': self.sMask,
-                'dpFairness': round(self.fairness, 2),
-                'rgRolesFairness': round(self.rolesFairness, 2),
-                'teamRolePriority': round(self.teamRolePriority, 2),
-                'vqUniformity': round(self.uniformity, 2),
-                'result': round(self.result, 2)
-            }
+            'TeamMask': self.TeamMask,
+            'fMask': self.fMask,
+            'sMask': self.sMask,
+            'dpFairness': round(self.fairness, 2),
+            'rgRolesFairness': round(self.rolesFairness, 2),
+            'teamRolePriority': round(self.teamRolePriority, 2),
+            'vqUniformity': round(self.uniformity, 2),
+            'result': round(self.result, 2)
+        }
 
     def __eq__(self, other):
         if self.result == other.result:
