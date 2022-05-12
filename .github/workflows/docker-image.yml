@@ -1,10 +1,10 @@
-name: Frontend Docker Image
+name: Backend Docker Image
 
 on:
   push:
-    branches: [ VueRewrite ]
+    branches: [ master ]
   pull_request:
-    branches: [ VueRewrite ]
+    branches: [ master ]
 
 jobs:
 
