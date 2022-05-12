@@ -2,7 +2,7 @@ from app.DataBase.db import *
 
 
 def createDB():
-    db.create_tables([Profile, Custom, Player, Perms, Roles, RolePerms])
+    db.create_tables([Profile, Custom, Player, Perms, Roles, RolePerms, Games, PlayerRoles])
 
 
 # create things
@@ -25,48 +25,61 @@ def checkProfile(Username, Password):
         return False
 
 
-def createPlayer(Username, Creator):  # можно что-то одно (тоже работает)
-    if Username and Creator:
-        if not Player.select().where(Player.Username == Username).exists():
-            P = Player.create(Username=Username, Creator=Creator)
-            return P
+def createPlayer(U, Username):
+    if Username:
+        P = Player.select().where(Player.Username == Username)
+        if not P.exists():
+            P = Player.create(Username=Username, Creator=U)
+        else:
+            P = P[0]
+        PR = getPlayerRoles(P, U)
+        if not PR:
+            PlayerRoles.create(Creator=U, Player=P)
+        return P
     return False
 
 
-def createCustom(Profile_ID, Player_ID):
+def createCustom(U, Player_ID):
     P = Player.select().where(Player.ID == Player_ID)
-    User = Profile.select().where(Profile.ID == Profile_ID)
-    if P.exists() and User.exists():
-        C = Custom.select().where(Custom.Creator == User, Custom.Player == P)
+    if P.exists():
+        C = Custom.select().where(Custom.Creator == U, Custom.Player == P)
         if not C.exists():
-            C = Custom.create(Creator=User[0], Player=P[0])
+            C = Custom.create(Creator=U, Player=P[0])
             return C
+    return False
+
+
+def createGame(Profile_ID, GameData):
+    U = Profile.select().where(Profile.ID == Profile_ID)
+    if U.exists():
+        G = Games.create(Creator=U[0], GameData=GameData, Active=False)
+        return G
     return False
 # -----------------------------------------
 
 
 # Change custom / roles
 # -----------------------------------------
-def changeRoles(Player_ID, NewRoles):
+def changeRoles(U, Player_ID, NewRoles):
     P = Player.select().where(Player.ID == Player_ID)
     if P.exists():
-        P = P[0]
-        P.Roles = NewRoles
-        P.save()
-        return True
-    else:
-        return False
+        PR = getPlayerRoles(P[0], U)
+        if PR is not False:
+            PR.Roles = NewRoles
+            PR.save()
+            return PR
+    return False
 
 
-def confirmFlex(Player_ID, isFlex):
+def changeFlex(U, Player_ID, isFlex):
     P = Player.select().where(Player.ID == Player_ID)
     if P.exists():
-        P = P[0]
-        P.isFlex = isFlex
-        P.save()
-        return True
-    else:
-        return False
+        PR = getPlayerRoles(P[0], U)
+        if PR is not False:
+            PR.isFlex = isFlex
+            PR.save()
+            return PR
+    return False
 
 
 def changeCustomSR_Tank(Custom_ID, New_SR):
@@ -116,6 +129,14 @@ def getCustomSR(Custom_ID):
 
 # get some things
 # -----------------------------------------
+def getPlayerRoles(P, U):
+    PR = PlayerRoles.select().where(PlayerRoles.Player == P, PlayerRoles.Creator == U)
+    if PR.exists():
+        return PR[0]
+    else:
+        return False
+
+
 def getCustomID(Profile_ID, Player_ID):
     C = Custom.select().where(Custom.Player == Player_ID, Custom.Creator == Profile_ID)
     if C.exists():
@@ -134,10 +155,9 @@ def getCustoms_byPlayer(Player_ID):
 
 
 def searchPlayer(search_query):
-    AllP = Player.select()
     ansm = []
-    for P in AllP:
-        if search_query.lower() in P.Username.lower() or search_query.lower() in P.BattleTag.lower():
+    for P in Player.select():
+        if search_query.lower() in P.Username.lower():
             ansm.append(P)
     return ansm
 
@@ -150,39 +170,23 @@ def getProfileID(Profile_Username):
         return None
 
 
-def getRoles(Player_ID):
+def getRoles(Profile_ID, Player_ID):
     P = Player.select().where(Player.ID == Player_ID)
-    if P.exists():
-        P = P[0]
-        return [i for i in P.Roles]
+    U = Profile.select().where(Profile.ID == Profile_ID)
+    if P.exists() and U.exists():
+        PR = getPlayerRoles(U[0], P[0])
+        if PR is not False:
+            return [i for i in PR.Roles]
+        else:
+            PR = PlayerRoles.create(Creator=U, Player=P)
+            return []
     else:
-        return []
+        return False
 
+
+# def getGames(Profile_ID):
+#     U = Profile.select().where(Pro)
 # -----------------------------------------
-# Full Creation
-
-
-def Full_CreateCustom(Player_ID, Profile_ID, TSR, DSR, HSR):
-    C = createCustom(Profile_ID, Player_ID)
-    if C:
-        status = True
-        status *= changeCustomSR_Tank(C.ID, TSR)
-        status *= changeCustomSR_Dps(C.ID, DSR)
-        status *= changeCustomSR_Heal(C.ID, HSR)
-        return bool(status)
-    return False
-
-
-def Full_CreatePlayer(Profile_ID, Username, TSR, DSR, HSR, Roles, Creator):
-    P = createPlayer(Username, Creator)
-    PBool = Full_CreateCustom(P.ID, Profile_ID, TSR, DSR, HSR)
-    PBool *= changeRoles(P.ID, Roles)
-    return bool(PBool)
-
-
-# print(Full_CreateCustom(2, 2, 2600, 2400, 2100))
-# print(Full_CreatePlayer(1, "Svevoloch", 3000, 2700, 2800, "TD",
-#                         Profile.select().where(Profile.Username == "Ivarys")[0]))
 
 # print(getCustoms_byPlayer(1))
 # print(changeRoles(2, "TH"))
@@ -190,13 +194,13 @@ def Full_CreatePlayer(Profile_ID, Username, TSR, DSR, HSR, Roles, Creator):
 # print(changeCustomSR_Tank(1, 3200))
 # print(changeCustomSR_Heal(1, 3000))
 # print(changeCustomSR_Dps(1, 3200))
-# print(createCustom("Ivar", "Ivarys"))
+# print(createCustom(1, i))
 # print(checkProfile("Ivar", "Ivar"))
-# print(createProfile("Ivarys", "123"))
-# print(getRoles(1))
+# print(createProfile("Ivarysss", "123"))
+# print(getRoles(1, 1))
 # createDB()
-# print(createPlayer("Ivarys",
-#              Profile.select().where(Profile.Username == "Ivarys")[0]))
+# print(createPlayer(1, "Ivarys4"))
+# print(Custom.get(Custom.ID == 1).getJson(Profile.select().where(Profile.Username == "Ivarys")[0]))
 # print(Profile.select().where(Profile.Username == "Ivarys")[0].getUserSettings())
 # ProfileDataConst = {"Amount": {"T": 2, "D": 2, "H": 2},
 #                     "TeamNames": {"1": "Team 1", "2": "Team 2"}, "AutoCustom": True,

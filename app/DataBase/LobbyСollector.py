@@ -1,33 +1,24 @@
 from app.DataBase.db import *
-import json
 
 
 def GetLobby(Profile_ID):
-    User = Profile.select().where(Profile.ID == Profile_ID)
-    if User.exists():
-        CMass = User[0].Customers.split(".")
-        if "" in CMass:
-            CMass.remove("")
-        return [int(i) for i in CMass]
+    U = Profile.select().where(Profile.ID == Profile_ID)
+    if U.exists():
+        return U[0].getLobbyInfo()
 
 
 def GetUserSettings(Profile_ID):
-    User = Profile.select().where(Profile.ID == Profile_ID)
-    if User.exists():
-        CMass = json.loads(User[0].LobbySettings)
-        return CMass
-
-
-def AddToLobby(Profile_ID, Custom_ID):
     U = Profile.select().where(Profile.ID == Profile_ID)
+    if U.exists():
+        return U[0].getUserSettings()
+
+
+def AddToLobby(U, Custom_ID):
     C = Custom.select().where(Custom.ID == Custom_ID)
-    if U.exists() and C.exists():
-        U, C = U[0], C[0]
+    if C.exists():
+        C = C[0]
 
-        CMass = U.Customers.split(".")
-
-        if "" in CMass:
-            CMass.remove("")
+        CMass = U.getLobbyInfo()
         USettings = U.getUserSettings()
         TeamPlayers = USettings["Amount"]["T"] + USettings["Amount"]["D"] + USettings["Amount"]["H"]
         if len(CMass) < TeamPlayers * 2 or USettings["ExtendedLobby"]:
@@ -38,37 +29,30 @@ def AddToLobby(Profile_ID, Custom_ID):
             if cacheToChange != -1:
                 CMass.remove(cacheToChange)
 
-            if not str(C.ID) in CMass:
-                CMass.append(str(C.ID))
-            U.Customers = ".".join(CMass)
-            U.save()
+            if C.ID not in CMass:
+                CMass.append(C.ID)
+            U.updateLobbyInfo(CMass)
             return True
     return False
 
 
-def DeleteFromLobby(Profile_ID, Custom_ID):
-    User = Profile.select().where(Profile.ID == Profile_ID)
+def DeleteFromLobby(U, Custom_ID):
     C = Custom.select().where(Custom.ID == Custom_ID)
-    if User.exists() and C.exists():
-        User, C = User[0], C[0]
+    if C.exists():
+        C = C[0]
+        CMass = U.getLobbyInfo()
 
-        CMass = User.Customers.split(".")
-        if "" in CMass:
-            CMass.remove("")
-        if str(C.ID) in CMass:
-            CMass.remove(str(C.ID))
-        User.Customers = ".".join(CMass)
-        User.save()
+        if C.ID in CMass:
+            CMass.remove(C.ID)
+        U.updateLobbyInfo(CMass)
         return True
     return False
 
 
 def ClearLobby(Profile_ID):
-    User = Profile.select().where(Profile.ID == Profile_ID)
-    if User.exists():
-        User = User[0]
-        User.Customers = ""
-        User.save()
+    U = Profile.select().where(Profile.ID == Profile_ID)
+    if U.exists():
+        U[0].updateLobbyInfo([])
         return True
     return False
 

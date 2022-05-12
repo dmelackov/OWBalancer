@@ -1,7 +1,7 @@
 from flask import Blueprint, request, Response
 from flask_login import login_required, current_user
-import app.DataBase.db as MainDB
-import app.DataBase.methods as DataBaseMethods
+import app.DataBase.db as db
+import app.DataBase.methods as db_methods
 import app.DataBase.LobbyСollector as LobbyMethods
 from flask import jsonify
 import logging
@@ -13,24 +13,22 @@ api = Blueprint('customs_api', __name__, template_folder='templates',
                 static_folder='static')
 
 
-@api.route('/getCustoms/<int:id>')
+@api.route('/getCustoms/<int:Pid>')
 @login_required
-def getCustoms(id):
+def getCustoms(Pid):
     module_logger.info(f"{current_user.Username} trying to get customs")
-    custom = DataBaseMethods.getCustomID(current_user.ID, id)
-    if custom and current_user.getUserSettings()["AutoCustom"]:
-        data = MainDB.Custom.get(MainDB.Custom.ID == custom).getJsonInfo()
-        data = {'data': data}
-        data['type'] = 'custom'
-        module_logger.info(
-            f"{current_user.Username}: Custom returning type '{data['type']}'")
-        return jsonify(data)
-    customs = DataBaseMethods.getCustoms_byPlayer(id)
+    if current_user.getUserSettings()["AutoCustom"]:
+        Cid = db_methods.getCustomID(current_user.ID, Pid)
+        if Cid:
+            C = db.Custom.get(db.Custom.ID == Cid).getJson(current_user)
+            data = {'data': C, 'type': 'custom'}
+            module_logger.info(
+                f"{current_user.Username}: Custom returning type '{data['type']}'")
+            return jsonify(data)
+    customs = db_methods.getCustoms_byPlayer(Pid)
     if customs:
-        data = list(map(lambda x: MainDB.Custom.get(
-            MainDB.Custom.ID == x).getJsonInfo(), customs))
-        data = {'data': data}
-        data['type'] = 'list'
+        data = {'data': list(map(lambda x: x.getJson(
+            current_user), customs)), 'type': 'list'}
         module_logger.info(
             f"{current_user.Username}: Custom returning type '{data['type']}'")
         return jsonify(data)
@@ -52,12 +50,12 @@ def changeRoleSr():
         f"{current_user.Username} trying change rating for custom({data['customId']}); {data['role']} to {data['rating'] }")
     if not (0 <= data["rating"] <= 5000):
         return Response(status=200)
-    if (data['role'] == "T"):
-        DataBaseMethods.changeCustomSR_Tank(data["customId"], data["rating"])
-    elif (data['role'] == "D"):
-        DataBaseMethods.changeCustomSR_Dps(data["customId"], data["rating"])
-    elif (data['role'] == "H"):
-        DataBaseMethods.changeCustomSR_Heal(data["customId"], data["rating"])
+    if data['role'] == "T":
+        db_methods.changeCustomSR_Tank(data["customId"], data["rating"])
+    elif data['role'] == "D":
+        db_methods.changeCustomSR_Dps(data["customId"], data["rating"])
+    elif data['role'] == "H":
+        db_methods.changeCustomSR_Heal(data["customId"], data["rating"])
     return Response(status=200)
 
 
@@ -67,8 +65,8 @@ def createCustom():
     if not checkProfilePermission(current_user, "create_custom"):
         return jsonify({"status": 403})
     data = request.get_json()
-    C = DataBaseMethods.createCustom(current_user.ID, data["id"])
+    C = db_methods.createCustom(current_user, data["id"])
     module_logger.info(
         f"{current_user.Username} trying create custom for {C.Player.Username}")
-    LobbyMethods.AddToLobby(current_user.ID, C.ID)
+    LobbyMethods.AddToLobby(current_user, C.ID)
     return Response(status=200)
