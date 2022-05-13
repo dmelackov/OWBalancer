@@ -5,7 +5,7 @@ from flask_login import UserMixin
 import json
 
 if db_type == "mysql":
-    db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password)
+    db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password, threadlocals=True)
 else:
     db = SqliteDatabase(DB_NAME + ".db")
 ProfileDataConst = '{"Amount": {"T": 2, "D": 2, "H": 2}, "TeamNames": {"1": "Team 1", "2": "Team 2"},' \
