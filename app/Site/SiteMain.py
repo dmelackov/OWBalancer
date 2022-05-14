@@ -45,6 +45,14 @@ class FlaskSite:
         serve(self.app, host="0.0.0.0", port=site_port)
 
     def initRouters(self):
+        @self.app.before_request
+        def _db_connect():
+            MainDB.db.connect()
+
+        @self.app.teardown_request
+        def _db_close(exc):
+            if not MainDB.db.is_closed():
+                MainDB.db.close()
 
         @self.login_manager.user_loader
         def load_user(user_id):
