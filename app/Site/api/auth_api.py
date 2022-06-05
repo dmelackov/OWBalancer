@@ -52,13 +52,11 @@ def registration():
     return jsonify({"status": 400})
 
 
-
 @login_required
-@api.route('/logout', methods=['GET'])
+@api.route('/logout', methods=['POST'])
 def logout():
     logout_user()
-    return redirect("/")
-
+    return jsonify({"status": 200, "message": "OK"})
 
 @api.route('/getCSRF', methods=['GET'])
 def getCSRF():
