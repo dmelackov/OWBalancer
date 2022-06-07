@@ -1,7 +1,7 @@
 from flask import Blueprint, request, Response
 from flask_login import login_required, current_user
 import app.DataBase.db as db
-import app.DataBase.methods as db_methods
+import app.DataBase.methods.methods as db_methods
 import app.DataBase.LobbyСollector as LobbyMethods
 from flask import jsonify
 import logging

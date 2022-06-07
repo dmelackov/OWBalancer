@@ -1,7 +1,8 @@
-from app.DataBase.methods import createDB
+from app.DataBase.methods.methods import createDB
 from app.Site.SiteMain import FlaskSite
 from threading import Thread
 import logging.config
+
 
 class SiteThread(Thread):
     def __init__(self):
@@ -10,6 +11,7 @@ class SiteThread(Thread):
     def run(self):
         site = FlaskSite()
         site.startFlask()
+
 
 logging.config.fileConfig('logging.conf')
 createDB()

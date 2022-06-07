@@ -1,11 +1,11 @@
-from flask import Blueprint, Response, jsonify, redirect, current_app, session
-from flask_login import LoginManager, login_required, login_user, logout_user, current_user
+from flask import Blueprint, Response, jsonify, redirect
+from flask_login import login_required, login_user, logout_user, current_user
 import logging
 from app.Site.forms.user import LoginForm, RegisterForm
 import app.DataBase.db as db
 from peewee import fn
 from flask_wtf import csrf
-import app.DataBase.methods as DataBaseMethods
+import app.DataBase.methods.methods as DataBaseMethods
 import app.DataBase.RolesMethods as RolesMethods
 
 module_logger = logging.getLogger("api")

@@ -1,11 +1,6 @@
 import app.DataBase.db as MainDB
-import app.DataBase.methods as DataBaseMethods
-import app.DataBase.RolesMethods as RolesMethods
-from flask import Flask, render_template, redirect
-from flask_login import LoginManager, login_required, login_user, logout_user, current_user
-from app.Site.forms.user import LoginForm, RegisterForm
-from peewee import fn
-from flask import jsonify, request
+from flask import Flask
+from flask_login import LoginManager
 from app.Site.api.api import api
 import logging
 from flask_wtf.csrf import CSRFProtect

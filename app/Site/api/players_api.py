@@ -1,11 +1,11 @@
 from flask import Blueprint, request, Response
 from flask_login import login_required, current_user
 import app.DataBase.db as db
-import app.DataBase.methods as db_methods
+import app.DataBase.methods.methods as db_methods
 from flask import jsonify
 import logging
 import re
-from app.DataBase.RolesMethods import checkProfilePermission, getUserPermissions
+from app.DataBase.RolesMethods import checkProfilePermission
 
 module_logger = logging.getLogger("api")
 
