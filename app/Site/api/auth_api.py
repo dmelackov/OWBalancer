@@ -57,7 +57,3 @@ def registration():
 def logout():
     logout_user()
     return jsonify({"status": 200, "message": "OK"})
-
-@api.route('/getCSRF', methods=['GET'])
-def getCSRF():
-    return csrf.generate_csrf()

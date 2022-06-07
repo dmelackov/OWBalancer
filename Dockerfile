@@ -1,4 +1,4 @@
-FROM python:3.7-slim
+FROM pypy:3.9-slim
 
 EXPOSE 80
 
@@ -16,7 +16,6 @@ WORKDIR /usr/src/balancer
 
 COPY . .
 
-RUN /usr/local/bin/python -m pip install --upgrade pip && \
-    pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-CMD [ "python3", "start.py"]
+CMD [ "pypy3", "start.py"]

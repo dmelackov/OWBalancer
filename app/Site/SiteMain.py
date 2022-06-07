@@ -31,15 +31,12 @@ class FlaskSite:
     def initFlaskConfig(self):
         self.app = Flask(__name__)
         self.app.config['SECRET_KEY'] = 'VanyaPidoras'
+        self.app.config["SESSION_COOKIE_SAMESITE"] = "Strict"
+        self.app.config["REMEMBER_COOKIE_SAMESITE"] = "Strict"
 
         self.login_manager = LoginManager()
         self.login_manager.init_app(self.app)
 
-        self.csrf = CSRFProtect()
-        self.csrf.init_app(self.app)
-
-        self.app.config.setdefault(
-            "WTF_CSRF_HEADERS", ["X-CSRFToken", "X-CSRF-Token", "X-Csrf-Token"])
 
     def startFlask(self):
         serve(self.app, host="0.0.0.0", port=site_port)
