@@ -3,7 +3,7 @@ from flask.wrappers import Response
 import logging
 import json
 from flask_login import login_required, current_user
-from app.DataBase.RolesMethods import checkProfilePermission
+from app.DataBase.methods.roles import checkProfilePermission
 from flask import jsonify
 from app.Calculation.GameBalance import createGame
 from app.Calculation.StaticAnalisys import recountModel
