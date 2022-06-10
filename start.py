@@ -1,9 +1,8 @@
-from app.DataBase.methods.methods import createDB
+from app.DataBase.methods import createDB
 from app.Site.SiteMain import FlaskSite
 from threading import Thread
 import logging.config
-
-
+import multiprocessing
 class SiteThread(Thread):
     def __init__(self):
         Thread.__init__(self)
@@ -11,9 +10,9 @@ class SiteThread(Thread):
     def run(self):
         site = FlaskSite()
         site.startFlask()
-
-
-logging.config.fileConfig('logging.conf')
-createDB()
-stThr = SiteThread()
-stThr.start()
+if __name__ == "__main__":
+    logging.config.fileConfig('logging.conf')
+    createDB()
+    multiprocessing.freeze_support()
+    stThr = SiteThread()
+    stThr.start()

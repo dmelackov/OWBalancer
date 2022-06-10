@@ -1,9 +1,7 @@
 from app.Static.globalClasses import ClassPlayer, ClassGameBalance, ClassTeam
 import itertools
 import random
-import datetime
 from app.DataBase.db import *
-
 
 def generateMask(countPlayers, countTanks, countDps):
     teamMask = []
@@ -80,6 +78,7 @@ def checkMask(tm, roleMask, Members, UserSettings):
     return mass, balanceError, maskError
 
 
+
 def createGame(U):
     UserSettings = U.getUserSettings()
     PlayersInTeam = UserSettings["Amount"]["T"] + UserSettings["Amount"]["D"] + UserSettings["Amount"]["H"]
@@ -96,13 +95,16 @@ def createGame(U):
         s = []
         balanceError = True
         maskError = True
+
         for tm in teamMask:
+            
             tempM, tempBalErr, tempMaskErr = checkMask(tm, roleMask, Members, UserSettings)
             if not tempBalErr:
                 balanceError = False
             if not tempMaskErr:
                 maskError = False
             s += tempM
+
         s.sort()
         # s[0].calcResult()
         if maskError:
