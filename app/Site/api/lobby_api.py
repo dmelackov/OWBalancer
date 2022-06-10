@@ -14,10 +14,11 @@ api = Blueprint('lobby_api', __name__, template_folder='templates',
 
 @api.route('/getLobby')
 @login_required
-def getLobby():
+async def getLobby() -> Response:
     module_logger.info(f"{current_user.Username} trying to get lobby")
     players = current_user.getLobbyInfo()
-    data = [i.getJson(current_user) for i in db.Custom.select().where(db.Custom.ID << players)]
+    data = [i.getJson(current_user)
+            for i in db.Custom.select().where(db.Custom.ID << players)]
     for PData in data:
         if PData['Creator']['ID'] == current_user.ID:
             PData['editable'] = True
@@ -33,7 +34,7 @@ def getLobby():
 
 @api.route('/addToLobby', methods=['POST'])
 @login_required
-def addToLobby():
+async def addToLobby() -> Response:
     if not checkProfilePermission(current_user, "add_customs_tolobby"):
         return jsonify({"status": 403})
     data = request.get_json()
@@ -45,7 +46,7 @@ def addToLobby():
 
 @api.route('/deleteFromLobby', methods=['POST'])
 @login_required
-def deleteFromLobby():
+async def deleteFromLobby() -> Response:
     if not checkProfilePermission(current_user, "add_customs_tolobby"):
         return jsonify({"status": 403})
     data = request.get_json()
@@ -57,7 +58,7 @@ def deleteFromLobby():
 
 @api.route('/clearLobby', methods=['POST'])
 @login_required
-def clearLobby():
+async def clearLobby() -> Response:
     if not checkProfilePermission(current_user, "add_customs_tolobby"):
         return jsonify({"status": 403})
     module_logger.info(f"{current_user.Username} trying clear lobby")

@@ -15,7 +15,7 @@ api = Blueprint('auth_api', __name__, template_folder='templates',
 
 
 @api.route('/login', methods=['POST'])
-def login():
+async def login() -> Response:
     if current_user.is_authenticated:
         return Response(status=403)
     module_logger.info(f"Trying log in")
@@ -33,7 +33,7 @@ def login():
 
 
 @api.route('/registration', methods=['POST'])
-def registration():
+async def registration() -> Response:
     if current_user.is_authenticated:
         return Response(status=403)
     form = RegisterForm()
@@ -54,6 +54,6 @@ def registration():
 
 @login_required
 @api.route('/logout', methods=['POST'])
-def logout():
+async def logout() -> Response:
     logout_user()
     return jsonify({"status": 200, "message": "OK"})

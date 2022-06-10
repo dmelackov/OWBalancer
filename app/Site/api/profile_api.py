@@ -1,8 +1,8 @@
-from flask import Blueprint
+from flask import Blueprint, Response
 from flask import jsonify
 import logging
-from flask_login import login_required, current_user
-from app.DataBase.RolesMethods import checkProfilePermission, getUserPermissions
+from flask_login import current_user
+from app.DataBase.RolesMethods import getUserPermissions
 from app.Site.api.settings_api import api as settings_api
 from app.Site.api.auth_api import api as auth_api
 from app.Site.api.balance_api import api as balance_api
@@ -18,7 +18,7 @@ api.register_blueprint(balance_api, url_prefix='/balance')
 
 
 @api.route('/getPermissions', methods=['GET'])
-def getPermissions():
+async def getPermissions() -> Response:
     if not current_user.is_authenticated:
         return jsonify([])
     module_logger.info(f"{current_user.Username} trying get permissions")
@@ -30,7 +30,7 @@ def getPermissions():
 
 
 @api.route('/getCurrentUserInfo', methods=['GET'])
-def getCurrentUserInfo():
+async def getCurrentUserInfo() -> Response:
     info = {}
     if not current_user.is_authenticated:
         info["Username"] = None
