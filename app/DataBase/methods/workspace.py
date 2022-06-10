@@ -9,7 +9,7 @@ def createWorkspace(U, Name, WorkspaceParams):
         return AnswerForm(status=False, error="already_exist")
 
     W = Workspace.create(Creator=U, Name=Name, WorkspaceParams=WorkspaceParams)
-    return AnswerForm(status=True, error=None, data={"Workspace": W})
+    return AnswerForm(status=True, error=None, data=W)
 
 
 def deleteWorkspace(WID):
@@ -26,7 +26,7 @@ def createInvite(U, W, UseLimit=1):
     while KeyData.select().where(KeyData.Key == Key):
         Key = W.ID + secrets.token_urlsafe(8)
     KD = KeyData.create(Key=Key, Workspace=Workspace, Creator=U, UseLimit=UseLimit)
-    return AnswerForm(status=True, error=None, data={"KeyData": KD})
+    return AnswerForm(status=True, error=None, data=KD)
 
 
 def joinWorkspace(U, W, InviteKey):
@@ -45,6 +45,14 @@ def joinWorkspace(U, W, InviteKey):
         return AnswerForm(status=False, error="use_limit")
 
     WU = WorkspaceProfile.create(Profile=U, Workspace=W)
-    return AnswerForm(status=True, error=None, data={"WorkspaceProfile": WU})
+    return AnswerForm(status=True, error=None, data=WU)
+
+
+def getWorkspaceProfile(U, W):
+    WU = WorkspaceProfile.select().where(WorkspaceProfile.Profile == U, WorkspaceProfile.Workspace == W)
+    if WU:
+        return AnswerForm(status=True, error=None, data=WU[0])
+    else:
+        return AnswerForm(status=False, error="instance_not_exist")
 
 

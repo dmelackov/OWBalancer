@@ -57,8 +57,8 @@ class Profile(DefaultModel, UserMixin):
     # -------------------
 
 
-defaultWorkspaceSettings = '{"AutoIncrement": false}'
 defaultWorkspaceParams = '{"CustomSystem": true}'
+defaultLobbyData = '{"Lobby": []}'
 
 
 class Workspace(DefaultModel):
@@ -67,14 +67,10 @@ class Workspace(DefaultModel):
     Description = TextField(default="")
     Creator = ForeignKeyField(Profile, to_field="ID")
     WorkspaceParams = TextField(default=defaultWorkspaceParams)
-    WorkspaceSettings = TextField(default=defaultWorkspaceSettings)
+    Lobby = TextField(default=defaultLobbyData)
 
     # Settings methods
     # -------------------
-    def setWorkspaceSettings(self, WSettings):
-        self.WorkspaceSettings = json.dumps(WSettings)
-        self.save()
-
     def setWorkspaceDescription(self, Desc):
         self.Description = Desc
         self.save()
@@ -89,7 +85,7 @@ class KeyData(DefaultModel):
     Creator = ForeignKeyField(Profile, to_field="ID")
 
 
-defaultLobbyData = '{"Lobby": []}'
+defaultWorkspaceSettings = '{"AutoIncrement": false, "generalLobby": false}'
 
 
 class WorkspaceProfile(DefaultModel):
@@ -98,6 +94,7 @@ class WorkspaceProfile(DefaultModel):
     Customers = TextField(default=defaultLobbyData)
     Role = ForeignKeyField(Roles, to_field="ID", null=True)
     Workspace = ForeignKeyField(Workspace, to_field="ID")
+    WorkspaceSettings = TextField(default=defaultWorkspaceSettings)
 
     # Lobby methods
     # -------------------

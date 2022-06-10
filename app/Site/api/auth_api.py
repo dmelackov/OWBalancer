@@ -6,7 +6,7 @@ import app.DataBase.db as db
 from peewee import fn
 from flask_wtf import csrf
 import app.DataBase.methods.methods as DataBaseMethods
-import app.DataBase.RolesMethods as RolesMethods
+import app.DataBase.methods.roles as RolesMethods
 
 module_logger = logging.getLogger("api")
 

@@ -1,8 +1,8 @@
 from flask import Blueprint
 from flask import jsonify
 import logging
-from flask_login import login_required, current_user
-from app.DataBase.RolesMethods import checkProfilePermission, getUserPermissions
+from flask_login import current_user
+from app.DataBase.methods.roles import getUserPermissions
 from app.Site.api.settings_api import api as settings_api
 from app.Site.api.auth_api import api as auth_api
 from app.Site.api.balance_api import api as balance_api
