@@ -2,6 +2,7 @@ from app.Static.globalClasses import ClassPlayer, ClassGameBalance, ClassTeam
 import itertools
 import random
 from app.DataBase.db import *
+import datetime
 
 
 def generateMask(countPlayers, countTanks, countDps):
@@ -80,7 +81,7 @@ def checkMask(tm, roleMask, Members, UserSettings):
 
 
 def createGame(WU):
-    UserSettings = WU.getUserSettings()
+    UserSettings = WU.Profile.getUserSettings()
     PlayersInTeam = UserSettings["Amount"]["T"] + UserSettings["Amount"]["D"] + UserSettings["Amount"]["H"]
     teamMask, roleMask = generateMask(PlayersInTeam, UserSettings["Amount"]["T"], UserSettings["Amount"]["D"])
 
@@ -104,6 +105,7 @@ def createGame(WU):
             if not tempMaskErr:
                 maskError = False
             s += tempM
+            # print(tm, len(s))
 
         s.sort()
         # s[0].calcResult()
@@ -133,6 +135,6 @@ def createGame(WU):
 
 
 # d1 = datetime.datetime.now()
-# print(createGame(Profile.select().where(Profile.ID == 1)[0]))
+# print(createGame(WorkspaceProfile.select().where(WorkspaceProfile.ID == 1)[0]))
 # d2 = datetime.datetime.now()
 # print("Весь метод:", str(d2 - d1))

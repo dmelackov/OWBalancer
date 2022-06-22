@@ -70,7 +70,8 @@ def generate_roles():
     RolePerms.create(Administrator, change_profile_role)
 
 
-tables = ['custom', 'games', 'perms', 'player', 'playerroles', 'profile', 'roleperms', 'roles']
+tables = ['custom', 'games', 'perms', 'player', 'playerroles', 'profile', 'roleperms', 'roles',
+          'workspace', 'workspaceprofile', 'keydata']
 role_tabels = ['perms', 'roleperms', 'roles']
 
 
@@ -80,20 +81,24 @@ def createDB():
             db.drop_tables([Perms, RolePerms, Roles])
             db.create_tables([Perms, RolePerms, Roles])
             generate_roles()
-        db.create_tables([Profile, Custom, Player, Games, PlayerRoles])
+        db.create_tables([Profile, Custom, Player, Games, PlayerRoles, Workspace, WorkspaceProfile, KeyData])
         return AnswerForm(status=True, error=None)
     return AnswerForm(status=False, error=None)
 
 
-if __name__ == "__main__":
-    U = Profile.create("Ivarys", "123").data
-    W = Workspace.create(U, "IvarysWorkspace", '{"CustomSystem": true}').data
-    WU = WorkspaceProfile.create(U, W).data
-    for i in range(12):
-        P = Player.create(WU, str(i)).data
-        PR = PlayerRoles.getPR(WU, P).data
-        PR.setFlex(True)
-        C = Custom.create(WU, P).data
-        C.changeSR("T", random.randint(1000, 2000))
-        C.changeSR("H", random.randint(1000, 2000))
-        C.changeSR("D", random.randint(1000, 2000))
+# if __name__ == "__main__":
+    # createDB()
+    # U = Profile.create("Ivarys", "123").data
+    # W = Workspace.create(U, "IvarysWorkspace", '{"CustomSystem": true}').data
+    # WU = WorkspaceProfile.create(U, W).data
+    # # U = Profile.getInstance(1)
+    # # W = Workspace.getInstance(1)
+    # # WU = WorkspaceProfile.getInstance(1)
+    # for i in range(12):
+    #     P = Player.create(WU, str(i)).data
+    #     PR = PlayerRoles.getPR(WU, P).data
+    #     PR.setFlex(True)
+    #     C = Custom.create(WU, P).data
+    #     C.changeSR("T", random.randint(1000, 2000))
+    #     C.changeSR("H", random.randint(1000, 2000))
+    #     C.changeSR("D", random.randint(1000, 2000))
