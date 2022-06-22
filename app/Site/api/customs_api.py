@@ -15,26 +15,14 @@ api = Blueprint('customs_api', __name__, template_folder='templates',
 
 @api.route('/getCustoms/<int:Pid>')
 @login_required
-async def getCustoms(Pid: int) -> Response:
-    module_logger.info(f"{current_user.Username} trying to get customs")
-    if current_user.getUserSettings()["AutoCustom"]:
-        Cid = db_methods.getCustomID(current_user.ID, Pid)
-        if Cid:
-            C = db.Custom.get(db.Custom.ID == Cid).getJson(current_user)
-            data = {'data': C, 'type': 'custom'}
-            module_logger.info(
-                f"{current_user.Username}: Custom returning type '{data['type']}'")
-            return jsonify(data)
+def getCustoms(Pid):
+    module_logger.info(f"{current_user.Username} trying to get customs for player with ID {Pid}")
     customs = db_methods.getCustoms_byPlayer(Pid)
+    customList = []
     if customs:
-        data = {'data': list(map(lambda x: x.getJson(
-            current_user), customs)), 'type': 'list'}
-        module_logger.info(
-            f"{current_user.Username}: Custom returning type '{data['type']}'")
-        return jsonify(data)
-    module_logger.info(
-        f"{current_user.Username}: Custom returning type 'none'")
-    return jsonify({'status': 200, 'message': 'Customs not found', 'type': 'none'})
+        customList = list(map(lambda x: x.getJson(current_user), customs))
+    module_logger.info(f"{current_user.Username}: Returning '{len(customList)}'")
+    return jsonify(customList)
 
 
 @api.route('/changeRoleSr', methods=['POST'])
