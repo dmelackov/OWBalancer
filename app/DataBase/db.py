@@ -192,14 +192,6 @@ class Workspace(DefaultModel):
         else:
             return AnswerForm(status=False, error="instance_not_exist")
 
-    @classmethod
-    def getByKey(cls, Key: str) -> AnswerForm:
-        KD = KeyData.select().where(KeyData.Key == Key)
-        if KD:
-            return AnswerForm(status=True, error=None, data=KD[0].Workspace)
-        else:
-            return AnswerForm(status=False, error="instance_not_exist")
-
 
 class KeyData(DefaultModel):
     ID = PrimaryKeyField()
@@ -215,6 +207,14 @@ class KeyData(DefaultModel):
             Key = W.ID + secrets.token_urlsafe(8)
         KD = super().create(Key=Key, Workspace=W, Creator=U, UseLimit=UseLimit)
         return AnswerForm(status=True, error=None, data=KD)
+
+    @classmethod
+    def getByKey(cls, Key: str) -> AnswerForm:
+        KD = KeyData.select().where(KeyData.Key == Key)
+        if KD:
+            return AnswerForm(status=True, error=None, data=KD[0])
+        else:
+            return AnswerForm(status=False, error="instance_not_exist")
 
 
 class WorkspaceProfile(DefaultModel):
@@ -388,17 +388,13 @@ class Custom(DefaultModel):
     HSR = IntegerField(default=0)
 
     @classmethod
-    def create(cls, WU: WorkspaceProfile, Player_ID: int) -> AnswerForm:
-        P = Player.select().where(Player.ID == Player_ID)
-        if P.exists():
-            C = Custom.select().where(Custom.Creator == WU, Custom.Player == P)
-            if not C.exists():
-                C = super().create(Creator=WU, Player=P[0])
-                return AnswerForm(status=True, error=None, data=C)
-            else:
-                return AnswerForm(status=False, error="already_exist")
+    def create(cls, WU, P) -> AnswerForm:
+        C = Custom.select().where(Custom.Creator == WU, Custom.Player == P)
+        if not C.exists():
+            C = super().create(Creator=WU, Player=P[0])
+            return AnswerForm(status=True, error=None, data=C)
         else:
-            return AnswerForm(status=False, error="player_not_exist")
+            return AnswerForm(status=False, error="already_exist")
 
     @classmethod
     def getInstance(cls, ID: int):

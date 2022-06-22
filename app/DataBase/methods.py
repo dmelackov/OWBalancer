@@ -1,3 +1,5 @@
+import random
+
 from app.DataBase.db import *
 
 
@@ -83,9 +85,15 @@ def createDB():
     return AnswerForm(status=False, error=None)
 
 
-# if __name__ == "__main__":
-#     U = Profile.create("Ivarys", "123").data
-#     W = Workspace.create(U, "IvarysWorkspace", '{"CustomSystem": true}')
-#     WU = WorkspaceProfile.create()
-#     for i in range(12):
-#         Player.create()
+if __name__ == "__main__":
+    U = Profile.create("Ivarys", "123").data
+    W = Workspace.create(U, "IvarysWorkspace", '{"CustomSystem": true}').data
+    WU = WorkspaceProfile.create(U, W).data
+    for i in range(12):
+        P = Player.create(WU, str(i)).data
+        PR = PlayerRoles.getPR(WU, P).data
+        PR.setFlex(True)
+        C = Custom.create(WU, P).data
+        C.changeSR("T", random.randint(1000, 2000))
+        C.changeSR("H", random.randint(1000, 2000))
+        C.changeSR("D", random.randint(1000, 2000))
