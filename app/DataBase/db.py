@@ -192,6 +192,14 @@ class Workspace(DefaultModel):
         else:
             return AnswerForm(status=False, error="instance_not_exist")
 
+    @classmethod
+    def getByKey(cls, Key: str) -> AnswerForm:
+        KD = KeyData.select().where(KeyData.Key == Key)
+        if KD:
+            return AnswerForm(status=True, error=None, data=KD[0].Workspace)
+        else:
+            return AnswerForm(status=False, error="instance_not_exist")
+
 
 class KeyData(DefaultModel):
     ID = PrimaryKeyField()
