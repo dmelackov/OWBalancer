@@ -3,6 +3,7 @@ import itertools
 import random
 from app.DataBase.db import *
 
+
 def generateMask(countPlayers, countTanks, countDps):
     teamMask = []
     roleMask = []
@@ -76,7 +77,6 @@ def checkMask(tm, roleMask, Members, UserSettings):
     if not mass:
         balanceError = True
     return mass, balanceError, maskError
-
 
 
 def createGame(U):
