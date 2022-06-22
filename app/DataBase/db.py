@@ -138,7 +138,7 @@ class Workspace(DefaultModel):
     Lobby = TextField(default=defaultLobbyData)
 
     @classmethod
-    def create(cls, U: Profile, Name: str, WorkspaceParams: str) -> AnswerForm:
+    def create(cls, U, Name: str, WorkspaceParams: str) -> AnswerForm:
         W = super().create(Creator=U, Name=Name, WorkspaceParams=WorkspaceParams)
         return AnswerForm(status=True, error=None, data=W)
 
@@ -391,7 +391,7 @@ class Custom(DefaultModel):
     def create(cls, WU, P) -> AnswerForm:
         C = Custom.select().where(Custom.Creator == WU, Custom.Player == P)
         if not C.exists():
-            C = super().create(Creator=WU, Player=P[0])
+            C = super().create(Creator=WU, Player=P)
             return AnswerForm(status=True, error=None, data=C)
         else:
             return AnswerForm(status=False, error="already_exist")
