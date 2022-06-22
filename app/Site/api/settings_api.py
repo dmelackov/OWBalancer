@@ -1,7 +1,6 @@
-from ast import Num
+from typing import Union
 import logging
-import string
-from flask import Blueprint, request, Response, send_file, jsonify
+from flask import Blueprint, request, Response, jsonify
 from flask_login import login_required, current_user
 
 module_logger = logging.getLogger("api")
@@ -12,13 +11,13 @@ api = Blueprint('settings_api', __name__, template_folder='templates',
 
 @api.route('/getSettings', methods=['GET'])
 @login_required
-def getSettings():
+async def getSettings() -> Response:
     return jsonify(current_user.getUserSettings())
 
 
 @api.route('/setSettings', methods=['POST'])
 @login_required
-def setSetting():
+async def setSetting() -> Response:
     data = request.get_json()
     if not validateSettings(data):
         module_logger.debug(
@@ -27,6 +26,8 @@ def setSetting():
     current_user.setUserSettings(data)
     return Response(status=200)
 
+
+NumberTypes = (int, float)
 
 settingsSchema = {"AutoCustom": bool,
                   "Autoincrement": bool,
@@ -44,18 +45,18 @@ teamCountSchema = {"T": int,
 teamNameSchema = {"1": str,
                   "2": str}
 mathSchema = {
-    "alpha": [float, int],
-    "beta": [float, int],
-    "gamma": [float, int],
-    "p": [float, int],
-    "q": [float, int],
-    "tWeight": [float, int],
-    "dWeight":[float, int],
-    "hWeight": [float, int]
+    "alpha": NumberTypes,
+    "beta": NumberTypes,
+    "gamma": NumberTypes,
+    "p": NumberTypes,
+    "q": NumberTypes,
+    "tWeight": NumberTypes,
+    "dWeight": NumberTypes,
+    "hWeight": NumberTypes
 }
 
 
-def validateSettings(settings: dict):
+def validateSettings(settings: dict[str, Union[int, bool, dict, str]]) -> bool:
     if set(settings.keys()) != set(settingsSchema.keys()):
         module_logger.debug("Main keys error")
         return False
@@ -68,16 +69,16 @@ def validateSettings(settings: dict):
     if set(settings["Math"].keys()) != set(mathSchema.keys()):
         module_logger.debug("Math keys error")
         return False
-    if not all([type(v) == settingsSchema[k] for k, v in settings.items()]):
+    if not all([isinstance(v, settingsSchema[k]) for k, v in settings.items()]):
         module_logger.debug("Main types error")
         return False
-    if not all([type(v) == teamCountSchema[k] for k, v in settings["Amount"].items()]):
+    if not all([isinstance(v, teamCountSchema[k]) for k, v in settings["Amount"].items()]):
         module_logger.debug("Amount types error")
         return False
-    if not all([type(v) == teamNameSchema[k] for k, v in settings["TeamNames"].items()]):
+    if not all([isinstance(v, teamNameSchema[k]) for k, v in settings["TeamNames"].items()]):
         module_logger.debug("TeamNames types error")
         return False
-    if not all([type(v) in mathSchema[k] for k, v in settings["Math"].items()]):
+    if not all([isinstance(v, mathSchema[k]) for k, v in settings["Math"].items()]):
         module_logger.debug("Math types error")
         return False
     return True

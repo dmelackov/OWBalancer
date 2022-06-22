@@ -3,8 +3,7 @@ from flask import Flask
 from flask_login import LoginManager
 from app.Site.api.api import api
 import logging
-from flask_wtf.csrf import CSRFProtect
-from app.params import site_port
+from app.params import site_port, secretKey
 from waitress import serve
 
 
@@ -17,37 +16,36 @@ class FlaskSite:
             cls.instance = super(FlaskSite, cls).__new__(cls)
         return cls.instance
 
-    def __init__(self):
+    def __init__(self) -> None:
         module_logger.info("Site init")
         self.initFlaskConfig()
         self.initRouters()
         module_logger.info("Site init complete")
 
-    def initFlaskConfig(self):
+    def initFlaskConfig(self) -> None:
         self.app = Flask(__name__)
-        self.app.config['SECRET_KEY'] = 'VanyaPidoras'
+        self.app.config['SECRET_KEY'] = secretKey
         self.app.config["SESSION_COOKIE_SAMESITE"] = "Strict"
         self.app.config["REMEMBER_COOKIE_SAMESITE"] = "Strict"
 
         self.login_manager = LoginManager()
         self.login_manager.init_app(self.app)
 
-
-    def startFlask(self):
+    def startFlask(self) -> None:
         serve(self.app, host="0.0.0.0", port=site_port)
 
-    def initRouters(self):
+    def initRouters(self) -> None:
         @self.app.before_request
-        def _db_connect():
+        def _db_connect() -> None:
             MainDB.db.connect()
 
         @self.app.teardown_request
-        def _db_close(exc):
+        def _db_close(exc) -> None:
             if not MainDB.db.is_closed():
                 MainDB.db.close()
 
         @self.login_manager.user_loader
-        def load_user(user_id):
+        def load_user(user_id: int) -> MainDB.Profile:
             return MainDB.Profile.get(MainDB.Profile.ID == user_id)
 
         self.app.register_blueprint(api, url_prefix='/api')

@@ -16,7 +16,7 @@ api = Blueprint('players_api', __name__, template_folder='templates',
 @api.route('/getPlayers/')
 @api.route('/getPlayers/<searchStr>')
 @login_required
-def getPlayers(searchStr=""):
+async def getPlayers(searchStr: str = "") -> Response:
     module_logger.info(f"{current_user.Username} trying to get players")
     players = db_methods.searchPlayer(searchStr)
     return jsonify(list(map(lambda x: x.getJson(), players)))
@@ -24,7 +24,7 @@ def getPlayers(searchStr=""):
 
 @api.route('/setRoles', methods=['POST'])
 @login_required
-def setRoles():
+async def setRoles() -> Response:
     if not checkProfilePermission(current_user, "change_player_roles"):
         return jsonify({"status": 403})
     data = request.get_json()
@@ -40,7 +40,7 @@ def setRoles():
 
 @api.route('/setFlex', methods=['POST'])
 @login_required
-def setFlex():
+async def setFlex() -> Response:
     if not checkProfilePermission(current_user, "change_player_roles"):
         return jsonify({"status": 403})
     data = request.get_json()
@@ -54,7 +54,7 @@ def setFlex():
 
 @api.route('/createPlayer', methods=['POST'])
 @login_required
-def createPlayer():
+async def createPlayer() -> Response:
     if not checkProfilePermission(current_user, "create_player"):
         return jsonify({"status": 403})
     data = request.get_json()

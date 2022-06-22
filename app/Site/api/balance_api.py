@@ -15,7 +15,7 @@ api = Blueprint('balance_api', __name__, template_folder='templates',
 
 @api.route('/calcBalance', methods=['POST'])
 @login_required
-def calcBalance():
+async def calcBalance() -> Response:
     module_logger.info(f"{current_user.Username} trying to calc Balance'")
     data = request.get_json()
     balance = {}
@@ -28,7 +28,7 @@ def calcBalance():
 
 @api.route('/getBalances', methods=['GET'])
 @login_required
-def getBalances():
+async def getBalances() -> Response:
     if not checkProfilePermission(current_user, "do_balance"):
         return jsonify({"status": 403})
     module_logger.info(f"{current_user.Username} trying get balance")

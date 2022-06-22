@@ -1,8 +1,8 @@
 from flask import Blueprint, request, Response
-from flask_login import login_required, current_user
 import app.DataBase.db as db
 import app.DataBase.methods.methods as db_methods
 import app.DataBase.LobbyСollector as LobbyMethods
+from flask_login import login_required, current_user
 from flask import jsonify
 import logging
 from app.DataBase.methods.roles import checkProfilePermission
@@ -15,7 +15,7 @@ api = Blueprint('customs_api', __name__, template_folder='templates',
 
 @api.route('/getCustoms/<int:Pid>')
 @login_required
-def getCustoms(Pid):
+async def getCustoms(Pid: int) -> Response:
     module_logger.info(f"{current_user.Username} trying to get customs")
     if current_user.getUserSettings()["AutoCustom"]:
         Cid = db_methods.getCustomID(current_user.ID, Pid)
@@ -39,7 +39,7 @@ def getCustoms(Pid):
 
 @api.route('/changeRoleSr', methods=['POST'])
 @login_required
-def changeRoleSr():
+async def changeRoleSr() -> Response:
     if not checkProfilePermission(current_user, "change_your_custom"):
         return jsonify({"status": 403})
     data = request.get_json()
@@ -61,7 +61,7 @@ def changeRoleSr():
 
 @api.route('/createCustom', methods=['POST'])
 @login_required
-def createCustom():
+async def createCustom() -> Response:
     if not checkProfilePermission(current_user, "create_custom"):
         return jsonify({"status": 403})
     data = request.get_json()
