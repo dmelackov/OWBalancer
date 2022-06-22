@@ -20,7 +20,7 @@ async def getPlayers(searchStr: str = "") -> Response:
     if not WU:
         return Response(status=403)
     module_logger.info(f"{current_user.Username} trying to get players")
-    players = db_methods.searchPlayer(searchStr)
+    players = db_methods.searchPlayer(searchStr) # Жду метода
     return jsonify(list(map(lambda x: x.getJson(), players)))
 
 
@@ -42,8 +42,8 @@ async def setRoles() -> Response:
         return Response(status=400)
     PR = db.PlayerRoles.getPR(WU, P).data
     if not PR:
-        pass
-    PR.setRoles(data['roles'])
+        return
+    PR.setRole(data['roles'])
     return Response(status=200)
 
 

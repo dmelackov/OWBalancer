@@ -1,5 +1,7 @@
 from app.Calculation.CalculationMethods import imbalanceFunc
+from typing import TypeVar, Generic, Union
 
+T = TypeVar('T')
 
 class ClassRole:
     SR = 0
@@ -138,24 +140,13 @@ class ClassGameBalance:
             'result': round(self.result, 2)
         }
 
-    def __eq__(self, other):
-        if self.result == other.result:
-            return True
-        else:
-            return False
-
-    def __lt__(self, other):
-        if self.result < other.result:
-            return True
-        else:
-            return False
 
 
-class AnswerForm:
-    def __init__(self, status, error, data=None):
-        self.status = status
-        self.error = error
-        self.data = data
+class AnswerForm(Generic[T]):
+    def __init__(self, status: bool, error: Union[None, str], data: Union[T, None]=None):
+        self.status: bool = status
+        self.error: Union[None, str] = error
+        self.data: Union[None, T] = data
 
     def __bool__(self):
         return self.status

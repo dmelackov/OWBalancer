@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Dict, Union
 import logging
 from flask import Blueprint, request, Response, jsonify
 from flask_login import login_required, current_user
@@ -56,7 +56,7 @@ mathSchema = {
 }
 
 
-def validateSettings(settings: dict[str, Union[int, bool, dict, str]]) -> bool:
+def validateSettings(settings: Dict[str, Union[int, bool, dict, str]]) -> bool:
     if set(settings.keys()) != set(settingsSchema.keys()):
         module_logger.debug("Main keys error")
         return False
