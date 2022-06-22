@@ -4,6 +4,14 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from flask_login import UserMixin
 import json
 from datetime import datetime as dt
+from app.Static.globalClasses import AnswerForm
+import secrets
+
+
+defaultWorkspaceParams = '{"CustomSystem": true}'
+defaultLobbyData = '{"Lobby": []}'
+defaultWorkspaceSettings = '{"AutoIncrement": false, "generalLobby": false}'
+
 
 if db_type == "mysql":
     db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password)
@@ -20,6 +28,15 @@ class Roles(DefaultModel):
     ID = PrimaryKeyField()
     Name = TextField()
 
+    @classmethod
+    def create(cls, Name):
+        R = Roles.select().where(Roles.Name == Name)
+        if not R.exists():
+            R = super().create(Name=Name)
+            return AnswerForm(status=True, error=None, data=R)
+        else:
+            return AnswerForm(status=False, error="instance_already_exist")
+
 
 defaultProfileData = '{"Amount": {"T": 2, "D": 2, "H": 2}, "TeamNames": {"1": "Team 1", "2": "Team 2"},' \
                    ' "AutoCustom": true, "ExtendedLobby": false, "Autoincrement": false, "BalanceLimit": 2500,' \
@@ -33,14 +50,46 @@ class Profile(DefaultModel, UserMixin):
     Password = TextField(null=True)
     LobbySettings = TextField(default=defaultProfileData)
 
-    # login methods
-    # -------------------
-    def set_password(self, password):
-        self.Password = generate_password_hash(password)
+    @classmethod
+    def create(cls, Username, Password):
+        if not Profile.select().where(Profile.Username == Username).exists():
+            U = super().create(Username=Username)
+            U.set_password(Password)
+            U.save()
+            return AnswerForm(status=True, error=None, data=U)
+        else:
+            return AnswerForm(status=True, error="already_exist")
+
+    @classmethod
+    def getInstance(cls, Username):
+        U = Profile.select().where(Profile.Username == Username)
+        if U:
+            return U[0]
+        else:
+            return None
+
+    @classmethod
+    def check(cls, Username, Password):
+        User = Profile.select().where(Profile.Username == Username)
+        if User.exists() and User[0].check_password(Password):
+            return AnswerForm(status=True, error=None)
+        else:
+            return AnswerForm(status=False, error="invalid_login")
+
+    @classmethod
+    def search(cls, search_query):
+        query = []
+        for P in Player.select():
+            if search_query.lower() in P.Username.lower():
+                query.append(P)
+        return query
+
+    def set_password(self, Password):
+        self.Password = generate_password_hash(Password)
         self.save()
 
-    def check_password(self, password):
-        return check_password_hash(self.Password, password)
+    def check_password(self, Password):
+        return check_password_hash(self.Password, Password)
 
     def getJson(self):
         return {
@@ -48,17 +97,16 @@ class Profile(DefaultModel, UserMixin):
             'username': self.Username
         }
 
-    # -------------------
-    # Settings methods
-    # -------------------
+    def getCustom(self, Player_ID):
+        C = Custom.select().where(Custom.Player == Player_ID, Custom.Creator == self)
+        if C.exists():
+            return AnswerForm(status=True, error=None, data=C[0])
+        else:
+            return AnswerForm(status=False, error="instance_not_exist")
+
     def setUserSettings(self, USettings):
         self.LobbySettings = json.dumps(USettings)
         self.save()
-    # -------------------
-
-
-defaultWorkspaceParams = '{"CustomSystem": true}'
-defaultLobbyData = '{"Lobby": []}'
 
 
 class Workspace(DefaultModel):
@@ -68,13 +116,58 @@ class Workspace(DefaultModel):
     Creator = ForeignKeyField(Profile, to_field="ID")
     WorkspaceParams = TextField(default=defaultWorkspaceParams)
     Lobby = TextField(default=defaultLobbyData)
+    Active = BooleanField(default=True)
 
-    # Settings methods
-    # -------------------
+    @classmethod
+    def create(cls, U, Name, WorkspaceParams):
+        W = Workspace.select().where(Workspace.Name == Name)
+        if W:
+            return AnswerForm(status=False, error="already_exist")
+
+        W = super().create(Creator=U, Name=Name, WorkspaceParams=WorkspaceParams)
+        return AnswerForm(status=True, error=None, data=W)
+
+    @classmethod
+    def getInstance(cls, ID):
+        W = Workspace.select().where(Workspace.ID == ID)
+        if W:
+            return W[0]
+        else:
+            return None
+
     def setWorkspaceDescription(self, Desc):
         self.Description = Desc
         self.save()
-    # -------------------0
+
+    def joinWorkspace(self, U, InviteKey):
+        KD = KeyData.select().where(KeyData.Key == InviteKey, KeyData.Workspace == self)
+        if not KD:
+            return AnswerForm(status=False, error="invalid_key")
+
+        WU = WorkspaceProfile.select().where(WorkspaceProfile.Profile == U and WorkspaceProfile.Workspace == self)
+        if WU:
+            if not WU[0].Active:
+                WU[0].Active = 1
+                WU[0].save()
+                return AnswerForm(status=True, error=None, data=WU[0])
+            else:
+                return AnswerForm(status=False, error="already_in")
+
+        KD = KD[0]
+        if KD.UseLimit > 0:
+            KD.UseLimit -= 1
+        elif KD.UseLimit == 0:
+            return AnswerForm(status=False, error="use_limit")
+
+        WU = WorkspaceProfile.create(Profile=U, Workspace=self)
+        return AnswerForm(status=True, error=None, data=WU)
+
+    def getWorkspaceProfile(self, U):
+        WU = WorkspaceProfile.select().where(WorkspaceProfile.Profile == U, WorkspaceProfile.Workspace == self)
+        if WU:
+            return AnswerForm(status=True, error=None, data=WU[0])
+        else:
+            return AnswerForm(status=False, error="instance_not_exist")
 
 
 class KeyData(DefaultModel):
@@ -84,8 +177,13 @@ class KeyData(DefaultModel):
     UseLimit = IntegerField(default=1)
     Creator = ForeignKeyField(Profile, to_field="ID")
 
-
-defaultWorkspaceSettings = '{"AutoIncrement": false, "generalLobby": false}'
+    @classmethod
+    def create(cls, U, W, UseLimit=1):
+        Key = W.ID + secrets.token_urlsafe(8)
+        while KeyData.select().where(KeyData.Key == Key):
+            Key = W.ID + secrets.token_urlsafe(8)
+        KD = super().create(Key=Key, Workspace=W, Creator=U, UseLimit=UseLimit)
+        return AnswerForm(status=True, error=None, data=KD)
 
 
 class WorkspaceProfile(DefaultModel):
@@ -96,8 +194,31 @@ class WorkspaceProfile(DefaultModel):
     Workspace = ForeignKeyField(Workspace, to_field="ID")
     WorkspaceSettings = TextField(default=defaultWorkspaceSettings)
 
-    # Lobby methods
-    # -------------------
+    @classmethod
+    def getInstance(cls, ID):
+        WU = WorkspaceProfile.select().where(WorkspaceProfile.ID == ID)
+        if WU:
+            return WU[0]
+        else:
+            return None
+
+    def getPermissions(self):
+        if self.Role is not None:
+            RPs = RolePerms.select().where(RolePerms.Role == self.Role)
+            mass = []
+            for RP in RPs:
+                mass.append(RP.Perm)
+            return AnswerForm(status=True, error=None, data=mass)
+        else:
+            return AnswerForm(status=False, error="empty_role")
+
+    def checkPermission(self, Perm):
+        PRs = self.getPermissions().data
+        if PRs:
+            if Perm in [i.Name for i in PRs]:
+                return AnswerForm(status=True, error=None)
+        return AnswerForm(status=False, error=None)
+
     def getUserSettings(self):
         return json.loads(self.LobbySettings)
 
@@ -110,11 +231,41 @@ class WorkspaceProfile(DefaultModel):
         self.Customers = json.dumps(d)
         self.save()
 
+    def addRole(self, Role):
+        if self.Role != Role:
+            self.Role = Role
+            self.save()
+            return AnswerForm(status=True, error=None)
+        else:
+            return AnswerForm(status=False, error="role_already_given")
+
 
 class Player(DefaultModel):
     ID = PrimaryKeyField()
     Username = TextField(null=True)
     Creator = ForeignKeyField(WorkspaceProfile, to_field="ID")
+
+    @classmethod
+    def create(cls, WU, Username):
+        if Username:
+            P = Player.select().where(Player.Username == Username)
+            if not P.exists():
+                P = super().create(Username=Username, Creator=WU)
+            else:
+                P = P[0]
+            PR = PlayerRoles.getPR(WU, P)
+            if not PR:
+                PlayerRoles.create(Creator=WU, Player=P)
+            return P
+        return False
+
+    @classmethod
+    def getInstance(cls, ID):
+        P = Player.select().where(Player.ID == ID)
+        if P:
+            return P[0]
+        else:
+            return None
 
     # return {
     #             "id": self.ID,
@@ -126,7 +277,6 @@ class Player(DefaultModel):
     #             "RolesPriority": priority,
     #             "isFlex": self.isFlex
     #         }
-
     def getJson(self):
         return {"ID": self.ID,
                 "Creator": self.Creator.getJson(),
@@ -140,6 +290,22 @@ class PlayerRoles(DefaultModel):
     Roles = TextField(default="")
     isFlex = BooleanField(default=False)
 
+    @classmethod
+    def getInstance(cls, ID):
+        PR = PlayerRoles.select().where(PlayerRoles.ID == ID)
+        if PR:
+            return PR[0]
+        else:
+            return None
+
+    @classmethod
+    def getPR(cls, WU, P):
+        PR = PlayerRoles.select().where(PlayerRoles.Player == P, PlayerRoles.Creator == WU)
+        if PR.exists():
+            return AnswerForm(status=True, error=None, data=PR[0])
+        else:
+            return AnswerForm(status=False, error="instance_not_exist")
+
     def getJsonRoles(self):
         if self.isFlex:
             return [{"role": i, "active": True} for i in "TDH"]
@@ -147,6 +313,19 @@ class PlayerRoles(DefaultModel):
             priority = [{"role": i, "active": True} for i in self.Roles] + \
                        [{"role": i, "active": False} for i in "TDH" if i not in self.Roles]
         return priority
+
+    def setRoles(self, newRoles):
+        if all(i in "TDH" for i in newRoles):
+            self.Roles = newRoles
+            self.save()
+            return AnswerForm(status=True, error=None)
+        else:
+            return AnswerForm(status=False, error="role_presentation_error")
+
+    def setFlex(self, Flex):
+        self.isFlex = bool(Flex)
+        self.save()
+        return AnswerForm(status=True, error=None)
 
 
 class Custom(DefaultModel):
@@ -156,6 +335,50 @@ class Custom(DefaultModel):
     TSR = IntegerField(default=0)
     DSR = IntegerField(default=0)
     HSR = IntegerField(default=0)
+
+    @classmethod
+    def create(cls, WU, Player_ID):
+        P = Player.select().where(Player.ID == Player_ID)
+        if P.exists():
+            C = Custom.select().where(Custom.Creator == WU, Custom.Player == P)
+            if not C.exists():
+                C = super().create(Creator=WU, Player=P[0])
+                return AnswerForm(status=True, error=None, data=C)
+            else:
+                return AnswerForm(status=False, error="already_exist")
+        else:
+            return AnswerForm(status=False, error="player_not_exist")
+
+    @classmethod
+    def getInstance(cls, ID):
+        C = Custom.select().where(Custom.ID == ID)
+        if C:
+            return C[0]
+        else:
+            return None
+
+    @classmethod
+    def get_byPlayer(cls, Player_ID):
+        P = Player.select().where(Player.ID == Player_ID)
+        if P.exists():
+            CList = Custom.select().where(Custom.Player == P[0])
+            if CList.exists():
+                return AnswerForm(status=True, error=None, data=[C for C in CList])
+        return AnswerForm(status=False, error="instance_not_exist")
+
+    def changeSR(self, Role, New_SR):
+        if Role == "T" or Role == 0:
+            self.TSR = New_SR
+            self.save()
+        elif Role == "D" or Role == 1:
+            self.DSR = New_SR
+            self.save()
+        elif Role == "H" or Role == 2:
+            self.HSR = New_SR
+            self.save()
+        else:
+            return AnswerForm(status=False, error="incorrect_role")
+        return AnswerForm(status=True, error=None)
 
     # returning json data with whole information about this custom
     # {
@@ -193,11 +416,29 @@ class Perms(DefaultModel):
     ID = PrimaryKeyField()
     Name = TextField()
 
+    @classmethod
+    def create(cls, Name):
+        Perm = Perms.select().where(Perms.Name == Name)
+        if not Perm.exists():
+            Perm = super().create(Name=Name)
+            return AnswerForm(status=True, error=None, data=Perm)
+        else:
+            return AnswerForm(status=False, error="instance_already_exists")
+
 
 class RolePerms(DefaultModel):
     ID = PrimaryKeyField()
     Role = ForeignKeyField(Roles, to_field="ID")
     Perm = ForeignKeyField(Perms, to_field="ID")
+
+    @classmethod
+    def create(cls, Role, Perm):
+        RP = RolePerms.select().where(RolePerms.Perm == Perm, RolePerms.Role == Role)
+        if not RP.exists():
+            RP = super().create(Perm=Perm, Role=Role)
+            return AnswerForm(status=True, error=None, data=RP)
+        else:
+            return AnswerForm(status=False, error="instance_already_exist")
 
 
 class Games(DefaultModel):
@@ -208,6 +449,14 @@ class Games(DefaultModel):
     GameStatic = TextField()
     GameData = TextField()
     Active = BooleanField()
+
+    @classmethod
+    def create(cls, Profile_ID, GameData):
+        U = Profile.select().where(Profile.ID == Profile_ID)
+        if U.exists():
+            G = super().create(Creator=U[0], GameData=GameData, Active=False)
+            return G
+        return False
 
     def activate(self):
         self.Active = True
