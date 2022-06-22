@@ -5,8 +5,6 @@ from app.Site.forms.user import LoginForm, RegisterForm
 import app.DataBase.db as db
 from peewee import fn
 from flask_wtf import csrf
-import app.DataBase.methods.methods as DataBaseMethods
-import app.DataBase.methods.roles as RolesMethods
 
 module_logger = logging.getLogger("api")
 
@@ -21,11 +19,10 @@ async def login() -> Response:
     module_logger.info(f"Trying log in")
     form = LoginForm()
     if form.validate_on_submit():
-        user = db.Profile.select().where(
-            fn.lower(db.Profile.Username) == form.login.data.lower())
-        if len(user) and user[0].check_password(form.password.data):
+        U = db.Profile.getProfile(form.login.data)
+        if U and U.check_password(form.password.data):
             module_logger.info(f"Sucefful log in {form.login.data}")
-            login_user(user[0], remember=form.remember_me.data)
+            login_user(U, remember=form.remember_me.data)
             return jsonify({"status": 200})
         module_logger.info(f"Incorrect log in {form.login.data}")
     return jsonify({"status": 400, "message": "Incorrect login or password"})
@@ -40,14 +37,9 @@ async def registration() -> Response:
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
             return jsonify({"status": 400, "message": "Passwords don't match"})
-        if db.Profile.select().where(fn.lower(db.Profile.Username) == form.login.data.lower()):
+        if db.Profile.getProfile(form.login):
             return jsonify({"status": 400, "message": "User already exist"})
-        DataBaseMethods.createProfile(
-            form.login.data, form.password.data)
-        RolesMethods.addRoleToProfile(
-            db.Profile.get(
-                db.Profile.Username == form.login.data),
-            db.Roles.get(db.Roles.ID == 1))
+        db.Profile.create(form.login.data, form.password.data)
         return jsonify({"status": 200, "message": "OK"})
     return jsonify({"status": 400})
 
