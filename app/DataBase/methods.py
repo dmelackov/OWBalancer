@@ -82,3 +82,10 @@ def createDB():
         return AnswerForm(status=True, error=None)
     return AnswerForm(status=False, error=None)
 
+
+# if __name__ == "__main__":
+#     U = Profile.create("Ivarys", "123").data
+#     W = Workspace.create(U, "IvarysWorkspace", '{"CustomSystem": true}')
+#     WU = WorkspaceProfile.create()
+#     for i in range(12):
+#         Player.create()

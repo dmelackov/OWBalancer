@@ -26,7 +26,7 @@ class DefaultModel(Model):
 
 class Roles(DefaultModel):
     ID = PrimaryKeyField()
-    Name = TextField()
+    Name = TextField(unique=True)
 
     @classmethod
     def create(cls, Name: str) -> AnswerForm:
@@ -36,6 +36,14 @@ class Roles(DefaultModel):
             return AnswerForm(status=True, error=None, data=R)
         else:
             return AnswerForm(status=False, error="instance_already_exist")
+
+    @classmethod
+    def getRole(cls, Name):
+        R = Roles.select().where(Roles.Name == Name)
+        if R:
+            return AnswerForm(status=True, error=None, data=R[0])
+        else:
+            return AnswerForm(status=False, error="instance_not_exist")
 
 
 defaultProfileData = '{"Amount": {"T": 2, "D": 2, "H": 2}, "TeamNames": {"1": "Team 1", "2": "Team 2"},' \
@@ -116,6 +124,10 @@ class Profile(DefaultModel, UserMixin):
         self.LobbySettings = json.dumps(USettings)
         self.save()
 
+    def getWorkspaceList(self):
+        WUs = WorkspaceProfile.select().where(WorkspaceProfile.Profile == self)
+        return AnswerForm(status=True, error=None, data=[WU.Workspace for WU in WUs])
+
 
 class Workspace(DefaultModel):
     ID = PrimaryKeyField()
@@ -137,6 +149,14 @@ class Workspace(DefaultModel):
             return W[0]
         else:
             return None
+
+    def getJson(self) -> dict:
+        return {
+            "ID": self.ID,
+            "Name": self.Name,
+            "Description": self.Description,
+            "Creator": self.Creator.getJson()
+        }
 
     def setWorkspaceDescription(self, Desc: str) -> None:
         self.Description = Desc
@@ -162,7 +182,7 @@ class Workspace(DefaultModel):
         elif KD.UseLimit == 0:
             return AnswerForm(status=False, error="use_limit")
 
-        WU = WorkspaceProfile.create(Profile=U, Workspace=self)
+        WU = WorkspaceProfile.create(U, self)
         return AnswerForm(status=True, error=None, data=WU)
 
     def getWorkspaceProfile(self, U: Profile) -> AnswerForm:
@@ -205,6 +225,17 @@ class WorkspaceProfile(DefaultModel):
             return WU[0]
         else:
             return None
+
+    @classmethod
+    def create(cls, U, W) -> AnswerForm:
+        WU = WorkspaceProfile.select().where(WorkspaceProfile.Profile == U, WorkspaceProfile.Workspace == W)
+        if WU and not WU[0].Active:
+            WU[0].Active = True
+            WU[0].save()
+            return AnswerForm(status=True, error=None, data=WU[0])
+        else:
+            WU = super().create(Profile=U, Workspace=W)
+            return AnswerForm(status=True, error=None, data=WU)
 
     @classmethod
     def getWU(cls, U, W) -> AnswerForm:
