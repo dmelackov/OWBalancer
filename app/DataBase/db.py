@@ -61,8 +61,16 @@ class Profile(DefaultModel, UserMixin):
             return AnswerForm(status=True, error="already_exist")
 
     @classmethod
-    def getInstance(cls, Username):
-        U = Profile.select().where(Profile.Username == Username)
+    def getInstance(cls, ID):
+        U = Profile.select().where(Profile.ID == ID)
+        if U:
+            return U[0]
+        else:
+            return None
+
+    @classmethod
+    def getProfile(cls, Username):
+        U = Profile.select().where(fn.lower(Profile.Username) == Username.lower())
         if U:
             return U[0]
         else:
