@@ -17,7 +17,7 @@ async def getSettings() -> Response:
 
 @api.route('/setSettings', methods=['POST'])
 @login_required
-async def setSetting() -> Response:
+async def setSettings() -> Response:
     data = request.get_json()
     if not validateSettings(data):
         module_logger.debug(
