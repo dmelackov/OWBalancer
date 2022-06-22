@@ -5,6 +5,7 @@ from flask_login import current_user
 from app.Site.api.settings_api import api as settings_api
 from app.Site.api.auth_api import api as auth_api
 from app.Site.api.balance_api import api as balance_api
+import app.Site.utils as utils
 
 module_logger = logging.getLogger("api")
 
@@ -21,7 +22,10 @@ async def getPermissions() -> Response:
     if not current_user.is_authenticated:
         return jsonify([])
     module_logger.info(f"{current_user.Username} trying get permissions")
-    perms = getUserPermissions(current_user)
+    WU = utils.getWorkspaceProfileByRequest()
+    if not WU:
+        return jsonify([])
+    perms = WU.getPermissions().data
     if perms is None:
         return jsonify([])
     perms = list(map(lambda x: x.Name, perms))
@@ -34,8 +38,10 @@ async def getCurrentUserInfo() -> Response:
     if not current_user.is_authenticated:
         info["Username"] = None
         info["Auth"] = False
+        info["Workspace"] = None
     else:
-        info["Username"] = current_user.Username
+        Wid = utils.getWorkspaceIdByRequest()
+        info = current_user.getJson()
         info["Auth"] = True
-        info["ID"] = current_user.ID
+        info["Workspace"] = Wid
     return jsonify(info)

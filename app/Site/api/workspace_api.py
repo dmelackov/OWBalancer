@@ -1,21 +1,19 @@
 from flask import Blueprint, Response, request
 from flask import jsonify
 import logging
-from flask_login import current_user
+from flask_login import current_user, login_required
 import app.DataBase.db as db
-import app.Site.utils as utils
 import json 
 
 module_logger = logging.getLogger("api")
 
-api = Blueprint('profile_api', __name__, template_folder='templates',
+api = Blueprint('workspace_api', __name__, template_folder='templates',
                 static_folder='static')
 
 
 @api.route("/setWorkspace", methods=["POST"])
+@login_required
 def setWorkspace():
-    if not current_user.is_authenticated:
-        return Response(status=403)
     data = request.get_json()
     if not data or not data["ID"]:
         return Response(status=400)
@@ -23,37 +21,58 @@ def setWorkspace():
     if not W:
         return Response(status=404)
     res = Response(status=200)
-    res.set_cookie("workspace", str(W.ID))
+    res.set_cookie("workspace", str(W.ID), max_age=60*60*24*365)
     return res
 
 
-@api.route("/getWorkspace")
-def getWorkspace():
-    if not current_user.is_authenticated:
-        return Response(status=403)
-    
+@api.route("/getWorkspace/<ID:int>")
+@login_required
+def getWorkspace(ID):
+    W = db.Workspace.getInstance(ID)
+    return W.getJson()    
 
 
 @api.route("/getWorkspaces")
+@login_required
 def getWorkspaces():
-    if not current_user.is_authenticated:
-        return Response(status=403)
+    Wl = current_user.getWorkspaceList()
+    Wljson = [i.getJson() for i in Wl]
+    return jsonify(Wljson)
 
 
 @api.route("/createWorkspace", methods=["POST"])
+@login_required
 def createWorkspace():
-    if not current_user.is_authenticated:
-        return Response(status=403)
-    json = request.get_json()
-    if not json or not json["name"] or not json["params"]:
+    jsonS = request.get_json()
+    if not jsonS or not jsonS["name"] or not jsonS["params"]:
         return Response(status=400)
-    W = db.Workspace.create(current_user, json["name"], json.dumps(json["params"])).data
-    res = Response(status=200)
-    res.set_cookie("workspace", str(W.ID))
-    return res
+    W = db.Workspace.create(current_user, jsonS["name"], json.dumps(jsonS["params"])).data
+    R = db.Roles.getRole("Administrator").data
+    WU = db.WorkspaceProfile.create(current_user, W).data
+    WU.setRole(R)
+    return Response(status=200)
 
 
 @api.route("/activeInviteCode", methods=["POST"])
+@login_required
 def activeInviteCode():
-    if not current_user.is_authenticated:
-        return Response(status=403)
+    jsonS = request.get_json()
+    if not jsonS or not jsonS["keyCode"]:
+        return Response(status=400)
+    W = db.Workspace.getByKey(jsonS["keyCode"]).data
+    if not W:
+        return Response(status=404)
+    status = W.joinWorkspace(current_user, jsonS["keyCode"]).status
+    if not status:
+        return Response(status=404)
+    return Response(status=200)
+
+@api.route("/getInviteCodeInfo/<code>")
+def getInviteCodeInfo(code):
+    KD = db.KeyData.getByKey(code).data
+    if not KD:
+        return Response(status=404)
+    return jsonify(KD.getJson())
+
+
+

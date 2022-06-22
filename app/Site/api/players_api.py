@@ -1,11 +1,10 @@
 from flask import Blueprint, request, Response
 from flask_login import login_required, current_user
 import app.DataBase.db as db
-import app.DataBase.methods.methods as db_methods
+import app.Site.utils as utils
 from flask import jsonify
 import logging
 import re
-from app.DataBase.methods.roles import checkProfilePermission
 
 module_logger = logging.getLogger("api")
 
@@ -17,6 +16,9 @@ api = Blueprint('players_api', __name__, template_folder='templates',
 @api.route('/getPlayers/<searchStr>')
 @login_required
 async def getPlayers(searchStr: str = "") -> Response:
+    WU = utils.getWorkspaceProfileByRequest()
+    if not WU:
+        return Response(status=403)
     module_logger.info(f"{current_user.Username} trying to get players")
     players = db_methods.searchPlayer(searchStr)
     return jsonify(list(map(lambda x: x.getJson(), players)))
@@ -25,42 +27,60 @@ async def getPlayers(searchStr: str = "") -> Response:
 @api.route('/setRoles', methods=['POST'])
 @login_required
 async def setRoles() -> Response:
-    if not checkProfilePermission(current_user, "change_player_roles"):
-        return jsonify({"status": 403})
+    WU = utils.getWorkspaceProfileByRequest()
+    if not WU:
+        return Response(status=403)
+    if not WU.checkPermission("change_player_roles").status:
+        return Response(status=403)
     data = request.get_json()
     module_logger.info(
-        f"{current_user.Username} trying to set custom {data['id']} roles '{data['roles']}'")
+        f"{current_user.Username} trying to set player {data['id']} roles '{data['roles']}'")
     if not re.fullmatch("[TDH]?[TDH]?[TDH]?", data['roles']):
-        return Response(status=200)
-    db_methods.changeRoles(current_user,
-                           db.Custom.get(db.Custom.ID == data['id']).Player.ID,
-                           data['roles'])
+        return Response(status=400)
+    P = db.Player.getInstance(data["id"])
+    if not P:
+        return Response(status=400)
+    PR = db.PlayerRoles.getPR(WU, P).data
+    if not PR:
+        pass
+    PR.setRoles(data['roles'])
     return Response(status=200)
 
 
 @api.route('/setFlex', methods=['POST'])
 @login_required
 async def setFlex() -> Response:
-    if not checkProfilePermission(current_user, "change_player_roles"):
-        return jsonify({"status": 403})
+    WU = utils.getWorkspaceProfileByRequest()
+    if not WU:
+        return Response(status=403)
+    if not WU.checkPermission("change_player_roles").status:
+        return Response(status=403)
     data = request.get_json()
     module_logger.info(
         f"{current_user.Username} trying to set flex {data['id']} to '{data['status']}'")
-    db_methods.changeFlex(current_user,
-                          db.Custom.get(db.Custom.ID == data['id']).Player.ID,
-                          bool(data['status']))
+    P = db.Player.getInstance(data["id"])
+    if not P:
+        return Response(status=400)
+    PR = db.PlayerRoles.getPR(WU, P).data
+    if not PR:
+        pass
+    PR.setFlex(data['status'])
     return Response(status=200)
 
 
 @api.route('/createPlayer', methods=['POST'])
 @login_required
 async def createPlayer() -> Response:
-    if not checkProfilePermission(current_user, "create_player"):
-        return jsonify({"status": 403})
+    WU = utils.getWorkspaceProfileByRequest()
+    if not WU:
+        return Response(status=403)
+    if not WU.checkPermission("create_player").status:
+        return Response(status=403)
     data = request.get_json()
+    if not data or not data["Username"]:
+        return Response(status=400)
     module_logger.info(
         f"{current_user.Username} trying create player {data['Username']}")
-    if db_methods.createPlayer(current_user, data["Username"]):
-        return Response(status=200)
-    else:
+    if not db.Player.create(WU, data["Username"]):
         return Response(status=500)
+    return Response(status=200)

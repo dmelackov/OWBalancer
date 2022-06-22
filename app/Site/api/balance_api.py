@@ -3,10 +3,10 @@ from flask.wrappers import Response
 import logging
 import json
 from flask_login import login_required, current_user
-from app.DataBase.methods.roles import checkProfilePermission
 from flask import jsonify
 from app.Calculation.GameBalance import createGame
 from app.Calculation.StaticAnalisys import recountModel
+import app.Site.utils as utils
 module_logger = logging.getLogger("api")
 
 api = Blueprint('balance_api', __name__, template_folder='templates',
@@ -16,6 +16,11 @@ api = Blueprint('balance_api', __name__, template_folder='templates',
 @api.route('/calcBalance', methods=['POST'])
 @login_required
 async def calcBalance() -> Response:
+    WU = utils.getWorkspaceProfileByRequest()
+    if not WU:
+        return Response(status=403)
+    if not WU.checkPermission("do_balance").status:
+        return Response(status=403)
     module_logger.info(f"{current_user.Username} trying to calc Balance'")
     data = request.get_json()
     balance = {}
@@ -29,10 +34,13 @@ async def calcBalance() -> Response:
 @api.route('/getBalances', methods=['GET'])
 @login_required
 async def getBalances() -> Response:
-    if not checkProfilePermission(current_user, "do_balance"):
-        return jsonify({"status": 403})
+    WU = utils.getWorkspaceProfileByRequest()
+    if not WU:
+        return Response(status=403)
+    if not WU.checkPermission("do_balance").status:
+        return Response(status=403)
     module_logger.info(f"{current_user.Username} trying get balance")
-    balance = createGame(current_user)
+    balance = createGame(WU)
     if balance["result"] == 200:
         module_logger.info(
             f"{current_user.Username} recieve balance with size {len(balance['active'])}")

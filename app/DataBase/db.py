@@ -216,6 +216,12 @@ class KeyData(DefaultModel):
         else:
             return AnswerForm(status=False, error="instance_not_exist")
 
+    def getJson(self):
+        return {
+            "workspace": self.Workspace.getJson(),
+            "creator": self.Creator.getJson()
+        }
+
 
 class WorkspaceProfile(DefaultModel):
     ID = PrimaryKeyField()
@@ -350,7 +356,7 @@ class PlayerRoles(DefaultModel):
             return None
 
     @classmethod
-    def getPR(cls, WU: WorkspaceProfile, P: Player) -> AnswerForm:
+    def getPR(cls, WU: WorkspaceProfile, P) -> AnswerForm:
         PR = PlayerRoles.select().where(PlayerRoles.Player == P, PlayerRoles.Creator == WU)
         if PR.exists():
             return AnswerForm(status=True, error=None, data=PR[0])
@@ -435,11 +441,11 @@ class Custom(DefaultModel):
     #          ],
     #     "CustomID": ID
     # }
-    def getJson(self, U: Profile) -> dict:
+    def getJson(self, WU: WorkspaceProfile) -> dict:
         P = self.Player
-        PR = PlayerRoles.select().where(PlayerRoles.Player == P, PlayerRoles.Creator == U)
+        PR = PlayerRoles.select().where(PlayerRoles.Player == P, PlayerRoles.Creator == WU)
         if not PR.exists():
-            PR = PlayerRoles.create(Creator=U, Player=P)
+            PR = PlayerRoles.create(Creator=WU, Player=P)
         else:
             PR = PR[0]
         data = {
