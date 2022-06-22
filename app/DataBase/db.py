@@ -124,6 +124,9 @@ class Profile(DefaultModel, UserMixin):
         self.LobbySettings = json.dumps(USettings)
         self.save()
 
+    def getUserSettings(self) -> dict:
+        return json.loads(self.LobbySettings)
+
     def getWorkspaceList(self):
         WUs = WorkspaceProfile.select().where(WorkspaceProfile.Profile == self)
         return AnswerForm(status=True, error=None, data=[WU.Workspace for WU in WUs])
