@@ -1,3 +1,4 @@
+from __future__ import annotations
 from peewee import *
 from app.params import DB_NAME, port, password, user, host, db_type
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -6,7 +7,6 @@ import json
 from datetime import datetime as dt
 from app.Static.globalClasses import AnswerForm
 import secrets
-from __future__ import annotations
 
 defaultWorkspaceParams = '{"CustomSystem": true}'
 defaultLobbyData = '{"Lobby": []}'
@@ -77,7 +77,7 @@ class Profile(DefaultModel, UserMixin):
             return None
 
     @classmethod
-    def getProfile(cls, Username: str):
+    def getProfile(cls, Username: str) -> Profile:
         U = Profile.select().where(fn.lower(Profile.Username) == Username.lower())
         if U:
             return U[0]
@@ -86,7 +86,7 @@ class Profile(DefaultModel, UserMixin):
 
     @classmethod
     def check(cls, Username: str, Password: str) -> AnswerForm[Profile]:
-        U = Profile.select().where(Profile.Username == Username)
+        U = Profile.select().where(fn.lower(Profile.Username) == Username.lower())
         if U and U[0].check_password(Password):
             return AnswerForm(status=True, error=None, data=U[0])
         else:

@@ -134,7 +134,7 @@ def createGame(WU):
         }
 
 
-d1 = datetime.datetime.now()
-(createGame(WorkspaceProfile.select().where(WorkspaceProfile.ID == 1)[0]))
-d2 = datetime.datetime.now()
-print("Весь метод:", str(d2 - d1))
+#d1 = datetime.datetime.now()
+#(createGame(WorkspaceProfile.select().where(WorkspaceProfile.ID == 1)[0]))
+#d2 = datetime.datetime.now()
+#print("Весь метод:", str(d2 - d1))

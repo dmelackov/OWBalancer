@@ -35,7 +35,7 @@ async def registration() -> Response:
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
             return jsonify({"status": 400, "message": "Passwords don't match"})
-        if db.Profile.getProfile(form.login):
+        if db.Profile.getProfile(form.login.data):
             return jsonify({"status": 400, "message": "User already exist"})
         db.Profile.create(form.login.data, form.password.data)
         return jsonify({"status": 200, "message": "OK"})

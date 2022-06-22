@@ -128,20 +128,6 @@ venv.bak/
 dmypy.json
 
 # Pyre type checker
+
+*.db
 .pyre/
-OWPlayers.db
-app/params.py
-/IMAGE.jpg
-/IMAGE2.jpg
-/owplayers.db
-/IMAGE.png
-/owbalancer1.db
-/app/Calculation/NeuroBalance/
-/owbalancer.db
-/owbalancer2.db
-/BalanceImages/
-/app/PIL/PILRewrite.py
-/app/icons/Test/
-/app/icons/
-/app/PIL/
-/owbalancer_log070622.db
