@@ -1,10 +1,11 @@
-from flask import Blueprint, Response, request
-from flask import jsonify
+from quart import Blueprint, Response, request
+from quart import jsonify
 import logging
-from flask_login import current_user
+from quart_login import current_user
 from app.Site.api.settings_api import api as settings_api
 from app.Site.api.auth_api import api as auth_api
 from app.Site.api.balance_api import api as balance_api
+from app.Site.api.workspace_api import api as workspace_api
 import app.Site.utils as utils
 
 module_logger = logging.getLogger("api")
@@ -15,6 +16,7 @@ api = Blueprint('profile_api', __name__, template_folder='templates',
 api.register_blueprint(settings_api, url_prefix='/settings')
 api.register_blueprint(auth_api, url_prefix='/auth')
 api.register_blueprint(balance_api, url_prefix='/balance')
+api.register_blueprint(workspace_api, url_prefix='/workspace')
 
 
 @api.route('/getPermissions', methods=['GET'])
@@ -40,8 +42,13 @@ async def getCurrentUserInfo() -> Response:
         info["Auth"] = False
         info["Workspace"] = None
     else:
-        Wid = utils.getWorkspaceIdByRequest()
+        WU = utils.getWorkspaceProfileByRequest()
         info = current_user.getJson()
         info["Auth"] = True
-        info["Workspace"] = Wid
+        if WU:
+            info["Workspace"] = WU.Workspace.getJson()
+            info["Role"] = WU.Role.Name
+        else:
+            info["Workspace"] = None
+            info["Role"] = None
     return jsonify(info)

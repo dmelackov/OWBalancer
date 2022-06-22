@@ -1,9 +1,9 @@
-from flask import Blueprint, request
+from quart import Blueprint, request
 from flask.wrappers import Response
 import logging
 import json
-from flask_login import login_required, current_user
-from flask import jsonify
+from quart_login import login_required, current_user
+from quart import jsonify
 from app.Calculation.GameBalance import createGame
 from app.Calculation.StaticAnalisys import recountModel
 import app.Site.utils as utils
@@ -18,16 +18,16 @@ api = Blueprint('balance_api', __name__, template_folder='templates',
 async def calcBalance() -> Response:
     WU = utils.getWorkspaceProfileByRequest()
     if not WU:
-        return Response(status=403)
+        return Response("Not Found Workspace Profile", status=403)
     if not WU.checkPermission("do_balance").status:
-        return Response(status=403)
+        return Response("Not enough permissions", status=403)
     module_logger.info(f"{current_user.Username} trying to calc Balance'")
-    data = request.get_json()
+    data = await request.get_json()
     balance = {}
     balance["static"] = data.get("static", None)
     balance["active"] = data.get("active", None)
     if balance["static"] is None or balance["active"] is None:
-        return Response(status=400)
+        return Response("Invalid data", status=400)
     return jsonify(recountModel(balance["static"], balance["active"], current_user))
 
 
@@ -36,9 +36,9 @@ async def calcBalance() -> Response:
 async def getBalances() -> Response:
     WU = utils.getWorkspaceProfileByRequest()
     if not WU:
-        return Response(status=403)
+        return Response("Not Found Workspace Profile", status=403)
     if not WU.checkPermission("do_balance").status:
-        return Response(status=403)
+        return Response("Not enough permissions", status=403)
     module_logger.info(f"{current_user.Username} trying get balance")
     balance = createGame(WU)
     if balance["result"] == 200:
