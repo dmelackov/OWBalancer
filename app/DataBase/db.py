@@ -119,19 +119,14 @@ class Profile(DefaultModel, UserMixin):
 
 class Workspace(DefaultModel):
     ID = PrimaryKeyField()
-    Name = TextField(unique=True)
+    Name = TextField()
     Description = TextField(default="")
     Creator = ForeignKeyField(Profile, to_field="ID")
     WorkspaceParams = TextField(default=defaultWorkspaceParams)
     Lobby = TextField(default=defaultLobbyData)
-    Active = BooleanField(default=True)
 
     @classmethod
     def create(cls, U: Profile, Name: str, WorkspaceParams: str) -> AnswerForm:
-        W = Workspace.select().where(Workspace.Name == Name)
-        if W:
-            return AnswerForm(status=False, error="already_exist")
-
         W = super().create(Creator=U, Name=Name, WorkspaceParams=WorkspaceParams)
         return AnswerForm(status=True, error=None, data=W)
 
@@ -186,7 +181,7 @@ class KeyData(DefaultModel):
     Creator = ForeignKeyField(Profile, to_field="ID")
 
     @classmethod
-    def create(cls, U: Profile, W: Workspace, UseLimit: int=1) -> AnswerForm:
+    def create(cls, U, W, UseLimit=1) -> AnswerForm:
         Key = W.ID + secrets.token_urlsafe(8)
         while KeyData.select().where(KeyData.Key == Key):
             Key = W.ID + secrets.token_urlsafe(8)
@@ -201,6 +196,7 @@ class WorkspaceProfile(DefaultModel):
     Role = ForeignKeyField(Roles, to_field="ID", null=True)
     Workspace = ForeignKeyField(Workspace, to_field="ID")
     WorkspaceSettings = TextField(default=defaultWorkspaceSettings)
+    Active = BooleanField(default=True)
 
     @classmethod
     def getInstance(cls, ID: int):
@@ -211,7 +207,7 @@ class WorkspaceProfile(DefaultModel):
             return None
 
     @classmethod
-    def getWU(cls, U, W):
+    def getWU(cls, U, W) -> AnswerForm:
         WU = WorkspaceProfile.select().where(WorkspaceProfile.Profile == U, WorkspaceProfile.Workspace == W)
         if WU:
             return AnswerForm(status=True, error=None, data=WU[0])

@@ -46,6 +46,6 @@ class FlaskSite:
 
         @self.login_manager.user_loader
         def load_user(user_id: int) -> MainDB.Profile:
-            return MainDB.Profile.get_by_id(user_id)
+            return MainDB.Profile.getInstance(user_id)
 
         self.app.register_blueprint(api, url_prefix='/api')

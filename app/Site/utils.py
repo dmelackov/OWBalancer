@@ -3,19 +3,28 @@ from flask_login import current_user
 import app.DataBase.db as db
 
 
-def getWorkspaceByRequest():
+def getWorkspaceIdByRequest() -> int:
     if "workspace" not in request.cookies:
         return None
     try:
         workspaceID = int(request.cookies)
     except ValueError:
         return None
-    return db.Workspace.getInstance(workspaceID)
+    return workspaceID
+
+def getWorkspaceByRequest() -> db.Workspace:
+    Wid = getWorkspaceIdByRequest()
+    if not Wid:
+        return None
+    return db.Workspace.getInstance(Wid)
     
 
-def getWorkspaceProfileByRequest():
-    W = getWorkspaceByRequest()
-    if not W:
+def getWorkspaceProfileByRequest() -> db.WorkspaceProfile:
+    Wid = getWorkspaceIdByRequest()
+    if not Wid:
         return None
-   
+    if "workspace" not in request.cookies:
+        return None
+    WU = db.WorkspaceProfile.getWU(current_user, Wid).data
+    return WU
     
