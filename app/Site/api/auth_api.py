@@ -1,10 +1,8 @@
-from flask import Blueprint, Response, jsonify, redirect
+from flask import Blueprint, Response, jsonify
 from flask_login import login_required, login_user, logout_user, current_user
 import logging
 from app.Site.forms.user import LoginForm, RegisterForm
 import app.DataBase.db as db
-from peewee import fn
-from flask_wtf import csrf
 
 module_logger = logging.getLogger("api")
 
@@ -19,8 +17,8 @@ async def login() -> Response:
     module_logger.info(f"Trying log in")
     form = LoginForm()
     if form.validate_on_submit():
-        U = db.Profile.getProfile(form.login.data)
-        if U and U.check_password(form.password.data):
+        U = db.Profile.check(form.login.data, form.password.data).data
+        if U:
             module_logger.info(f"Sucefful log in {form.login.data}")
             login_user(U, remember=form.remember_me.data)
             return jsonify({"status": 200})

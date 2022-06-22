@@ -78,9 +78,9 @@ class Profile(DefaultModel, UserMixin):
 
     @classmethod
     def check(cls, Username: str, Password: str) -> AnswerForm:
-        User = Profile.select().where(Profile.Username == Username)
-        if User.exists() and User[0].check_password(Password):
-            return AnswerForm(status=True, error=None)
+        U = Profile.select().where(Profile.Username == Username)
+        if U and U[0].check_password(Password):
+            return AnswerForm(status=True, error=None, data=U[0])
         else:
             return AnswerForm(status=False, error="invalid_login")
 
