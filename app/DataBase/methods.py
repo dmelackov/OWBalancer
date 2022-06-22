@@ -2,25 +2,25 @@ from app.DataBase.db import *
 
 
 def generate_roles():
-    Guest = Roles.create("Guest")
-    Customer = Roles.create("Customer")
-    Moderator = Roles.create("Moderator")
-    Administrator = Roles.create("Administrator")
+    Guest = Roles.create("Guest").data
+    Customer = Roles.create("Customer").data
+    Moderator = Roles.create("Moderator").data
+    Administrator = Roles.create("Administrator").data
 
-    add_customs_toLobby = Perms.create("add_customs_tolobby")
-    do_balance = Perms.create("do_balance")
-    change_player_roles = Perms.create("change_player_roles")
-    create_player = Perms.create("create_player")
-    delete_your_player = Perms.create("delete_your_player")
-    change_your_player = Perms.create("change_your_player")
-    create_custom = Perms.create("create_custom")
-    change_your_custom = Perms.create("change_your_custom")
-    delete_your_custom = Perms.create("delete_your_custom")
-    admin_panel_access = Perms.create("admin_panel_access")
-    delete_custom = Perms.create("delete_custom")
-    change_player = Perms.create("change_player")
-    delete_player = Perms.create("delete_player")
-    change_profile_role = Perms.create("change_profile_role")
+    add_customs_toLobby = Perms.create("add_customs_tolobby").data
+    do_balance = Perms.create("do_balance").data
+    change_player_roles = Perms.create("change_player_roles").data
+    create_player = Perms.create("create_player").data
+    delete_your_player = Perms.create("delete_your_player").data
+    change_your_player = Perms.create("change_your_player").data
+    create_custom = Perms.create("create_custom").data
+    change_your_custom = Perms.create("change_your_custom").data
+    delete_your_custom = Perms.create("delete_your_custom").data
+    admin_panel_access = Perms.create("admin_panel_access").data
+    delete_custom = Perms.create("delete_custom").data
+    change_player = Perms.create("change_player").data
+    delete_player = Perms.create("delete_player").data
+    change_profile_role = Perms.create("change_profile_role").data
 
     # права Guest
     RolePerms.create(Guest, add_customs_toLobby)
@@ -68,5 +68,17 @@ def generate_roles():
     RolePerms.create(Administrator, change_profile_role)
 
 
+tables = ['custom', 'games', 'perms', 'player', 'playerroles', 'profile', 'roleperms', 'roles']
+role_tabels = ['perms', 'roleperms', 'roles']
+
+
 def createDB():
-    db.create_tables([Profile, Custom, Player, Perms, Roles, RolePerms, Games, PlayerRoles])
+    if any(table not in db.get_tables() for table in tables):
+        if any(table not in db.get_tables() for table in role_tabels):
+            db.drop_tables([Perms, RolePerms, Roles])
+            db.create_tables([Perms, RolePerms, Roles])
+            generate_roles()
+        db.create_tables([Profile, Custom, Player, Games, PlayerRoles])
+        return AnswerForm(status=True, error=None)
+    return AnswerForm(status=False, error=None)
+

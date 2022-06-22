@@ -210,6 +210,14 @@ class WorkspaceProfile(DefaultModel):
         else:
             return None
 
+    @classmethod
+    def getWU(cls, U, W):
+        WU = WorkspaceProfile.select().where(WorkspaceProfile.Profile == U, WorkspaceProfile.Workspace == W)
+        if WU:
+            return AnswerForm(status=True, error=None, data=WU[0])
+        else:
+            return AnswerForm(status=False, error="instance_not_exist")
+
     def getPermissions(self) -> AnswerForm:
         if self.Role is not None:
             RPs = RolePerms.select().where(RolePerms.Role == self.Role)

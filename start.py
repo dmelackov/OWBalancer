@@ -1,4 +1,4 @@
-from app.DataBase.methods.methods import createDB
+from app.DataBase.methods import createDB
 from app.Site.SiteMain import FlaskSite
 from threading import Thread
 import logging.config

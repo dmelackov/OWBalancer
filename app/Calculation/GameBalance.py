@@ -30,7 +30,7 @@ def formPlayersData(Lobby, Creator):
             PlayersList.append(P)
             M = ClassPlayer(CustomIterator.TSR, CustomIterator.DSR, CustomIterator.HSR, CustomIterator.Player.Username)
             Members.append(M)
-            accord[CustomIterator.Player] = M
+            accord[P] = M
     PR = PlayerRoles.select().where(PlayerRoles.Player << PlayersList, PlayerRoles.Creator == Creator)
     if PR.exists():
         for PRIterator in PR:
@@ -79,16 +79,16 @@ def checkMask(tm, roleMask, Members, UserSettings):
     return mass, balanceError, maskError
 
 
-def createGame(U):
-    UserSettings = U.getUserSettings()
+def createGame(WU):
+    UserSettings = WU.getUserSettings()
     PlayersInTeam = UserSettings["Amount"]["T"] + UserSettings["Amount"]["D"] + UserSettings["Amount"]["H"]
     teamMask, roleMask = generateMask(PlayersInTeam, UserSettings["Amount"]["T"], UserSettings["Amount"]["D"])
 
-    Lobby = U.getLobbyInfo()
+    Lobby = WU.getLobbyInfo()
     Lobby = generateLobby(Lobby, PlayersInTeam)
 
     if Lobby:
-        Members = formPlayersData(Lobby, U)
+        Members = formPlayersData(Lobby, WU)
         PlayersDict = []
         for M in Members:
             PlayersDict.append(M.dict())
