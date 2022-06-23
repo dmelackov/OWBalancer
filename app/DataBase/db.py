@@ -39,7 +39,7 @@ class Roles(DefaultModel):
             return AnswerForm(status=False, error="instance_already_exist")
 
     @classmethod
-    def getRole(cls, Name):
+    def getRole(cls, Name) -> AnswerForm[Roles]:
         R = Roles.select().where(Roles.Name == Name)
         if R:
             return AnswerForm(status=True, error=None, data=R[0])
@@ -178,7 +178,7 @@ class Workspace(DefaultModel):
         elif KD.UseLimit == 0:
             return AnswerForm(status=False, error="use_limit")
 
-        WU = WorkspaceProfile.create(U, self)
+        WU = WorkspaceProfile.create(U, self).data
         return AnswerForm(status=True, error=None, data=WU)
 
     def getWorkspaceProfile(self, U: Profile) -> AnswerForm[WorkspaceProfile]:
