@@ -102,7 +102,6 @@ def createGame(WU):
             if not tempMaskErr:
                 maskError = False
             s += tempM
-            #print(tm, len(s))
 
         s.sort(key=lambda x: x.result)
         # print(len(s))
@@ -132,8 +131,8 @@ def createGame(WU):
         }
 
 
-if __name__ == "__main__":
-    d1 = datetime.datetime.now()
-    print(createGame(WorkspaceProfile.select().where(WorkspaceProfile.ID == 1)[0]))
-    d2 = datetime.datetime.now()
-    print("Весь метод:", str(d2 - d1))
+# if __name__ == "__main__":
+#     d1 = datetime.datetime.now()
+#     print(createGame(WorkspaceProfile.select().where(WorkspaceProfile.ID == 1)[0]))
+#     d2 = datetime.datetime.now()
+#     print("Весь метод:", str(d2 - d1))

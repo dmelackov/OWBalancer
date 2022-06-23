@@ -280,9 +280,6 @@ class WorkspaceProfile(DefaultModel):
                 return AnswerForm(status=True, error=None)
         return AnswerForm(status=False, error=None)
 
-    def getUserSettings(self) -> dict:
-        return json.loads(self.LobbySettings)
-
     def getLobbyInfo(self) -> list:
         LobbyData = json.loads(self.Customers)
         return LobbyData["Lobby"]
@@ -304,7 +301,7 @@ class WorkspaceProfile(DefaultModel):
         C = Custom.getInstance(Custom_ID)
         if C:
             CMass = self.getLobbyInfo()
-            USettings = self.getUserSettings()
+            USettings = self.Profile.getUserSettings()
             TeamPlayers = USettings["Amount"]["T"] + USettings["Amount"]["D"] + USettings["Amount"]["H"]
             if len(CMass) < TeamPlayers * 2 or USettings["ExtendedLobby"]:
                 cacheToChange = -1
@@ -322,6 +319,21 @@ class WorkspaceProfile(DefaultModel):
                 self.updateLobbyInfo(CMass)
                 return AnswerForm(status=True, error=None)
         return AnswerForm(status=False, error="instance_not_exist")
+
+    def DeleteFromLobby(self, Custom_ID):
+        C = Custom.getInstance(Custom_ID)
+        if C:
+            CMass = self.getLobbyInfo()
+
+            if C.ID in CMass:
+                CMass.remove(C.ID)
+            self.updateLobbyInfo(CMass)
+            return AnswerForm(status=True, error=None)
+        return AnswerForm(status=True, error="instance_not_exist")
+
+    def ClearLobby(self):
+        self.updateLobbyInfo([])
+        return AnswerForm(status=True, error=None)
 
 
 class Player(DefaultModel):
