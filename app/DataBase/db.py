@@ -30,7 +30,7 @@ class Roles(DefaultModel):
     Name = TextField(unique=True)
 
     @classmethod
-    def create(cls, Name: str) -> AnswerForm[Roles]:
+    def create(cls, Name: str) -> AnswerForm[Union[None, Roles]]:
         R = Roles.select().where(Roles.Name == Name)
         if not R.exists():
             R = super().create(Name=Name)
@@ -39,7 +39,7 @@ class Roles(DefaultModel):
             return AnswerForm(status=False, error="instance_already_exist")
 
     @classmethod
-    def getRole(cls, Name) -> AnswerForm[Roles]:
+    def getRole(cls, Name) -> AnswerForm[Union[None, Roles]]:
         R = Roles.select().where(Roles.Name == Name)
         if R:
             return AnswerForm(status=True, error=None, data=R[0])
@@ -60,7 +60,7 @@ class Profile(DefaultModel, UserMixin):
     LobbySettings = TextField(default=defaultProfileData)
 
     @classmethod
-    def create(cls, Username: str, Password: str) -> AnswerForm[Profile]:
+    def create(cls, Username: str, Password: str) -> AnswerForm[Union[None, Profile]]:
         if not Profile.select().where(Profile.Username == Username).exists():
             U = super().create(Username=Username)
             U.set_password(Password)
@@ -86,7 +86,7 @@ class Profile(DefaultModel, UserMixin):
             return None
 
     @classmethod
-    def check(cls, Username: str, Password: str) -> AnswerForm[Profile]:
+    def check(cls, Username: str, Password: str) -> AnswerForm[Union[None, Profile]]:
         U = Profile.select().where(fn.lower(Profile.Username) == Username.lower())
         if U and U[0].check_password(Password):
             return AnswerForm(status=True, error=None, data=U[0])
@@ -106,7 +106,7 @@ class Profile(DefaultModel, UserMixin):
             'username': self.Username
         }
 
-    def getCustom(self, Player_ID: int) -> AnswerForm[Custom]:
+    def getCustom(self, Player_ID: int) -> AnswerForm[Union[None, Custom]]:
         C = Custom.select().where(Custom.Player == Player_ID, Custom.Creator == self)
         if C.exists():
             return AnswerForm(status=True, error=None, data=C[0])
@@ -158,7 +158,7 @@ class Workspace(DefaultModel):
         self.Description = Desc
         self.save()
 
-    def joinWorkspace(self, U: Profile, InviteKey: str) -> AnswerForm[WorkspaceProfile]:
+    def joinWorkspace(self, U: Profile, InviteKey: str) -> AnswerForm[Union[None, WorkspaceProfile]]:
         KD = KeyData.select().where(KeyData.Key == InviteKey, KeyData.Workspace == self)
         if not KD:
             return AnswerForm(status=False, error="invalid_key")
@@ -181,7 +181,7 @@ class Workspace(DefaultModel):
         WU = WorkspaceProfile.create(U, self).data
         return AnswerForm(status=True, error=None, data=WU)
 
-    def getWorkspaceProfile(self, U: Profile) -> AnswerForm[WorkspaceProfile]:
+    def getWorkspaceProfile(self, U: Profile) -> AnswerForm[Union[None, WorkspaceProfile]]:
         WU = WorkspaceProfile.select().where(WorkspaceProfile.Profile == U, WorkspaceProfile.Workspace == self)
         if WU:
             return AnswerForm(status=True, error=None, data=WU[0])
@@ -197,7 +197,7 @@ class KeyData(DefaultModel):
     Creator = ForeignKeyField(Profile, to_field="ID")
 
     @classmethod
-    def create(cls, U, W, UseLimit=1) -> AnswerForm[Profile]:
+    def create(cls, U, W, UseLimit=1) -> AnswerForm[KeyData]:
         Key = W.ID + secrets.token_urlsafe(8)
         while KeyData.select().where(KeyData.Key == Key):
             Key = W.ID + secrets.token_urlsafe(8)
@@ -205,7 +205,7 @@ class KeyData(DefaultModel):
         return AnswerForm(status=True, error=None, data=KD)
 
     @classmethod
-    def getByKey(cls, Key: str) -> AnswerForm[KeyData]:
+    def getByKey(cls, Key: str) -> AnswerForm[Union[None, KeyData]]:
         KD = KeyData.select().where(KeyData.Key == Key)
         if KD:
             return AnswerForm(status=True, error=None, data=KD[0])
@@ -248,14 +248,14 @@ class WorkspaceProfile(DefaultModel):
             return AnswerForm(status=True, error=None, data=WU)
 
     @classmethod
-    def getWU(cls, U, W) -> AnswerForm[WorkspaceProfile]:
+    def getWU(cls, U, W) -> AnswerForm[Union[None, WorkspaceProfile]]:
         WU = WorkspaceProfile.select().where(WorkspaceProfile.Profile == U, WorkspaceProfile.Workspace == W)
         if WU:
             return AnswerForm(status=True, error=None, data=WU[0])
         else:
             return AnswerForm(status=False, error="instance_not_exist")
 
-    def getPermissions(self) -> AnswerForm[list[Perms]]:
+    def getPermissions(self) -> AnswerForm[Union[None, list[Perms]]]:
         if self.Role is not None:
             RPs = RolePerms.select().where(RolePerms.Role == self.Role)
             mass = []
@@ -322,7 +322,7 @@ class Player(DefaultModel):
     Creator = ForeignKeyField(WorkspaceProfile, to_field="ID")
 
     @classmethod
-    def create(cls, WU: WorkspaceProfile, Username: str) -> AnswerForm[Player]:
+    def create(cls, WU: WorkspaceProfile, Username: str) -> AnswerForm[Union[None, Player]]:
         if Username:
             P = Player.select().where(Player.Username == Username)
             if not P.exists():
@@ -383,7 +383,7 @@ class PlayerRoles(DefaultModel):
             return None
 
     @classmethod
-    def getPR(cls, WU: WorkspaceProfile, P) -> AnswerForm[WorkspaceProfile]:
+    def getPR(cls, WU: WorkspaceProfile, P) -> AnswerForm[Union[None, WorkspaceProfile]]:
         PR = PlayerRoles.select().where(PlayerRoles.Player == P, PlayerRoles.Creator == WU)
         if PR.exists():
             return AnswerForm(status=True, error=None, data=PR[0])
@@ -421,7 +421,7 @@ class Custom(DefaultModel):
     HSR = IntegerField(default=0)
 
     @classmethod
-    def create(cls, WU, P) -> AnswerForm[Custom]:
+    def create(cls, WU, P) -> AnswerForm[Union[None, Custom]]:
         C = Custom.select().where(Custom.Creator == WU, Custom.Player == P)
         if not C.exists():
             C = super().create(Creator=WU, Player=P)
@@ -438,7 +438,7 @@ class Custom(DefaultModel):
             return None
 
     @classmethod
-    def get_byPlayer(cls, Player_ID: int) -> AnswerForm[list[Custom]]:
+    def get_byPlayer(cls, Player_ID: int) -> AnswerForm[Union[None, list[Custom]]]:
         P = Player.select().where(Player.ID == Player_ID)
         if P.exists():
             CList = Custom.select().where(Custom.Player == P[0])
@@ -497,7 +497,7 @@ class Perms(DefaultModel):
     Name = TextField()
 
     @classmethod
-    def create(cls, Name: str) -> AnswerForm[Perms]:
+    def create(cls, Name: str) -> AnswerForm[Union[None, Perms]]:
         Perm = Perms.select().where(Perms.Name == Name)
         if not Perm.exists():
             Perm = super().create(Name=Name)
@@ -512,7 +512,7 @@ class RolePerms(DefaultModel):
     Perm = ForeignKeyField(Perms, to_field="ID")
 
     @classmethod
-    def create(cls, Role: Roles, Perm: Perms) -> AnswerForm[RolePerms]:
+    def create(cls, Role: Roles, Perm: Perms) -> AnswerForm[Union[None, RolePerms]]:
         RP = RolePerms.select().where(RolePerms.Perm == Perm, RolePerms.Role == Role)
         if not RP.exists():
             RP = super().create(Perm=Perm, Role=Role)

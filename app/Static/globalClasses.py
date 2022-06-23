@@ -143,10 +143,10 @@ class ClassGameBalance:
 
 
 class AnswerForm(Generic[T]):
-    def __init__(self, status: bool, error: Union[None, str], data: Union[T, None]=None):
+    def __init__(self, status: bool, error: Union[None, str], data: T=None):
         self.status: bool = status
         self.error: Union[None, str] = error
-        self.data: Union[None, T] = data
+        self.data: T = data
 
     def __bool__(self):
         return self.status
