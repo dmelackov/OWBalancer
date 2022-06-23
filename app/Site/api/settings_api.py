@@ -1,7 +1,7 @@
-from typing import Union
+from typing import Dict, Union
 import logging
-from flask import Blueprint, request, Response, jsonify
-from flask_login import login_required, current_user
+from quart import Blueprint, request, Response, jsonify
+from quart_login import login_required, current_user
 
 module_logger = logging.getLogger("api")
 
@@ -18,13 +18,13 @@ async def getSettings() -> Response:
 @api.route('/setSettings', methods=['POST'])
 @login_required
 async def setSettings() -> Response:
-    data = request.get_json()
+    data = await request.get_json()
     if not validateSettings(data):
         module_logger.debug(
             f"{current_user.Username} set invalid settings data {str(data)}")
-        return Response(status=400)
+        return Response("Invalid data", status=400)
     current_user.setUserSettings(data)
-    return Response(status=200)
+    return Response("ok", status=200)
 
 
 NumberTypes = (int, float)
@@ -56,7 +56,7 @@ mathSchema = {
 }
 
 
-def validateSettings(settings: dict[str, Union[int, bool, dict, str]]) -> bool:
+def validateSettings(settings: Dict[str, Union[int, bool, dict, str]]) -> bool:
     if set(settings.keys()) != set(settingsSchema.keys()):
         module_logger.debug("Main keys error")
         return False

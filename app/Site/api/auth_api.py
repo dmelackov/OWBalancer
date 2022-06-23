@@ -1,5 +1,5 @@
-from flask import Blueprint, Response, jsonify
-from flask_login import login_required, login_user, logout_user, current_user
+from quart import Blueprint, Response, jsonify
+from quart_login import login_required, login_user, logout_user, current_user
 import logging
 from app.Site.forms.user import LoginForm, RegisterForm
 import app.DataBase.db as db
@@ -13,7 +13,7 @@ api = Blueprint('auth_api', __name__, template_folder='templates',
 @api.route('/login', methods=['POST'])
 async def login() -> Response:
     if current_user.is_authenticated:
-        return Response(status=403)
+        return Response("Not enough permissions", status=403)
     module_logger.info(f"Trying log in")
     form = LoginForm()
     if form.validate_on_submit():
@@ -30,12 +30,12 @@ async def login() -> Response:
 @api.route('/registration', methods=['POST'])
 async def registration() -> Response:
     if current_user.is_authenticated:
-        return Response(status=403)
+        return Response("Not enough permissions", status=403)
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
             return jsonify({"status": 400, "message": "Passwords don't match"})
-        if db.Profile.getProfile(form.login):
+        if db.Profile.getProfile(form.login.data):
             return jsonify({"status": 400, "message": "User already exist"})
         db.Profile.create(form.login.data, form.password.data)
         return jsonify({"status": 200, "message": "OK"})

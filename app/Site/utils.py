@@ -1,5 +1,5 @@
-from flask import request
-from flask_login import current_user
+from quart import request
+from quart_login import current_user
 import app.DataBase.db as db
 
 
@@ -7,7 +7,7 @@ def getWorkspaceIdByRequest() -> int:
     if "workspace" not in request.cookies:
         return None
     try:
-        workspaceID = int(request.cookies)
+        workspaceID = int(request.cookies["workspace"])
     except ValueError:
         return None
     return workspaceID

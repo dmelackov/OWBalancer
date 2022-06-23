@@ -27,7 +27,8 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
-
+venv*/
+debug.py
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
@@ -127,20 +128,6 @@ venv.bak/
 dmypy.json
 
 # Pyre type checker
+
+*.db
 .pyre/
-OWPlayers.db
-app/params.py
-/IMAGE.jpg
-/IMAGE2.jpg
-/owplayers.db
-/IMAGE.png
-/owbalancer1.db
-/app/Calculation/NeuroBalance/
-/owbalancer.db
-/owbalancer2.db
-/BalanceImages/
-/app/PIL/PILRewrite.py
-/app/icons/Test/
-/app/icons/
-/app/PIL/
-/owbalancer_log070622.db
