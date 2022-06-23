@@ -92,14 +92,6 @@ class Profile(DefaultModel, UserMixin):
         else:
             return AnswerForm(status=False, error="invalid_login")
 
-    @classmethod
-    def search(cls, search_query: str) -> list:
-        query = []
-        for P in Player.select():
-            if search_query.lower() in P.Username.lower():
-                query.append(P)
-        return query
-
     def set_password(self, Password: str) -> None:
         self.Password = generate_password_hash(Password)
         self.save()
@@ -293,6 +285,29 @@ class WorkspaceProfile(DefaultModel):
         else:
             return AnswerForm(status=False, error="role_already_given")
 
+    def addToLobby(self, Custom_ID):
+        C = Custom.getInstance(Custom_ID)
+        if C:
+            CMass = self.getLobbyInfo()
+            USettings = self.getUserSettings()
+            TeamPlayers = USettings["Amount"]["T"] + USettings["Amount"]["D"] + USettings["Amount"]["H"]
+            if len(CMass) < TeamPlayers * 2 or USettings["ExtendedLobby"]:
+                cacheToChange = -1
+                for C_ID in CMass:
+                    LobbyC = Custom.getInstance(Custom_ID)
+                    if not LobbyC:
+                        return AnswerForm(status=False, error="broken_lobby")
+                    if LobbyC and LobbyC.Player == C.Player:
+                        cacheToChange = C_ID
+                if cacheToChange != -1:
+                    CMass.remove(cacheToChange)
+
+                if C.ID not in CMass:
+                    CMass.append(C.ID)
+                self.updateLobbyInfo(CMass)
+                return AnswerForm(status=True, error=None)
+        return AnswerForm(status=False, error="instance_not_exist")
+
 
 class Player(DefaultModel):
     ID = PrimaryKeyField()
@@ -320,6 +335,14 @@ class Player(DefaultModel):
             return P[0]
         else:
             return None
+
+    @classmethod
+    def search(cls, search_query: str) -> list:
+        query = []
+        for P in Player.select():
+            if search_query.lower() in P.Username.lower():
+                query.append(P)
+        return query
 
     # return {
     #             "id": self.ID,
