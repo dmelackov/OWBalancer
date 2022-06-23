@@ -64,10 +64,8 @@ def checkMask(tm, roleMask, Members, UserSettings):
     for mask in roleMask:
         if sTeam.checkMask(mask):
             sGoodMask.append(mask)
-
     if not fGoodMask or not sGoodMask:
         maskError = True
-
     mass = []
     for fMask in fGoodMask:
         for sMask in sGoodMask:
@@ -98,7 +96,6 @@ def createGame(WU):
         maskError = True
 
         for tm in teamMask:
-            
             tempM, tempBalErr, tempMaskErr = checkMask(tm, roleMask, Members, UserSettings)
             if not tempBalErr:
                 balanceError = False
@@ -108,6 +105,7 @@ def createGame(WU):
             #print(tm, len(s))
 
         s.sort(key=lambda x: x.result)
+        print(len(s))
         # s[0].calcResult()
         if maskError:
             response = {
@@ -134,7 +132,7 @@ def createGame(WU):
         }
 
 
-#d1 = datetime.datetime.now()
-#(createGame(WorkspaceProfile.select().where(WorkspaceProfile.ID == 1)[0]))
-#d2 = datetime.datetime.now()
-#print("Весь метод:", str(d2 - d1))
+d1 = datetime.datetime.now()
+print(createGame(WorkspaceProfile.select().where(WorkspaceProfile.ID == 1)[0]))
+d2 = datetime.datetime.now()
+print("Весь метод:", str(d2 - d1))

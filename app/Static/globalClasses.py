@@ -3,6 +3,7 @@ from typing import TypeVar, Generic, Union
 
 T = TypeVar('T')
 
+
 class ClassRole:
     SR = 0
     tag = ""

@@ -146,6 +146,14 @@ class Workspace(DefaultModel):
         else:
             return None
 
+    def searchPlayers(self, search_query: str) -> list:
+        query = []
+        WUs = WorkspaceProfile.select().where(WorkspaceProfile.Workspace == self)
+        for P in Player.select().where(Player.Creator << WUs):
+            if search_query.lower() in P.Username.lower():
+                query.append(P)
+        return query
+
     def getJson(self) -> dict:
         return {
             "ID": self.ID,
@@ -342,14 +350,6 @@ class Player(DefaultModel):
             return P[0]
         else:
             return None
-
-    @classmethod
-    def search(cls, search_query: str) -> list:
-        query = []
-        for P in Player.select():
-            if search_query.lower() in P.Username.lower():
-                query.append(P)
-        return query
 
     # return {
     #             "id": self.ID,
@@ -554,4 +554,3 @@ class Games(DefaultModel):
         self.Active = False
         self.save()
         return True
-
