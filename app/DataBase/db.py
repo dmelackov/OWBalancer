@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import Union
 from peewee import *
 from app.params import DB_NAME, port, password, user, host, db_type
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -69,7 +70,7 @@ class Profile(DefaultModel, UserMixin):
             return AnswerForm(status=True, error="already_exist")
 
     @classmethod
-    def getInstance(cls, ID: int) -> Profile:
+    def getInstance(cls, ID: int) -> Union[Profile, None]:
         U = Profile.select().where(Profile.ID == ID)
         if U:
             return U[0]
@@ -77,7 +78,7 @@ class Profile(DefaultModel, UserMixin):
             return None
 
     @classmethod
-    def getProfile(cls, Username: str) -> Profile:
+    def getProfile(cls, Username: str) -> Union[Profile, None]:
         U = Profile.select().where(fn.lower(Profile.Username) == Username.lower())
         if U:
             return U[0]
@@ -138,7 +139,7 @@ class Workspace(DefaultModel):
         return AnswerForm(status=True, error=None, data=W)
 
     @classmethod
-    def getInstance(cls, ID: int) -> Workspace:
+    def getInstance(cls, ID: int) -> Union[Workspace, None]:
         W = Workspace.select().where(Workspace.ID == ID)
         if W:
             return W[0]
@@ -228,7 +229,7 @@ class WorkspaceProfile(DefaultModel):
     Active = BooleanField(default=True)
 
     @classmethod
-    def getInstance(cls, ID: int) -> WorkspaceProfile:
+    def getInstance(cls, ID: int) -> Union[WorkspaceProfile, None]:
         WU = WorkspaceProfile.select().where(WorkspaceProfile.ID == ID)
         if WU:
             return WU[0]
@@ -335,7 +336,7 @@ class Player(DefaultModel):
         return AnswerForm(status=False, error="username_is_empty")
 
     @classmethod
-    def getInstance(cls, ID: int) -> Player:
+    def getInstance(cls, ID: int) -> Union[Player, None]:
         P = Player.select().where(Player.ID == ID)
         if P:
             return P[0]
@@ -374,7 +375,7 @@ class PlayerRoles(DefaultModel):
     isFlex = BooleanField(default=False)
 
     @classmethod
-    def getInstance(cls, ID: int) -> PlayerRoles:
+    def getInstance(cls, ID: int) -> Union[PlayerRoles, None]:
         PR = PlayerRoles.select().where(PlayerRoles.ID == ID)
         if PR:
             return PR[0]
@@ -429,7 +430,7 @@ class Custom(DefaultModel):
             return AnswerForm(status=False, error="already_exist")
 
     @classmethod
-    def getInstance(cls, ID: int) -> Custom:
+    def getInstance(cls, ID: int) -> Union[Custom, None]:
         C = Custom.select().where(Custom.ID == ID)
         if C:
             return C[0]
