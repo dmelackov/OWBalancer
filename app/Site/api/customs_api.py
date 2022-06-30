@@ -1,4 +1,3 @@
-import json
 from quart import Blueprint, request, Response
 import app.DataBase.db as db
 from quart_login import login_required, current_user
@@ -19,10 +18,10 @@ def getCustoms(Pid):
     if not WU:
         return Response("Not Found Workspace Profile", status=403)
     module_logger.info(f"{current_user.Username} trying to get customs for player with ID {Pid}")
-    customs = db.Custom.get_byPlayer(Pid).data
-    customList = []
-    if customs:
-        customList = list(map(lambda x: x.getJson(current_user), customs))
+    customsAF = db.Custom.get_byPlayer(Pid)
+    if not customsAF.data:
+        return Response(customsAF.error, status=403)
+    customList = list(map(lambda x: x.getJson(current_user), customsAF.data))
     module_logger.info(f"{current_user.Username}: Returning '{len(customList)}' customs")
     return jsonify(customList)
 

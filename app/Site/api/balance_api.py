@@ -1,12 +1,10 @@
 from quart import Blueprint, request, Response
 import logging
-import json
 from quart_login import login_required, current_user
 from quart import jsonify
 from app.Calculation.GameBalance import createGame
 from app.Calculation.StaticAnalisys import recountModel
 import app.Site.utils as utils
-from typing import Union
 
 
 module_logger = logging.getLogger("api")
@@ -33,7 +31,7 @@ async def calcBalance() -> Response:
 
 @api.route('/getBalances', methods=['GET'])
 @login_required
-async def getBalances() -> Union[Response, str]:
+async def getBalances() -> Response:
     WU = utils.getWorkspaceProfileByRequest()
     if not WU:
         return Response("Not Found Workspace Profile", status=403)
@@ -46,4 +44,4 @@ async def getBalances() -> Union[Response, str]:
             f"{current_user.Username} recieve balance with size {len(balance['active'])}")
     else:
         module_logger.info(f"{current_user.Username} dont recieve balances with reason {balance['status']}")
-    return json.dumps(balance)
+    return jsonify(balance)

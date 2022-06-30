@@ -484,8 +484,7 @@ class Custom(DefaultModel):
         P = Player.select().where(Player.ID == Player_ID)
         if P.exists():
             CList = Custom.select().where(Custom.Player == P[0])
-            if CList.exists():
-                return AnswerForm(status=True, error=None, data=[C for C in CList])
+            return AnswerForm(status=True, error=None, data=[C for C in CList])
         return AnswerForm(status=False, error="instance_not_exist")
 
     def changeSR(self, Role: str, New_SR: int) -> AnswerForm[None]:
