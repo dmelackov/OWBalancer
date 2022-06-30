@@ -22,5 +22,13 @@ ____
 ## Manage Lobby
 - [ ] Update this section after implementing general lobby feature into the frontline
 
+## Balance Lobby
+When lobby is filled u should click on "Balance teams" button on the bottom
 
+![image](https://user-images.githubusercontent.com/63819958/176712007-93801e29-1699-4b24-b6f9-5ab318db13e6.png)
 
+Then after loading you will get balance.
+
+![image](https://user-images.githubusercontent.com/63819958/176713245-d104b760-a5cb-4421-8e01-b66c45172157.png)
+
+You can also scroll through the balance options to find the best one. And you can also swap players manually by drag n drop players.
