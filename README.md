@@ -20,7 +20,7 @@ Depending on the settings of the workspace (custom system), there can be 2 optio
   Your own custom is highlighted with green.
 ____
 ## Manage Lobby
-[] 
+- [ ] Update this section after implementing general lobby feature into the frontline
 
 
 
