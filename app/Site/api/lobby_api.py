@@ -1,7 +1,6 @@
 from quart import Blueprint, request, Response
 from quart_login import login_required, current_user
 import app.DataBase.db as db
-import app.DataBase.LobbyСollector as LobbyMethods
 from quart import jsonify
 import logging
 import app.Site.utils as utils
@@ -65,8 +64,12 @@ async def deleteFromLobby() -> Response:
     data = await request.get_json()
     module_logger.info(
         f"{current_user.Username} trying delete from lobby custom with id {data['id']}")
-    LobbyMethods.DeleteFromLobby(current_user, data['id']) # TODO
-    return Response("ok", status=200)
+    C = db.Custom.getInstance(data['id'])
+    if C:
+        WU.DeleteFromLobby(C)
+        return Response("ok", status=200)
+    else:
+        return Response(C.error, status=403)
 
 
 @api.route('/clearLobby', methods=['POST'])

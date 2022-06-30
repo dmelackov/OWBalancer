@@ -44,7 +44,7 @@ async def setRoles() -> Response:
         return Response("Invalid data", status=400)
     PR = db.PlayerRoles.getPR(WU, P).data
     if not PR:
-        return
+        return Response(PR.error, status=403)
     PR.setRoles(data['roles'])
     return Response("ok", status=200)
 
@@ -54,7 +54,7 @@ async def setRoles() -> Response:
 async def setFlex() -> Response:
     WU = utils.getWorkspaceProfileByRequest()
     if not WU:
-        return Response("Not Found Workspace Profile", status=403)
+        return Response("Workspace Profile Not Found", status=403)
     if not WU.checkPermission("change_player_roles").status:
         return Response("Not enough permissions", status=403)
     data = await request.get_json()
@@ -83,6 +83,7 @@ async def createPlayer() -> Response:
         return Response("Invalid data", status=400)
     module_logger.info(
         f"{current_user.Username} trying create player {data['Username']}")
-    if not db.Player.create(WU, data["Username"]):
-        return Response(status=500)
+    P = db.Player.create(WU, data["Username"])
+    if not P:
+        return Response(P.error, status=500)
     return Response("ok", status=200)

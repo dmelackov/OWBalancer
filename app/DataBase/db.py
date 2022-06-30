@@ -201,6 +201,9 @@ class Workspace(DefaultModel):
         else:
             return AnswerForm(status=False, error="instance_not_exist")
 
+    def getWorkspaceParams(self):
+        return json.loads(self.WorkspaceParams)
+
 
 class KeyData(DefaultModel):
     ID = PrimaryKeyField()
@@ -285,17 +288,26 @@ class WorkspaceProfile(DefaultModel):
                 return AnswerForm(status=True, error=None)
         return AnswerForm(status=False, error=None)
 
-    def getUserSettings(self) -> dict:
-        return json.loads(self.LobbySettings)
-
     def getLobbyInfo(self) -> list:
-        LobbyData = json.loads(self.Customers)
-        return LobbyData["Lobby"]
+        WSettings = json.loads(self.WorkspaceSettings)
+        if WSettings["generalLobby"]:
+            LobbyData = json.loads(self.Workspace.Lobby)
+        else:
+            LobbyData = json.loads(self.Customers)
+        CustomChecker = [C.ID for C in Custom.select().where(Custom.ID << LobbyData["Lobby"])]
+        if len(CustomChecker) != len(LobbyData["Lobby"]):
+            self.updateLobbyInfo(CustomChecker)
+        return CustomChecker
 
     def updateLobbyInfo(self, mass: list) -> None:
+        WSettings = json.loads(self.WorkspaceSettings)
         d = {"Lobby": mass}
-        self.Customers = json.dumps(d)
-        self.save()
+        if WSettings["generalLobby"]:
+            self.Workspace.Lobby = json.dumps(d)
+            self.Workspace.save()
+        else:
+            self.Customers = json.dumps(d)
+            self.save()
 
     def setRole(self, Role: Roles) -> AnswerForm[None]:
         if self.Role != Role:
@@ -305,28 +317,40 @@ class WorkspaceProfile(DefaultModel):
         else:
             return AnswerForm(status=False, error="role_already_given")
 
-    def addToLobby(self, Custom_ID) -> AnswerForm[None]:
+    def addToLobby(self, C):
+        CMass = self.getLobbyInfo()
+        USettings = self.Profile.getUserSettings()
+        TeamPlayers = USettings["Amount"]["T"] + USettings["Amount"]["D"] + USettings["Amount"]["H"]
+        if len(CMass) < TeamPlayers * 2 or USettings["ExtendedLobby"]:
+            cacheToChange = -1
+            for C_ID in CMass:
+                LobbyC = Custom.getInstance(C_ID)
+                if not LobbyC:
+                    return AnswerForm(status=False, error="broken_lobby")
+                if LobbyC and LobbyC.Player == C.Player:
+                    cacheToChange = C_ID
+            if cacheToChange != -1:
+                CMass.remove(cacheToChange)
+
+            if C.ID not in CMass:
+                CMass.append(C.ID)
+            self.updateLobbyInfo(CMass)
+            return AnswerForm(status=True, error=None)
+
+    def DeleteFromLobby(self, Custom_ID):
         C = Custom.getInstance(Custom_ID)
         if C:
             CMass = self.getLobbyInfo()
-            USettings = self.getUserSettings()
-            TeamPlayers = USettings["Amount"]["T"] + USettings["Amount"]["D"] + USettings["Amount"]["H"]
-            if len(CMass) < TeamPlayers * 2 or USettings["ExtendedLobby"]:
-                cacheToChange = -1
-                for C_ID in CMass:
-                    LobbyC = Custom.getInstance(Custom_ID)
-                    if not LobbyC:
-                        return AnswerForm(status=False, error="broken_lobby")
-                    if LobbyC and LobbyC.Player == C.Player:
-                        cacheToChange = C_ID
-                if cacheToChange != -1:
-                    CMass.remove(cacheToChange)
 
-                if C.ID not in CMass:
-                    CMass.append(C.ID)
-                self.updateLobbyInfo(CMass)
-                return AnswerForm(status=True, error=None)
-        return AnswerForm(status=False, error="instance_not_exist")
+            if C.ID in CMass:
+                CMass.remove(C.ID)
+            self.updateLobbyInfo(CMass)
+            return AnswerForm(status=True, error=None)
+        return AnswerForm(status=True, error="instance_not_exist")
+
+    def ClearLobby(self):
+        self.updateLobbyInfo([])
+        return AnswerForm(status=True, error=None)
 
     def getJson(self) -> dict:
         return {
@@ -434,7 +458,13 @@ class Custom(DefaultModel):
 
     @classmethod
     def create(cls, WU, P) -> AnswerForm[Union[None, Custom]]:
-        C = Custom.select().where(Custom.Creator == WU, Custom.Player == P)
+        if WU.Workspace.getWorkspaceParams()["CustomSystem"]:
+            C = Custom.select().where(Custom.Creator == WU, Custom.Player == P)
+        else:
+            WUs = WorkspaceProfile.select().where(WorkspaceProfile.Workspace == WU.Workspace)
+            if not WUs:
+                return AnswerForm(status=False, error="instance_not_exist")
+            C = Custom.select().where(Custom.Creator << WUs, Custom.Player == P)
         if not C.exists():
             C = super().create(Creator=WU, Player=P)
             return AnswerForm(status=True, error=None, data=C)

@@ -1,7 +1,6 @@
 import json
 from quart import Blueprint, request, Response
 import app.DataBase.db as db
-import app.DataBase.LobbyСollector as LobbyMethods
 from quart_login import login_required, current_user
 from quart import jsonify
 import logging
