@@ -1,4 +1,4 @@
-from quart import Blueprint, Response, request
+from quart import Blueprint, Response
 from quart import jsonify
 import logging
 from quart_login import current_user
