@@ -19,9 +19,9 @@ def getCustoms(Pid):
         return Response("Not Found Workspace Profile", status=403)
     module_logger.info(f"{current_user.Username} trying to get customs for player with ID {Pid}")
     customsAF = db.Custom.get_byPlayer(Pid)
-    if not customsAF.data:
+    if customsAF.data is None:
         return Response(customsAF.error, status=403)
-    customList = list(map(lambda x: x.getJson(current_user), customsAF.data))
+    customList = list(map(lambda x: x.getJson(WU), customsAF.data))
     module_logger.info(f"{current_user.Username}: Returning '{len(customList)}' customs")
     return jsonify(customList)
 

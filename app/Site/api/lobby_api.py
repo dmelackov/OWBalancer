@@ -46,7 +46,10 @@ async def addToLobby() -> Response:
         return Response("Invalid data", status=400)
     module_logger.info(
         f"{current_user.Username} trying add to lobby custom with id {data['id']}")
-    af = WU.addToLobby(data['id'])
+    C = db.Custom.getInstance(data['id'])
+    if not C:
+        return Response("Invalid data", status=403)
+    af = WU.addToLobby(C)
     if af.status:
         return Response("ok", status=200)
     else:
@@ -69,7 +72,7 @@ async def deleteFromLobby() -> Response:
         WU.DeleteFromLobby(C)
         return Response("ok", status=200)
     else:
-        return Response(C.error, status=403)
+        return Response("Invalid data", status=403)
 
 
 @api.route('/clearLobby', methods=['POST'])
@@ -81,5 +84,5 @@ async def clearLobby() -> Response:
     if not WU.checkPermission("add_customs_tolobby").status:
         return Response("Not enough permissions", status=403)
     module_logger.info(f"{current_user.Username} trying clear lobby")
-    WU.updateLobbyInfo([]) # TODO change to method clearLobby
+    WU.ClearLobby()
     return Response("ok", status=200)

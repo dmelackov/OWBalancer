@@ -3,7 +3,7 @@ from quart import Quart
 from quart_login import LoginManager
 from app.Site.api.api import api
 import logging
-from app.params import site_port, secretKey
+from app.params import site_port, secretKey, debug
 import uvicorn
 
 module_logger = logging.getLogger("site")
@@ -31,7 +31,7 @@ class FlaskSite:
         self.login_manager.init_app(self.app)
 
     def startFlask(self) -> None:
-        uvicorn.run(self.app, host="0.0.0.0", port=site_port)
+        uvicorn.run(self.app, host="0.0.0.0", port=site_port, debug=debug)
 
     def initRouters(self) -> None:
         #@self.app.before_request

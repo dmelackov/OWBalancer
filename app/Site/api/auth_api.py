@@ -45,4 +45,6 @@ async def registration() -> Response:
 @api.route('/logout', methods=['POST'])
 async def logout() -> Response:
     logout_user()
-    return jsonify({"status": 200, "message": "OK"})
+    req = Response("ok", status=200)
+    req.set_cookie('workspace', '', expires=0)
+    return req

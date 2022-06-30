@@ -317,7 +317,7 @@ class WorkspaceProfile(DefaultModel):
         else:
             return AnswerForm(status=False, error="role_already_given")
 
-    def addToLobby(self, C):
+    def addToLobby(self, C: Custom) -> AnswerForm[None]:
         CMass = self.getLobbyInfo()
         USettings = self.Profile.getUserSettings()
         TeamPlayers = USettings["Amount"]["T"] + USettings["Amount"]["D"] + USettings["Amount"]["H"]
@@ -336,6 +336,7 @@ class WorkspaceProfile(DefaultModel):
                 CMass.append(C.ID)
             self.updateLobbyInfo(CMass)
             return AnswerForm(status=True, error=None)
+        return AnswerForm(status=False, error="lobby_is_overflowing")
 
     def DeleteFromLobby(self, Custom_ID):
         C = Custom.getInstance(Custom_ID)
