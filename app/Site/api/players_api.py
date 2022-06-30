@@ -20,7 +20,7 @@ async def getPlayers(searchStr: str = "") -> Response:
     if not WU:
         return Response("Not Found Workspace Profile", status=403)
     module_logger.info(f"{current_user.Username} trying to get players")
-    players = db_methods.searchPlayer(searchStr) # Жду метода
+    players = WU.Workspace.searchPlayers(searchStr)
     return jsonify(list(map(lambda x: x.getJson(), players)))
 
 
@@ -45,7 +45,7 @@ async def setRoles() -> Response:
     PR = db.PlayerRoles.getPR(WU, P).data
     if not PR:
         return
-    PR.setRole(data['roles'])
+    PR.setRoles(data['roles'])
     return Response("ok", status=200)
 
 

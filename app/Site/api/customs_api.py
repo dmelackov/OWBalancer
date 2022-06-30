@@ -1,3 +1,4 @@
+import json
 from quart import Blueprint, request, Response
 import app.DataBase.db as db
 import app.DataBase.LobbyСollector as LobbyMethods
@@ -19,11 +20,11 @@ def getCustoms(Pid):
     if not WU:
         return Response("Not Found Workspace Profile", status=403)
     module_logger.info(f"{current_user.Username} trying to get customs for player with ID {Pid}")
-    customs = db_methods.getCustoms_byPlayer(Pid)
+    customs = db.Custom.get_byPlayer(Pid).data
     customList = []
     if customs:
         customList = list(map(lambda x: x.getJson(current_user), customs))
-    module_logger.info(f"{current_user.Username}: Returning '{len(customList)}'")
+    module_logger.info(f"{current_user.Username}: Returning '{len(customList)}' customs")
     return jsonify(customList)
 
 
@@ -65,6 +66,8 @@ async def createCustom() -> Response:
         return Response("Invalid data", status=400)
     module_logger.info(
         f"{current_user.Username} trying create custom for {P.Username}")  
-    C = db.Custom.create(WU, P)
-    LobbyMethods.AddToLobby(current_user, C.ID) # Жду новых методов
-    return Response("ok", status=200)
+    C = db.Custom.create(WU, P).data
+    if C:
+        return jsonify(C.getJson(WU))
+    else:
+        return Response("Internal server error", status=500)

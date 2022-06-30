@@ -45,6 +45,11 @@ class Roles(DefaultModel):
             return AnswerForm(status=True, error=None, data=R[0])
         else:
             return AnswerForm(status=False, error="instance_not_exist")
+    
+    def getJson(self) -> dict:
+        return {
+            "Name": self.Name,
+        }
 
 
 defaultProfileData = '{"Amount": {"T": 2, "D": 2, "H": 2}, "TeamNames": {"1": "Team 1", "2": "Team 2"},' \
@@ -300,7 +305,7 @@ class WorkspaceProfile(DefaultModel):
         else:
             return AnswerForm(status=False, error="role_already_given")
 
-    def addToLobby(self, Custom_ID):
+    def addToLobby(self, Custom_ID) -> AnswerForm[None]:
         C = Custom.getInstance(Custom_ID)
         if C:
             CMass = self.getLobbyInfo()
@@ -322,6 +327,13 @@ class WorkspaceProfile(DefaultModel):
                 self.updateLobbyInfo(CMass)
                 return AnswerForm(status=True, error=None)
         return AnswerForm(status=False, error="instance_not_exist")
+
+    def getJson(self) -> dict:
+        return {
+            "ID": self.ID,
+            "Profile": self.Profile.getJson(),
+            "Role": self.Role.getJson()
+        }
 
 
 class Player(DefaultModel):
@@ -383,7 +395,7 @@ class PlayerRoles(DefaultModel):
             return None
 
     @classmethod
-    def getPR(cls, WU: WorkspaceProfile, P) -> AnswerForm[Union[None, WorkspaceProfile]]:
+    def getPR(cls, WU: WorkspaceProfile, P) -> AnswerForm[Union[None, PlayerRoles]]:
         PR = PlayerRoles.select().where(PlayerRoles.Player == P, PlayerRoles.Creator == WU)
         if PR.exists():
             return AnswerForm(status=True, error=None, data=PR[0])

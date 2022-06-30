@@ -43,10 +43,15 @@ async def addToLobby() -> Response:
     if not WU.checkPermission("add_customs_tolobby").status:
         return Response("Not enough permissions", status=403)
     data = await request.get_json()
+    if not data or not data["id"]:
+        return Response("Invalid data", status=400)
     module_logger.info(
         f"{current_user.Username} trying add to lobby custom with id {data['id']}")
-    LobbyMethods.AddToLobby(current_user, data['id'])
-    return jsonify({"status": 200})
+    af = WU.addToLobby(data['id'])
+    if af.status:
+        return Response("ok", status=200)
+    else:
+        return Response(af.error, status=400)
 
 
 @api.route('/deleteFromLobby', methods=['POST'])
@@ -55,12 +60,12 @@ async def deleteFromLobby() -> Response:
     WU = utils.getWorkspaceProfileByRequest()
     if not WU:
         return Response("Not Found Workspace Profile", status=403)
-    if not checkProfilePermission(current_user, "add_customs_tolobby"):
-        return jsonify({"status": 403})
+    if not WU.checkPermission("add_customs_tolobby").status:
+        return Response("Not enough permissions", status=403)
     data = await request.get_json()
     module_logger.info(
         f"{current_user.Username} trying delete from lobby custom with id {data['id']}")
-    LobbyMethods.DeleteFromLobby(current_user, data['id'])
+    LobbyMethods.DeleteFromLobby(current_user, data['id']) # TODO
     return Response("ok", status=200)
 
 
@@ -70,9 +75,8 @@ async def clearLobby() -> Response:
     WU = utils.getWorkspaceProfileByRequest()
     if not WU:
         return Response("Not Found Workspace Profile", status=403)
-    if not checkProfilePermission(current_user, "add_customs_tolobby"):
-        return jsonify({"status": 403})
+    if not WU.checkPermission("add_customs_tolobby").status:
+        return Response("Not enough permissions", status=403)
     module_logger.info(f"{current_user.Username} trying clear lobby")
-    current_user.updateLobbyInfo([])
-    # LobbyMethods.ClearLobby(current_user.ID)
+    WU.updateLobbyInfo([]) # TODO change to method clearLobby
     return Response("ok", status=200)

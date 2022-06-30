@@ -35,7 +35,7 @@ async def getWorkspace(ID):
 @api.route("/getWorkspaces")
 @login_required
 async def getWorkspaces():
-    Wl = current_user.getWorkspaceList()
+    Wl = current_user.getWorkspaceList().data
     Wljson = [i.getJson() for i in Wl]
     return jsonify(Wljson)
 

@@ -1,5 +1,4 @@
-from quart import Blueprint, request
-from flask.wrappers import Response
+from quart import Blueprint, request, Response
 import logging
 import json
 from quart_login import login_required, current_user

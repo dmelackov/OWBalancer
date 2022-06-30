@@ -41,6 +41,7 @@ async def getCurrentUserInfo() -> Response:
         info["Username"] = None
         info["Auth"] = False
         info["Workspace"] = None
+        req = jsonify(info)
     else:
         WU = utils.getWorkspaceProfileByRequest()
         info = current_user.getJson()
@@ -48,7 +49,10 @@ async def getCurrentUserInfo() -> Response:
         if WU:
             info["Workspace"] = WU.Workspace.getJson()
             info["Role"] = WU.Role.Name
+            req = jsonify(info)
         else:
             info["Workspace"] = None
             info["Role"] = None
-    return jsonify(info)
+            req = jsonify(info)
+            req.set_cookie('workspace', '', expires=0)
+    return req
