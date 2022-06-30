@@ -19,7 +19,7 @@ async def setWorkspace():
         return Response("Invalid data", status=400)
     W = db.Workspace.getInstance(data["ID"])
     if not W:
-        return Response(status=404)
+        return Response("Instance Not Exist", status=404)
     res = Response("ok", status=200)
     res.set_cookie("workspace", str(W.ID), max_age=60*60*24*365)
     return res

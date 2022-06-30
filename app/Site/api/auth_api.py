@@ -26,7 +26,6 @@ async def login() -> Response:
     return jsonify({"status": 400, "message": "Incorrect login or password"})
 
 
-
 @api.route('/registration', methods=['POST'])
 async def registration() -> Response:
     if current_user.is_authenticated:

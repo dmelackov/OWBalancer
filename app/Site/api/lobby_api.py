@@ -1,7 +1,6 @@
 from quart import Blueprint, request, Response
 from quart_login import login_required, current_user
 import app.DataBase.db as db
-import app.DataBase.LobbyСollector as LobbyMethods
 from quart import jsonify
 import logging
 import app.Site.utils as utils
@@ -45,8 +44,12 @@ async def addToLobby() -> Response:
     data = await request.get_json()
     module_logger.info(
         f"{current_user.Username} trying add to lobby custom with id {data['id']}")
-    LobbyMethods.AddToLobby(current_user, data['id'])
-    return jsonify({"status": 200})
+    C = db.Custom.getInstance(data['id'])
+    if C:
+        WU.addToLobby(C)
+        return jsonify({"status": 200})
+    else:
+        return Response(C.error, status=403)
 
 
 @api.route('/deleteFromLobby', methods=['POST'])
@@ -55,13 +58,17 @@ async def deleteFromLobby() -> Response:
     WU = utils.getWorkspaceProfileByRequest()
     if not WU:
         return Response("Not Found Workspace Profile", status=403)
-    if not checkProfilePermission(current_user, "add_customs_tolobby"):
+    if not WU.checkPermission("add_customs_tolobby"):
         return jsonify({"status": 403})
     data = await request.get_json()
     module_logger.info(
         f"{current_user.Username} trying delete from lobby custom with id {data['id']}")
-    LobbyMethods.DeleteFromLobby(current_user, data['id'])
-    return Response("ok", status=200)
+    C = db.Custom.getInstance(data['id'])
+    if C:
+        WU.DeleteFromLobby(C)
+        return Response("ok", status=200)
+    else:
+        return Response(C.error, status=403)
 
 
 @api.route('/clearLobby', methods=['POST'])
@@ -70,9 +77,9 @@ async def clearLobby() -> Response:
     WU = utils.getWorkspaceProfileByRequest()
     if not WU:
         return Response("Not Found Workspace Profile", status=403)
-    if not checkProfilePermission(current_user, "add_customs_tolobby"):
+    if not WU.checkPermission("add_customs_tolobby"):
         return jsonify({"status": 403})
     module_logger.info(f"{current_user.Username} trying clear lobby")
-    current_user.updateLobbyInfo([])
+    WU.updateLobbyInfo([])
     # LobbyMethods.ClearLobby(current_user.ID)
     return Response("ok", status=200)

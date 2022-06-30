@@ -87,6 +87,10 @@ def createDB():
 
 
 # if __name__ == "__main__":
+#     U = WorkspaceProfile.get(WorkspaceProfile.ID == 1)
+#     C = Custom.getInstance(13)
+#     print(U.addToLobby(C))
+    # print(U)
     # createDB()
     # U = Profile.create("Ivarys", "123").data
     # W = Workspace.create(U, "IvarysWorkspace", '{"CustomSystem": true}').data
