@@ -26,8 +26,8 @@ class DefaultModel(Model):
 
 
 class Roles(DefaultModel):
-    ID = PrimaryKeyField()
-    Name = TextField(unique=True)
+    ID: int = PrimaryKeyField()
+    Name: str = TextField(unique=True)
 
     @classmethod
     def create(cls, Name: str) -> AnswerForm[Union[None, Roles]]:
@@ -59,10 +59,10 @@ defaultProfileData = '{"Amount": {"T": 2, "D": 2, "H": 2}, "TeamNames": {"1": "T
 
 
 class Profile(DefaultModel, UserMixin):
-    ID = PrimaryKeyField()
-    Username = TextField()
-    Password = TextField(null=True)
-    LobbySettings = TextField(default=defaultProfileData)
+    ID: int = PrimaryKeyField()
+    Username: str = TextField()
+    Password: str = TextField(null=True)
+    LobbySettings: str = TextField(default=defaultProfileData)
 
     @classmethod
     def create(cls, Username: str, Password: str) -> AnswerForm[Union[None, Profile]]:
@@ -131,12 +131,12 @@ class Profile(DefaultModel, UserMixin):
 
 
 class Workspace(DefaultModel):
-    ID = PrimaryKeyField()
-    Name = TextField()
-    Description = TextField(default="")
-    Creator = ForeignKeyField(Profile, to_field="ID")
-    WorkspaceParams = TextField(default=defaultWorkspaceParams)
-    Lobby = TextField(default=defaultLobbyData)
+    ID: int = PrimaryKeyField()
+    Name: str = TextField()
+    Description: str = TextField(default="")
+    Creator: Profile = ForeignKeyField(Profile, to_field="ID")
+    WorkspaceParams: str = TextField(default=defaultWorkspaceParams)
+    Lobby: str = TextField(default=defaultLobbyData)
 
     @classmethod
     def create(cls, U, Name: str, WorkspaceParams: str) -> AnswerForm[Workspace]:
@@ -206,11 +206,11 @@ class Workspace(DefaultModel):
 
 
 class KeyData(DefaultModel):
-    ID = PrimaryKeyField()
-    Key = TextField()
-    Workspace = ForeignKeyField(Workspace, to_field="ID")
-    UseLimit = IntegerField(default=1)
-    Creator = ForeignKeyField(Profile, to_field="ID")
+    ID: int = PrimaryKeyField()
+    Key: str = TextField()
+    Workspace: Workspace = ForeignKeyField(Workspace, to_field="ID")
+    UseLimit: int = IntegerField(default=1)
+    Creator: Profile = ForeignKeyField(Profile, to_field="ID")
 
     @classmethod
     def create(cls, U, W, UseLimit=1) -> AnswerForm[KeyData]:
@@ -236,13 +236,13 @@ class KeyData(DefaultModel):
 
 
 class WorkspaceProfile(DefaultModel):
-    ID = PrimaryKeyField()
-    Profile = ForeignKeyField(Profile, to_field="ID")
-    Customers = TextField(default=defaultLobbyData)
-    Role = ForeignKeyField(Roles, to_field="ID", null=True)
-    Workspace = ForeignKeyField(Workspace, to_field="ID")
-    WorkspaceSettings = TextField(default=defaultWorkspaceSettings)
-    Active = BooleanField(default=True)
+    ID: int = PrimaryKeyField()
+    Profile: Profile = ForeignKeyField(Profile, to_field="ID")
+    Customers: str = TextField(default=defaultLobbyData)
+    Role: Roles = ForeignKeyField(Roles, to_field="ID", null=True)
+    Workspace: Workspace = ForeignKeyField(Workspace, to_field="ID")
+    WorkspaceSettings: str = TextField(default=defaultWorkspaceSettings)
+    Active: bool = BooleanField(default=True)
 
     @classmethod
     def getInstance(cls, ID: int) -> Union[WorkspaceProfile, None]:
@@ -362,9 +362,9 @@ class WorkspaceProfile(DefaultModel):
 
 
 class Player(DefaultModel):
-    ID = PrimaryKeyField()
-    Username = TextField(null=True)
-    Creator = ForeignKeyField(WorkspaceProfile, to_field="ID")
+    ID: int = PrimaryKeyField()
+    Username: str = TextField(null=True)
+    Creator: WorkspaceProfile = ForeignKeyField(WorkspaceProfile, to_field="ID")
 
     @classmethod
     def create(cls, WU: WorkspaceProfile, Username: str) -> AnswerForm[Union[None, Player]]:
@@ -405,11 +405,11 @@ class Player(DefaultModel):
 
 
 class PlayerRoles(DefaultModel):
-    ID = PrimaryKeyField()
-    Creator = ForeignKeyField(WorkspaceProfile, to_field="ID")
-    Player = ForeignKeyField(Player, to_field="ID")
-    Roles = TextField(default="")
-    isFlex = BooleanField(default=False)
+    ID: int = PrimaryKeyField()
+    Creator: WorkspaceProfile = ForeignKeyField(WorkspaceProfile, to_field="ID")
+    Player: Player = ForeignKeyField(Player, to_field="ID")
+    Roles: str = TextField(default="")
+    isFlex: bool = BooleanField(default=False)
 
     @classmethod
     def getInstance(cls, ID: int) -> Union[PlayerRoles, None]:
@@ -450,12 +450,12 @@ class PlayerRoles(DefaultModel):
 
 
 class Custom(DefaultModel):
-    ID = PrimaryKeyField()
-    Creator = ForeignKeyField(WorkspaceProfile, to_field="ID")
-    Player = ForeignKeyField(Player, to_field="ID")
-    TSR = IntegerField(default=0)
-    DSR = IntegerField(default=0)
-    HSR = IntegerField(default=0)
+    ID: int = PrimaryKeyField()
+    Creator: WorkspaceProfile = ForeignKeyField(WorkspaceProfile, to_field="ID")
+    Player: Player = ForeignKeyField(Player, to_field="ID")
+    TSR: int = IntegerField(default=0)
+    DSR: int = IntegerField(default=0)
+    HSR: int = IntegerField(default=0)
 
     @classmethod
     def create(cls, WU, P) -> AnswerForm[Union[None, Custom]]:
@@ -535,8 +535,8 @@ class Custom(DefaultModel):
 
 
 class Perms(DefaultModel):
-    ID = PrimaryKeyField()
-    Name = TextField()
+    ID: int = PrimaryKeyField()
+    Name: str = TextField()
 
     @classmethod
     def create(cls, Name: str) -> AnswerForm[Union[None, Perms]]:
@@ -549,9 +549,9 @@ class Perms(DefaultModel):
 
 
 class RolePerms(DefaultModel):
-    ID = PrimaryKeyField()
-    Role = ForeignKeyField(Roles, to_field="ID")
-    Perm = ForeignKeyField(Perms, to_field="ID")
+    ID: int = PrimaryKeyField()
+    Role: Roles = ForeignKeyField(Roles, to_field="ID")
+    Perm: Perms = ForeignKeyField(Perms, to_field="ID")
 
     @classmethod
     def create(cls, Role: Roles, Perm: Perms) -> AnswerForm[Union[None, RolePerms]]:
@@ -564,13 +564,13 @@ class RolePerms(DefaultModel):
 
 
 class Games(DefaultModel):
-    ID = PrimaryKeyField()
-    Creator = ForeignKeyField(Profile, to_field="ID")
-    Timestamp = DateTimeField(null=True)
-    Winner = IntegerField(null=True)
-    GameStatic = TextField()
-    GameData = TextField()
-    Active = BooleanField()
+    ID: int = PrimaryKeyField()
+    Creator: Profile = ForeignKeyField(Profile, to_field="ID")
+    Timestamp: dt = DateTimeField(null=True)
+    Winner: int = IntegerField(null=True)
+    GameStatic: str = TextField()
+    GameData: str = TextField()
+    Active: bool = BooleanField()
 
     @classmethod
     def create(cls, Profile_ID, GameData):
