@@ -1,12 +1,12 @@
 # **[Balancer](https://owbalancer.ddns.net)** user guide
 # <a name="Contents">Contents</a>
-- [Workspace](#manage-Workspace)
-- [Players](#manage-Players)
-- [Customs](#manage-Customs)
-- [Lobby](#manage-Lobby)
-- [Balance](#balance-Lobby)
-- [Settings](#settings)
-- [Math](#math)
+1. [Workspace](#manage-Workspace)
+2. [Players](#manage-Players)
+3. [Customs](#manage-Customs)
+4. [Lobby](#manage-Lobby)
+5. [Balance](#balance-Lobby)
+6. [Settings](#settings)
+7. [Math](#math)
 
 
 ## Manage Workspace
