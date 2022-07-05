@@ -1,13 +1,20 @@
 # **[Balancer](https://owbalancer.ddns.net)** user guide
 # <a name="Contents">Contents</a>
-- <h2 src="#manage-Workspace">Workspace</h2>
+- [Workspace](#manage-Workspace)
+- [Players](#manage-Players)
+- [Customs](#manage-Customs)
+- [Lobby](#manage-Lobby)
+- [Balance](#balance-Lobby)
+- [Settings](#settings)
+- [Math](#math)
+
 
 ## Manage Workspace
 
 
 [Back](#Contents)
 ____
-## <a name="Players">Create Players</a> 
+## Create Players
 
 <img src="https://user-images.githubusercontent.com/63819958/176691488-d7badc02-ad4c-4369-a798-15d73e2242e0.png" align="left" height=auto width="200" />
 
@@ -22,7 +29,6 @@ You can also edit player nicknames or delete players / customs by rcl on players
 [Back](#Contents)
 ____
 ## Manage Customs
-<a name="Customs"></a>
 P.S - Customs are "profiles" of players created by different users. You can use other users's customs, but you can't edit not your own custom. 
 Depending on the settings of the workspace (custom system), there can be 2 options for working with custom:
 * if "noCustom" setting is ON in the workspace, then custom will not be used and all players will be shared between different users
@@ -36,13 +42,11 @@ Depending on the settings of the workspace (custom system), there can be 2 optio
 [Back](#Contents)
 ____
 ## Manage Lobby
-<a name="Lobby"></a>
 - [ ] Update this section after implementing general lobby feature into the frontline
 
 [Back](#Contents)
 ____
 ## Balance Lobby
-<a name="Balance"></a>
 <img src="https://user-images.githubusercontent.com/63819958/176712007-93801e29-1699-4b24-b6f9-5ab318db13e6.png" align="right" height=auto width="500px" />
 When lobby is filled u should click on "Balance teams" button on the bottom
 
@@ -59,7 +63,6 @@ You can scroll through the balance options to find the best one. And you can als
 [Back](#Contents)
 ____
 ## Settings
-<a name="Settings"></a>
 <img src="https://user-images.githubusercontent.com/63819958/177350191-cab567e3-1074-4b81-8200-9a7b2b291da7.png" align="right" height=auto width="200px" />
 
 You can get access to user settings by clicking onto nickname in right top corner and click `settings`
@@ -78,7 +81,6 @@ Here you can edit decoration settings and balancer math coefficients (more about
 [Back](#Contents)
 ____
 # Math
-<a name="Math"></a>
 Balance list is sorted by analyzing each of the balances using the mathematical formulas described below (hereinafter simply `evaluation`)
 
 let:
