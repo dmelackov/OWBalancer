@@ -37,6 +37,8 @@ async def setRoles(WU: db.WorkspaceProfile, Pid: int) -> Response:
     P = db.Player.getInstance(Pid)
     if not P:
         return Response("Invalid data", status=400)
+    if P.Creator.Workspace != WU.Workspace:
+        return Response("Not enough permissions", status=403) 
     PR = db.PlayerRoles.getPR(WU, P).data
     if not PR:
         return Response(PR.error, status=403)
@@ -57,6 +59,8 @@ async def setFlex(WU: db.WorkspaceProfile, Pid: int) -> Response:
     P = db.Player.getInstance(Pid)
     if not P:
         return Response("Invalid data", status=400)
+    if P.Creator.Workspace != WU.Workspace:
+        return Response("Not enough permissions", status=403) 
     PR = db.PlayerRoles.getPR(WU, P).data
     if not PR:
         pass
@@ -88,6 +92,8 @@ async def deletePlayer(WU: db.WorkspaceProfile, Pid: int) -> Response:
     P = db.Player.getInstance(Pid)
     if not P:
         return Response("Invalid data", status=400)
+    if P.Creator.Workspace != WU.Workspace:
+        return Response("Not enough permissions", status=403) 
     if P.Creator != WU and not WU.checkPermission("delete_player").status:
         return Response("Not enough permissions", status=403)
     P.delete_instance(recursive=True)
@@ -106,6 +112,8 @@ async def changeNickname(WU: db.WorkspaceProfile, Pid: int) -> Response:
     P = db.Player.getInstance(Pid)
     if not P:
         return Response("Invalid data", status=400)
+    if P.Creator.Workspace != WU.Workspace:
+        return Response("Not enough permissions", status=403) 
     # TODO delete_player -> change_player
     if P.Creator != WU and not WU.checkPermission("delete_player").status:
         return Response("Not enough permissions", status=403)

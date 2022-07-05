@@ -39,6 +39,8 @@ async def changeRoleSr(WU: db.WorkspaceProfile, Cid: int) -> Response:
     C = db.Custom.getInstance(Cid)
     if not C:
         return Response("Invalid data", status=400)
+    if C.Creator.Workspace != WU.Workspace:
+        return Response("Not enough permissions", status=403) 
     C.changeSR(data['role'], data["rating"])
     return Response("ok", status=200)
 
@@ -54,6 +56,8 @@ async def createCustom(WU: db.WorkspaceProfile) -> Response:
     P = db.Player.getInstance(data["id"])
     if not P:
         return Response("Invalid data", status=400)
+    if P.Creator.Workspace != WU.Workspace:
+        return Response("Not enough permissions", status=403) 
     module_logger.info(
         f"{current_user.Username} trying create custom for {P.Username}")  
     C = db.Custom.create(WU, P)
@@ -71,6 +75,8 @@ async def deleteCustom(WU: db.WorkspaceProfile, Cid) -> Response:
     C = db.Custom.getInstance(Cid)
     if not C:
         return Response("Invalid data", status=400)
+    if C.Creator.Workspace != WU.Workspace:
+        return Response("Not enough permissions", status=403) 
     if C.Creator != WU and not WU.checkPermission("delete_custom").status:
         return Response("Not enough permissions", status=403)
     C.delete_instance()
