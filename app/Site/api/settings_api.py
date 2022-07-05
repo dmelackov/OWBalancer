@@ -15,7 +15,7 @@ async def getSettings() -> Response:
     return jsonify(current_user.getUserSettings())
 
 
-@api.route('/setSettings', methods=['POST'])
+@api.route('/setSettings', methods=['PUT'])
 @login_required
 async def setSettings() -> Response:
     data = await request.get_json()

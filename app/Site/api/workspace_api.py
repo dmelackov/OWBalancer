@@ -11,13 +11,10 @@ api = Blueprint('workspace_api', __name__, template_folder='templates',
                 static_folder='static')
 
 
-@api.route("/setWorkspace", methods=["POST"])
+@api.route("/setWorkspace/<int:Wid>", methods=["PUT"])
 @login_required
-async def setWorkspace():
-    data = await request.get_json()
-    if not data or not data["ID"]:
-        return Response("Invalid data", status=400)
-    W = db.Workspace.getInstance(data["ID"])
+async def setWorkspace(Wid):
+    W = db.Workspace.getInstance(Wid)
     if not W:
         return Response("Instance Not Exist", status=404)
     res = Response("ok", status=200)

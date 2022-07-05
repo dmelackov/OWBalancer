@@ -33,20 +33,17 @@ async def getLobby() -> Response:
     return jsonify(data)
 
 
-@api.route('/addToLobby', methods=['POST'])
+@api.route('/addToLobby/<int:Cid>', methods=['POST'])
 @login_required
-async def addToLobby() -> Response:
+async def addToLobby(Cid) -> Response:
     WU = utils.getWorkspaceProfileByRequest()
     if not WU:
         return Response("Not Found Workspace Profile", status=403)
     if not WU.checkPermission("add_customs_tolobby").status:
         return Response("Not enough permissions", status=403)
-    data = await request.get_json()
-    if not data or not data["id"]:
-        return Response("Invalid data", status=400)
     module_logger.info(
-        f"{current_user.Username} trying add to lobby custom with id {data['id']}")
-    C = db.Custom.getInstance(data['id'])
+        f"{current_user.Username} trying add to lobby custom with id {Cid}")
+    C = db.Custom.getInstance(Cid)
     if not C:
         return Response("Invalid data", status=403)
     af = WU.addToLobby(C)
@@ -56,18 +53,17 @@ async def addToLobby() -> Response:
         return Response(af.error, status=400)
 
 
-@api.route('/deleteFromLobby', methods=['POST'])
+@api.route('/deleteFromLobby/<int:Cid>', methods=['DELETE'])
 @login_required
-async def deleteFromLobby() -> Response:
+async def deleteFromLobby(Cid) -> Response:
     WU = utils.getWorkspaceProfileByRequest()
     if not WU:
         return Response("Not Found Workspace Profile", status=403)
     if not WU.checkPermission("add_customs_tolobby").status:
         return Response("Not enough permissions", status=403)
-    data = await request.get_json()
     module_logger.info(
-        f"{current_user.Username} trying delete from lobby custom with id {data['id']}")
-    C = db.Custom.getInstance(data['id'])
+        f"{current_user.Username} trying delete from lobby custom with id {Cid}")
+    C = db.Custom.getInstance(Cid)
     if C:
         WU.DeleteFromLobby(C)
         return Response("ok", status=200)
@@ -75,7 +71,7 @@ async def deleteFromLobby() -> Response:
         return Response("Invalid data", status=403)
 
 
-@api.route('/clearLobby', methods=['POST'])
+@api.route('/clearLobby', methods=['DELETE'])
 @login_required
 async def clearLobby() -> Response:
     WU = utils.getWorkspaceProfileByRequest()

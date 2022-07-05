@@ -24,22 +24,22 @@ async def getPlayers(searchStr: str = "") -> Response:
     return jsonify(list(map(lambda x: x.getJson(), players)))
 
 
-@api.route('/setRoles', methods=['POST'])
+@api.route('/setRoles/<int:Pid>', methods=['PUT'])
 @login_required
-async def setRoles() -> Response:
+async def setRoles(Pid) -> Response:
     WU = utils.getWorkspaceProfileByRequest()
     if not WU:
         return Response("Not Found Workspace Profile", status=403)
     if not WU.checkPermission("change_player_roles").status:
         return Response("Not enough permissions", status=403)
     data = await request.get_json()
-    if not data or not data["roles"] or not data["id"]:
+    if not data or not data["roles"]:
         return Response("Invalid data", status=400)
     module_logger.info(
-        f"{current_user.Username} trying to set player {data['id']} roles '{data['roles']}'")
+        f"{current_user.Username} trying to set player {Pid} roles '{data['roles']}'")
     if not re.fullmatch("[TDH]?[TDH]?[TDH]?", data['roles']):
         return Response("Invalid data", status=400)
-    P = db.Player.getInstance(data["id"])
+    P = db.Player.getInstance(Pid)
     if not P:
         return Response("Invalid data", status=400)
     PR = db.PlayerRoles.getPR(WU, P).data
@@ -49,18 +49,20 @@ async def setRoles() -> Response:
     return Response("ok", status=200)
 
 
-@api.route('/setFlex', methods=['POST'])
+@api.route('/setFlex/<int:Pid>', methods=['PUT'])
 @login_required
-async def setFlex() -> Response:
+async def setFlex(Pid) -> Response:
     WU = utils.getWorkspaceProfileByRequest()
     if not WU:
         return Response("Workspace Profile Not Found", status=403)
     if not WU.checkPermission("change_player_roles").status:
         return Response("Not enough permissions", status=403)
     data = await request.get_json()
+    if not data or data.get("status", None) is None:
+        return Response("Invalid data", status=400)
     module_logger.info(
-        f"{current_user.Username} trying to set flex {data['id']} to '{data['status']}'")
-    P = db.Player.getInstance(data["id"])
+        f"{current_user.Username} trying to set flex {Pid} to '{data['status']}'")
+    P = db.Player.getInstance(Pid)
     if not P:
         return Response("Invalid data", status=400)
     PR = db.PlayerRoles.getPR(WU, P).data
