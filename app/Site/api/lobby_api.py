@@ -13,10 +13,8 @@ api = Blueprint('lobby_api', __name__, template_folder='templates',
 
 @api.route('/getLobby')
 @login_required
-async def getLobby() -> Response:
-    WU = utils.getWorkspaceProfileByRequest()
-    if not WU:
-        return Response("Not Found Workspace Profile", status=403)
+@utils.WorkspaceUser
+async def getLobby(WU: db.WorkspaceProfile) -> Response:
     module_logger.info(f"{current_user.Username} trying to get lobby")
     players = WU.getLobbyInfo()
     data = [db.Custom.getInstance(i).getJson(WU) for i in players]
@@ -35,12 +33,9 @@ async def getLobby() -> Response:
 
 @api.route('/addToLobby/<int:Cid>', methods=['POST'])
 @login_required
-async def addToLobby(Cid) -> Response:
-    WU = utils.getWorkspaceProfileByRequest()
-    if not WU:
-        return Response("Not Found Workspace Profile", status=403)
-    if not WU.checkPermission("add_customs_tolobby").status:
-        return Response("Not enough permissions", status=403)
+@utils.WorkspaceUser
+@utils.PermsRequredOR("add_customs_tolobby")
+async def addToLobby(WU: db.WorkspaceProfile, Cid: int) -> Response:
     module_logger.info(
         f"{current_user.Username} trying add to lobby custom with id {Cid}")
     C = db.Custom.getInstance(Cid)
@@ -55,12 +50,9 @@ async def addToLobby(Cid) -> Response:
 
 @api.route('/deleteFromLobby/<int:Cid>', methods=['DELETE'])
 @login_required
-async def deleteFromLobby(Cid) -> Response:
-    WU = utils.getWorkspaceProfileByRequest()
-    if not WU:
-        return Response("Not Found Workspace Profile", status=403)
-    if not WU.checkPermission("add_customs_tolobby").status:
-        return Response("Not enough permissions", status=403)
+@utils.WorkspaceUser
+@utils.PermsRequredOR("add_customs_tolobby")
+async def deleteFromLobby(WU: db.WorkspaceProfile, Cid: int) -> Response:
     module_logger.info(
         f"{current_user.Username} trying delete from lobby custom with id {Cid}")
     C = db.Custom.getInstance(Cid)
@@ -73,12 +65,9 @@ async def deleteFromLobby(Cid) -> Response:
 
 @api.route('/clearLobby', methods=['DELETE'])
 @login_required
-async def clearLobby() -> Response:
-    WU = utils.getWorkspaceProfileByRequest()
-    if not WU:
-        return Response("Not Found Workspace Profile", status=403)
-    if not WU.checkPermission("add_customs_tolobby").status:
-        return Response("Not enough permissions", status=403)
+@utils.WorkspaceUser
+@utils.PermsRequredOR("add_customs_tolobby")
+async def clearLobby(WU: db.WorkspaceProfile) -> Response:
     module_logger.info(f"{current_user.Username} trying clear lobby")
     WU.ClearLobby()
     return Response("ok", status=200)

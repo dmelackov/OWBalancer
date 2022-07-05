@@ -13,10 +13,8 @@ api = Blueprint('customs_api', __name__, template_folder='templates',
 
 @api.route('/getCustoms/<int:Pid>')
 @login_required
-def getCustoms(Pid):
-    WU = utils.getWorkspaceProfileByRequest()
-    if not WU:
-        return Response("Not Found Workspace Profile", status=403)
+@utils.WorkspaceUser
+def getCustoms(WU: db.WorkspaceProfile, Pid: int):
     module_logger.info(f"{current_user.Username} trying to get customs for player with ID {Pid}")
     customsAF = db.Custom.get_byPlayer(Pid)
     if customsAF.data is None:
@@ -28,12 +26,9 @@ def getCustoms(Pid):
 
 @api.route('/changeRoleSr/<int:Cid>', methods=['PUT'])
 @login_required
-async def changeRoleSr(Cid) -> Response:
-    WU = utils.getWorkspaceProfileByRequest()
-    if not WU:
-        return Response("Not Found Workspace Profile", status=403)
-    if not WU.checkPermission("change_your_custom").status:
-        return Response("Not enough permissions", status=403)
+@utils.WorkspaceUser
+@utils.PermsRequredOR("change_your_custom")
+async def changeRoleSr(WU: db.WorkspaceProfile, Cid: int) -> Response:
     data = await request.get_json()
     if not data or not Cid or not data["rating"] or not data["role"]:
         return Response("Invalid data", status=400)
@@ -50,12 +45,9 @@ async def changeRoleSr(Cid) -> Response:
 
 @api.route('/createCustom', methods=['POST'])
 @login_required
-async def createCustom() -> Response:
-    WU = utils.getWorkspaceProfileByRequest()
-    if not WU:
-        return Response("Not Found Workspace Profile", status=403)
-    if not WU.checkPermission("create_custom").status:
-        return Response("Not enough permissions", status=403)
+@utils.WorkspaceUser
+@utils.PermsRequredOR("change_your_custom")
+async def createCustom(WU: db.WorkspaceProfile) -> Response:
     data = await request.get_json()
     if not data or not data["id"]:
         return Response("Invalid data", status=400)
@@ -69,3 +61,17 @@ async def createCustom() -> Response:
         return jsonify(C.data.getJson(WU))
     else:
         return Response(C.error, status=500)
+
+
+@api.route('/deleteCustom/<int:Cid>', methods=['DELETE'])
+@login_required
+@utils.WorkspaceUser
+@utils.PermsRequredOR(["delete_your_custom", "delete_custom"])
+async def deleteCustom(WU: db.WorkspaceProfile, Cid) -> Response:
+    C = db.Custom.getInstance(Cid)
+    if not C:
+        return Response("Invalid data", status=400)
+    if C.Creator != WU and not WU.checkPermission("delete_custom").status:
+        return Response("Not enough permissions", status=403)
+    C.delete_instance()
+    return Response("ok", status=200)

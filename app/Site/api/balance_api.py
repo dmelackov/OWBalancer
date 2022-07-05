@@ -5,7 +5,7 @@ from quart import jsonify
 from app.Calculation.GameBalance import createGame
 from app.Calculation.StaticAnalisys import recountModel
 import app.Site.utils as utils
-
+import app.DataBase.db as db
 
 module_logger = logging.getLogger("api")
 
@@ -15,12 +15,9 @@ api = Blueprint('balance_api', __name__, template_folder='templates',
 
 @api.route('/calcBalance', methods=['POST'])
 @login_required
-async def calcBalance() -> Response:
-    WU = utils.getWorkspaceProfileByRequest()
-    if not WU:
-        return Response("Not Found Workspace Profile", status=403)
-    if not WU.checkPermission("do_balance").status:
-        return Response("Not enough permissions", status=403)
+@utils.WorkspaceUser
+@utils.PermsRequredOR("do_balance")
+async def calcBalance(WU: db.WorkspaceProfile) -> Response:
     module_logger.info(f"{current_user.Username} trying to calc Balance'")
     data = await request.get_json()
     balance = {"static": data.get("static", None), "active": data.get("active", None)}
@@ -31,12 +28,9 @@ async def calcBalance() -> Response:
 
 @api.route('/getBalances', methods=['GET'])
 @login_required
-async def getBalances() -> Response:
-    WU = utils.getWorkspaceProfileByRequest()
-    if not WU:
-        return Response("Not Found Workspace Profile", status=403)
-    if not WU.checkPermission("do_balance").status:
-        return Response("Not enough permissions", status=403)
+@utils.WorkspaceUser
+@utils.PermsRequredOR("do_balance")
+async def getBalances(WU: db.WorkspaceProfile) -> Response:
     module_logger.info(f"{current_user.Username} trying get balance")
     balance = createGame(WU)
     if balance["result"] == 200:
