@@ -14,7 +14,7 @@
 
 [Back](#Contents)
 ____
-## Create Players
+##  Manage Players
 
 <img src="https://user-images.githubusercontent.com/63819958/176691488-d7badc02-ad4c-4369-a798-15d73e2242e0.png" align="left" height=auto width="200" />
 
