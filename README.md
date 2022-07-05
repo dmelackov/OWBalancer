@@ -1,6 +1,6 @@
 # **[Balancer](https://owbalancer.ddns.net)** user guide
 # <a name="Contents">Contents</a>
-- [Workspace](#manage-Workspace)
+- <h2 src="#manage-Workspace">Workspace</h2>
 
 ## Manage Workspace
 
