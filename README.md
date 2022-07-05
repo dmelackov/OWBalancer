@@ -69,7 +69,7 @@ You can get access to user settings by clicking onto nickname in right top corne
 <br clear="right"/>
 
 ##
-<img src="https://user-images.githubusercontent.com/63819958/177349956-c6d1ff8c-3ea4-4ba6-b773-74851bf405d8.png" align="right" height=auto width="500px" />
+<img src="https://user-images.githubusercontent.com/63819958/177395888-11c82511-d738-4b46-b7fa-64cb68b65dd6.png" align="right" height=auto width="500px" />
 
 Here you can edit decoration settings and balancer math coefficients (more about math [__here__](#Math))
 * Custom Autochoice - let you automaticly select your own custom while adding people into lobby
