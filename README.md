@@ -1,5 +1,7 @@
 # **[Balancer](https://owbalancer.ddns.net)** user guide
 # <a name="Contents">Contents</a>
+- [Workspace](#manage-Workspace)
+
 ## Manage Workspace
 
 
@@ -17,7 +19,7 @@ You can also edit player nicknames or delete players / customs by rcl on players
 <img src="https://user-images.githubusercontent.com/63819958/177334323-a39c61cf-4ce9-4bad-bfde-65dbfca0b56b.png" align="left" height=auto width="600" />
 <br clear="left"/>
 
-[Back to top](#Top)
+[Back](#Contents)
 ____
 ## Manage Customs
 <a name="Customs"></a>
@@ -31,13 +33,13 @@ Depending on the settings of the workspace (custom system), there can be 2 optio
   Here you can select which one of the customs you want to add into the lobby.
   Your own custom is highlighted with green.
   
-[Back to top](#Top)
+[Back](#Contents)
 ____
 ## Manage Lobby
 <a name="Lobby"></a>
 - [ ] Update this section after implementing general lobby feature into the frontline
 
-[Back to top](#Top)
+[Back](#Contents)
 ____
 ## Balance Lobby
 <a name="Balance"></a>
@@ -54,7 +56,7 @@ You can scroll through the balance options to find the best one. And you can als
 
 <br clear="right"/>
 
-[Back to top](#Top)
+[Back](#Contents)
 ____
 ## Settings
 <a name="Settings"></a>
@@ -73,7 +75,7 @@ Here you can edit decoration settings and balancer math coefficients (more about
 * Autoincrement - Not realised yet
 <br clear="right"/>
 
-[Back to top](#Top)
+[Back](#Contents)
 ____
 # Math
 <a name="Math"></a>
@@ -124,4 +126,4 @@ All coefficients can be changed on the settings page according to this list:
 
 On the balance result you can see $Evaluation = ImbalaceFunc(X, Y)$, $Fairness = \alpha * dpFairness(X, Y) + \beta * dpRoleFairness(X, Y)$ and $Uniformity = vqUniformity(X, Y)$
 
-[Back to top](#Top)
+[Back](#Contents)
