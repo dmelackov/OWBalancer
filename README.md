@@ -23,7 +23,7 @@ Than player will appear in the bottom of players menu.
 ##
 You can also edit player nicknames or delete players / customs by rcl on players name in the list
 
-<img src="https://user-images.githubusercontent.com/63819958/177334323-a39c61cf-4ce9-4bad-bfde-65dbfca0b56b.png" align="left" height=auto width="600" />
+<img src="https://user-images.githubusercontent.com/63819958/177334323-a39c61cf-4ce9-4bad-bfde-65dbfca0b56b.png" align="left" height=auto width="400" />
 <br clear="left"/>
 
 [Back](#Contents)
