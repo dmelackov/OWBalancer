@@ -126,6 +126,12 @@ All coefficients can be changed on the settings page according to this list:
   dWeight - DpsMultiplier
 </p>
 
-On the balance result you can see $Evaluation = ImbalaceFunc(X, Y), $airness = \alpha * dpFairness(X, Y) + \beta * dpRoleFairness(X, Y) and Uniformity = vqUniformity(X, Y)$
+On the balance result you can see
+
+$$Evaluation = ImbalaceFunc(X, Y)$$
+
+$$Fairness = \alpha * dpFairness(X, Y) + \beta * dpRoleFairness(X, Y)$$
+
+$$Uniformity = vqUniformity(X, Y)$$
 
 [Back](#Contents)
