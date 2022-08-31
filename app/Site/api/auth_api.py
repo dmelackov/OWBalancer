@@ -1,5 +1,5 @@
 from quart import Blueprint, Response, jsonify
-from quart_login import login_required, login_user, logout_user, current_user
+from flask_login import login_required, login_user, logout_user, current_user
 import logging
 from app.Site.forms.user import LoginForm, RegisterForm
 import app.DataBase.db as db

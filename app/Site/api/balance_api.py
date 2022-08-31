@@ -1,6 +1,6 @@
 from quart import Blueprint, request, Response
 import logging
-from quart_login import login_required, current_user
+from flask_login import login_required, current_user
 from quart import jsonify
 from app.Calculation.GameBalance import createGame
 from app.Calculation.StaticAnalisys import recountModel

@@ -2,7 +2,7 @@ from functools import wraps
 from math import perm
 from typing import List, Union
 from quart import request, Response
-from quart_login import current_user
+from flask_login import current_user
 import app.DataBase.db as db
 
 

@@ -1,7 +1,7 @@
 from typing import Dict, Union
 import logging
 from quart import Blueprint, request, Response, jsonify
-from quart_login import login_required, current_user
+from flask_login import login_required, current_user
 
 module_logger = logging.getLogger("api")
 

@@ -3,7 +3,7 @@ from typing import Union
 from peewee import *
 from app.params import DB_NAME, port, password, user, host, db_type
 from werkzeug.security import check_password_hash, generate_password_hash
-from quart_login import UserMixin
+from flask_login import UserMixin
 import json
 from datetime import datetime as dt
 from app.Static.globalClasses import AnswerForm

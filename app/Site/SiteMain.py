@@ -1,6 +1,6 @@
 import app.DataBase.db as MainDB
 from quart import Quart
-from quart_login import LoginManager
+from flask_login import LoginManager
 from app.Site.api.api import api
 import logging
 from app.params import site_port, secretKey, debug

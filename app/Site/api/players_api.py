@@ -1,5 +1,5 @@
 from quart import Blueprint, request, Response
-from quart_login import login_required, current_user
+from flask_login import login_required, current_user
 import app.DataBase.db as db
 import app.Site.utils as utils
 from quart import jsonify

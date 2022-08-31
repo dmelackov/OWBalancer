@@ -1,7 +1,7 @@
 from quart import Blueprint, Response
 from quart import jsonify
 import logging
-from quart_login import current_user
+from flask_login import current_user
 from app.Site.api.settings_api import api as settings_api
 from app.Site.api.auth_api import api as auth_api
 from app.Site.api.balance_api import api as balance_api
