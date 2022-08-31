@@ -23,9 +23,11 @@ def generate_roles():
     change_player = Perms.create("change_player").data
     delete_player = Perms.create("delete_player").data
     change_profile_role = Perms.create("change_profile_role").data
+    moderate_workspace = Perms.create("moderate_workspace").data
 
     # права Guest
     RolePerms.create(Guest, add_customs_toLobby)
+    RolePerms.create(Guest, change_player_roles)
     RolePerms.create(Guest, do_balance)
 
     # Права Customer
@@ -68,6 +70,7 @@ def generate_roles():
     RolePerms.create(Administrator, delete_custom)
     RolePerms.create(Administrator, admin_panel_access)
     RolePerms.create(Administrator, change_profile_role)
+    RolePerms.create(Administrator, moderate_workspace)
 
 
 tables = ['custom', 'games', 'perms', 'player', 'playerroles', 'profile', 'roleperms', 'roles',

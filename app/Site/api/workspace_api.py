@@ -50,9 +50,9 @@ async def createWorkspace():
     return Response("ok", status=200)
 
 
-@api.route("/activeInviteCode", methods=["POST"])
+@api.route("/activateInviteCode", methods=["POST"])
 @login_required
-async def activeInviteCode():
+async def activateInviteCode():
     jsonS = await request.get_json()
     if not jsonS or not jsonS["keyCode"]:
         return Response("Invalid data", status=400)
