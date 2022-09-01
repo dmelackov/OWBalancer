@@ -1,4 +1,4 @@
-from quart import Blueprint
+from flask import Blueprint
 import logging
 from app.Site.api.customs_api import api as customs_api
 from app.Site.api.profile_api import api as profile_api

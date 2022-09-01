@@ -1,6 +1,6 @@
 from typing import Dict, Union
 import logging
-from quart import Blueprint, request, Response, jsonify
+from flask import Blueprint, request, Response, jsonify
 from flask_login import login_required, current_user
 
 module_logger = logging.getLogger("api")
@@ -18,7 +18,7 @@ async def getSettings() -> Response:
 @api.route('/setSettings', methods=['PUT'])
 @login_required
 async def setSettings() -> Response:
-    data = await request.get_json()
+    data = request.get_json()
     if not validateSettings(data):
         module_logger.debug(
             f"{current_user.Username} set invalid settings data {str(data)}")

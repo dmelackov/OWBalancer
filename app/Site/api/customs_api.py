@@ -1,7 +1,7 @@
-from quart import Blueprint, request, Response
+from flask import Blueprint, request, Response
 import app.DataBase.db as db
 from flask_login import login_required, current_user
-from quart import jsonify
+from flask import jsonify
 import logging
 import app.Site.utils as utils
 
@@ -29,7 +29,7 @@ def getCustoms(WU: db.WorkspaceProfile, Pid: int):
 @utils.WorkspaceUser
 @utils.PermsRequredOR("change_your_custom")
 async def changeRoleSr(WU: db.WorkspaceProfile, Cid: int) -> Response:
-    data = await request.get_json()
+    data = request.get_json()
     if not data or not Cid or not data["rating"] or not data["role"]:
         return Response("Invalid data", status=400)
     module_logger.info(
@@ -50,7 +50,7 @@ async def changeRoleSr(WU: db.WorkspaceProfile, Cid: int) -> Response:
 @utils.WorkspaceUser
 @utils.PermsRequredOR("change_your_custom")
 async def createCustom(WU: db.WorkspaceProfile) -> Response:
-    data = await request.get_json()
+    data = request.get_json()
     if not data or not data["id"]:
         return Response("Invalid data", status=400)
     P = db.Player.getInstance(data["id"])

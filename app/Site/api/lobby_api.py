@@ -1,7 +1,7 @@
-from quart import Blueprint, request, Response
+from flask import Blueprint, request, Response
 from flask_login import login_required, current_user
 import app.DataBase.db as db
-from quart import jsonify
+from flask import jsonify
 import logging
 import app.Site.utils as utils
 

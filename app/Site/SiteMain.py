@@ -1,10 +1,11 @@
 import app.DataBase.db as MainDB
-from quart import Quart
+from flask import Flask
 from flask_login import LoginManager
 from app.Site.api.api import api
 import logging
 from app.params import site_port, secretKey, debug
 import uvicorn
+from asgiref.wsgi import WsgiToAsgi
 
 module_logger = logging.getLogger("site")
 
@@ -22,7 +23,7 @@ class FlaskSite:
         module_logger.info("Site init complete")
 
     def initFlaskConfig(self) -> None:
-        self.app = Quart(__name__)
+        self.app = Flask(__name__)
         self.app.config['SECRET_KEY'] = secretKey
         self.app.config["SESSION_COOKIE_SAMESITE"] = "Strict"
         self.app.config["REMEMBER_COOKIE_SAMESITE"] = "Strict"
@@ -30,8 +31,10 @@ class FlaskSite:
         self.login_manager = LoginManager()
         self.login_manager.init_app(self.app)
 
+        self.asgi_app = WsgiToAsgi(self.app)
+
     def startFlask(self) -> None:
-        uvicorn.run(self.app, host="0.0.0.0", port=site_port, debug=debug)
+        uvicorn.run(self.asgi_app, host="0.0.0.0", port=site_port, debug=debug)
 
     def initRouters(self) -> None:
         #@self.app.before_request

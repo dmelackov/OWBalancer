@@ -1,7 +1,7 @@
-from quart import Blueprint, request, Response
+from flask import Blueprint, request, Response
 import logging
 from flask_login import login_required, current_user
-from quart import jsonify
+from flask import jsonify
 from app.Calculation.GameBalance import createGame
 from app.Calculation.StaticAnalisys import recountModel
 import app.Site.utils as utils
@@ -19,7 +19,7 @@ api = Blueprint('balance_api', __name__, template_folder='templates',
 @utils.PermsRequredOR("do_balance")
 async def calcBalance(WU: db.WorkspaceProfile) -> Response:
     module_logger.info(f"{current_user.Username} trying to calc Balance'")
-    data = await request.get_json()
+    data = request.get_json()
     balance = {"static": data.get("static", None), "active": data.get("active", None)}
     if balance["static"] is None or balance["active"] is None:
         return Response("Invalid data", status=400)

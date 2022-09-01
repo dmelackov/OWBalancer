@@ -1,5 +1,5 @@
-from quart import Blueprint, Response, request
-from quart import jsonify
+from flask import Blueprint, Response, request
+from flask import jsonify
 import logging
 from flask_login import current_user, login_required
 import app.DataBase.db as db
@@ -40,7 +40,7 @@ async def getWorkspaces():
 @api.route("/createWorkspace", methods=["POST"])
 @login_required
 async def createWorkspace():
-    jsonS = await request.get_json()
+    jsonS = request.get_json()
     if not jsonS or not jsonS["name"] or not jsonS["params"]:
         return Response("Invalid data", status=400)
     W = db.Workspace.create(current_user, jsonS["name"], json.dumps(jsonS["params"])).data
@@ -53,7 +53,7 @@ async def createWorkspace():
 @api.route("/activateInviteCode", methods=["POST"])
 @login_required
 async def activateInviteCode():
-    jsonS = await request.get_json()
+    jsonS = request.get_json()
     if not jsonS or not jsonS["keyCode"]:
         return Response("Invalid data", status=400)
     W = db.Workspace.getByKey(jsonS["keyCode"]).data

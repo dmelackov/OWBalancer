@@ -1,8 +1,8 @@
-from quart import Blueprint, request, Response
+from flask import Blueprint, request, Response
 from flask_login import login_required, current_user
 import app.DataBase.db as db
 import app.Site.utils as utils
-from quart import jsonify
+from flask import jsonify
 import logging
 import re
 
@@ -27,7 +27,7 @@ async def getPlayers(WU: db.WorkspaceProfile, searchStr: str = "") -> Response:
 @utils.WorkspaceUser
 @utils.PermsRequredOR("change_player_roles")
 async def setRoles(WU: db.WorkspaceProfile, Pid: int) -> Response:
-    data = await request.get_json()
+    data = request.get_json()
     if not data or not data["roles"]:
         return Response("Invalid data", status=400)
     module_logger.info(
@@ -51,7 +51,7 @@ async def setRoles(WU: db.WorkspaceProfile, Pid: int) -> Response:
 @utils.WorkspaceUser
 @utils.PermsRequredOR("change_player_roles")
 async def setFlex(WU: db.WorkspaceProfile, Pid: int) -> Response:
-    data = await request.get_json()
+    data = request.get_json()
     if not data or data.get("status", None) is None:
         return Response("Invalid data", status=400)
     module_logger.info(
@@ -73,7 +73,7 @@ async def setFlex(WU: db.WorkspaceProfile, Pid: int) -> Response:
 @utils.WorkspaceUser
 @utils.PermsRequredOR("create_player")
 async def createPlayer(WU: db.WorkspaceProfile) -> Response:
-    data = await request.get_json()
+    data = request.get_json()
     if not data or not data["Username"]:
         return Response("Invalid data", status=400)
     module_logger.info(
@@ -106,7 +106,7 @@ async def deletePlayer(WU: db.WorkspaceProfile, Pid: int) -> Response:
 # TODO delete_player -> change_player
 @utils.PermsRequredOR(["change_your_player", "delete_player"])
 async def changeNickname(WU: db.WorkspaceProfile, Pid: int) -> Response:
-    data = await request.get_json()
+    data = request.get_json()
     if not data or not data["Username"]:
         return Response("Invalid data", status=400)
     P = db.Player.getInstance(Pid)

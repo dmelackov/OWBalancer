@@ -1,5 +1,5 @@
-from quart import Blueprint, Response
-from quart import jsonify
+from flask import Blueprint, Response
+from flask import jsonify
 import logging
 from flask_login import current_user
 from app.Site.api.settings_api import api as settings_api
