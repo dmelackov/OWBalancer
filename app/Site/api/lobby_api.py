@@ -18,16 +18,6 @@ async def getLobby(WU: db.WorkspaceProfile) -> Response:
     module_logger.info(f"{current_user.Username} trying to get lobby")
     players = WU.getLobbyInfo()
     data = [db.Custom.getInstance(i).getJson(WU) for i in players]
-    for PData in data:
-        if PData['Creator']['ID'] == WU.ID:
-            PData['editable'] = True
-        else:
-            PData['editable'] = False
-        if not sum([1 if PData["Roles"][i]["sr"] else 0 for i in range(3)]) or \
-                not sum([PData["Roles"][i]["active"] for i in range(3)]):
-            PData["warn"] = True
-        else:
-            PData["warn"] = False
     return jsonify(data)
 
 

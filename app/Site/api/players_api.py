@@ -28,7 +28,7 @@ async def getPlayers(WU: db.WorkspaceProfile, searchStr: str = "") -> Response:
 @utils.PermsRequredOR("change_player_roles")
 async def setRoles(WU: db.WorkspaceProfile, Pid: int) -> Response:
     data = request.get_json()
-    if not data or not data["roles"]:
+    if not data or "roles" not in data:
         return Response("Invalid data", status=400)
     module_logger.info(
         f"{current_user.Username} trying to set player {Pid} roles '{data['roles']}'")
@@ -52,7 +52,7 @@ async def setRoles(WU: db.WorkspaceProfile, Pid: int) -> Response:
 @utils.PermsRequredOR("change_player_roles")
 async def setFlex(WU: db.WorkspaceProfile, Pid: int) -> Response:
     data = request.get_json()
-    if not data or data.get("status", None) is None:
+    if not data or "status" not in data:
         return Response("Invalid data", status=400)
     module_logger.info(
         f"{current_user.Username} trying to set flex {Pid} to '{data['status']}'")
