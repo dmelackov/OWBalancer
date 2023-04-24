@@ -30,6 +30,14 @@ class Roles(DefaultModel):
     Name: str = TextField(unique=True)
 
     @classmethod
+    def getInstance(cls, ID: int) -> Union[Roles, None]:
+        R = Roles.select().where(Roles.ID == ID)
+        if R:
+            return R[0]
+        else:
+            return None
+
+    @classmethod
     def create(cls, Name: str) -> AnswerForm[Union[None, Roles]]:
         R = Roles.select().where(Roles.Name == Name)
         if not R.exists():
