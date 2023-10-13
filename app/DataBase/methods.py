@@ -1,6 +1,25 @@
 import random
 
 from app.DataBase.db import *
+from enum import Enum
+
+
+class Permissions(Enum):
+    add_customs_toLobby = "add_customs_toLobby"
+    do_balance = "do_balance"
+    change_player_roles = "change_player_roles"
+    create_player = "create_player"
+    delete_your_player = "delete_your_player"
+    change_your_player = "change_your_player"
+    create_custom = "create_custom"
+    change_your_custom = "change_your_custom"
+    delete_your_custom = "delete_your_custom"
+    admin_panel_access = "admin_panel_access"
+    delete_custom = "delete_custom"
+    change_player = "change_player"
+    delete_player = "delete_player"
+    change_profile_role = "change_profile_role"
+    moderate_workspace = "moderate_workspace"
 
 
 def generate_roles():
@@ -84,7 +103,8 @@ def createDB():
             db.drop_tables([Perms, RolePerms, Roles])
             db.create_tables([Perms, RolePerms, Roles])
             generate_roles()
-        db.create_tables([Profile, Custom, Player, Games, PlayerRoles, Workspace, WorkspaceProfile, KeyData])
+        db.create_tables([Profile, Custom, Player, Games,
+                         PlayerRoles, Workspace, WorkspaceProfile, KeyData])
         return AnswerForm(status=True, error=None)
     return AnswerForm(status=False, error=None)
 

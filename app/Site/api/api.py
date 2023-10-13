@@ -1,17 +1,18 @@
-from flask import Blueprint
-import logging
-from app.Site.api.customs_api import api as customs_api
-from app.Site.api.profile_api import api as profile_api
-from app.Site.api.players_api import api as players_api
-from app.Site.api.lobby_api import api as lobby_api
+from fastapi import APIRouter
+import app.Site.api.Profile.auth as Auth
+import app.Site.api.Profile.profile as Profile
+import app.Site.api.Profile.workspace as Workspace
+import app.Site.api.Profile.settings as Settings
+import app.Site.api.Players.players as Players
+import app.Site.api.Players.customs as Customs
 
+router = APIRouter(
+    prefix="/api",
+)
 
-module_logger = logging.getLogger("api")
-
-api = Blueprint('api', __name__, template_folder='templates',
-                static_folder='static')
-
-api.register_blueprint(customs_api, url_prefix='/customs')
-api.register_blueprint(profile_api, url_prefix='/profile')
-api.register_blueprint(players_api, url_prefix='/players')
-api.register_blueprint(lobby_api, url_prefix='/lobby')
+router.include_router(Profile.router)
+router.include_router(Auth.router)
+router.include_router(Workspace.router)
+router.include_router(Settings.router)
+router.include_router(Players.router)
+router.include_router(Customs.router)

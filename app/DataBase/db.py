@@ -1,21 +1,23 @@
 from __future__ import annotations
 from typing import Union
 from peewee import *
-from app.params import DB_NAME, port, password, user, host, db_type
+from app.params import DB_NAME, DB_TYPE, DB_HOST, DB_PORT, DB_USER_LOGIN, DB_USER_PASSWORD
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_login import UserMixin
 import json
 from datetime import datetime as dt
 from app.Static.globalClasses import AnswerForm
 import secrets
+import app.DataBase.dataModels as dataModels
+
 
 defaultWorkspaceParams = '{"CustomSystem": true}'
 defaultLobbyData = '{"Lobby": []}'
 defaultWorkspaceSettings = '{"AutoIncrement": false, "generalLobby": false}'
 
 
-if db_type == "mysql":
-    db = MySQLDatabase(DB_NAME, host=host, port=port, user=user, password=password)
+if DB_TYPE == "mysql":
+    db = MySQLDatabase(DB_NAME, host=DB_HOST, port=DB_PORT,
+                       user=DB_USER_LOGIN, password=DB_USER_PASSWORD)
 else:
     db = SqliteDatabase(DB_NAME + ".db")
 
@@ -53,24 +55,23 @@ class Roles(DefaultModel):
             return AnswerForm(status=True, error=None, data=R[0])
         else:
             return AnswerForm(status=False, error="instance_not_exist")
-    
-    def getJson(self) -> dict:
-        return {
-            "Name": self.Name,
-        }
+
+    def getJson(self) -> dataModels.Roles:
+        return dataModels.Roles(ID=self.ID, Name=self.Name)
 
 
 defaultProfileData = '{"Amount": {"T": 2, "D": 2, "H": 2}, "TeamNames": {"1": "Team 1", "2": "Team 2"},' \
-                   ' "AutoCustom": true, "ExtendedLobby": false, "Autoincrement": false, "BalanceLimit": 2500,' \
-                   '"fColor": "#1e90ff", "sColor": "#ff6347", "ExpandedResult": true, "Math":{"alpha": 3.0, ' \
-                   '"beta": 1.0, "gamma": 80.0, "p": 2.0, "q": 2.0, "tWeight": 1.1, "dWeight": 1.0, "hWeight": 0.9}}'
+    ' "AutoCustom": true, "ExtendedLobby": false, "Autoincrement": false, "BalanceLimit": 2500,' \
+    '"fColor": "#1e90ff", "sColor": "#ff6347", "ExpandedResult": true, "Math":{"alpha": 3.0, ' \
+    '"beta": 1.0, "gamma": 80.0, "p": 2.0, "q": 2.0, "tWeight": 1.1, "dWeight": 1.0, "hWeight": 0.9}}'
 
 
-class Profile(DefaultModel, UserMixin):
+class Profile(DefaultModel):
     ID: int = PrimaryKeyField()
     Username: str = TextField()
     Password: str = TextField(null=True)
     LobbySettings: str = TextField(default=defaultProfileData)
+    Secret: str = TextField()
 
     @classmethod
     def create(cls, Username: str, Password: str) -> AnswerForm[Union[None, Profile]]:
@@ -108,16 +109,14 @@ class Profile(DefaultModel, UserMixin):
 
     def set_password(self, Password: str) -> None:
         self.Password = generate_password_hash(Password)
+        self.Secret = secrets.token_urlsafe(8)
         self.save()
 
     def check_password(self, Password: str) -> bool:
         return check_password_hash(self.Password, Password)
 
-    def getJson(self) -> dict:
-        return {
-            'ID': self.ID,
-            'username': self.Username
-        }
+    def getJson(self) -> dataModels.Profile:
+        return dataModels.Profile(ID=self.ID, Username=self.Username)
 
     def getCustom(self, Player_ID: int) -> AnswerForm[Union[None, Custom]]:
         C = Custom.select().where(Custom.Player == Player_ID, Custom.Creator == self)
@@ -159,7 +158,7 @@ class Workspace(DefaultModel):
         else:
             return None
 
-    def searchPlayers(self, search_query: str) -> list:
+    def searchPlayers(self, search_query: str) -> list[Player]:
         query = []
         WUs = WorkspaceProfile.select().where(WorkspaceProfile.Workspace == self)
         for P in Player.select().where(Player.Creator << WUs):
@@ -167,13 +166,8 @@ class Workspace(DefaultModel):
                 query.append(P)
         return query
 
-    def getJson(self) -> dict:
-        return {
-            "ID": self.ID,
-            "Name": self.Name,
-            "Description": self.Description,
-            "Creator": self.Creator.getJson()
-        }
+    def getJson(self) -> dataModels.Workspace:
+        return dataModels.Workspace(ID=self.ID, Name=self.Name, Description=self.Description, Creator=self.Creator.getJson())
 
     def setWorkspaceDescription(self, Desc: str) -> None:
         self.Description = Desc
@@ -184,7 +178,8 @@ class Workspace(DefaultModel):
         if not KD:
             return AnswerForm(status=False, error="invalid_key")
 
-        WU = WorkspaceProfile.select().where(WorkspaceProfile.Profile == U and WorkspaceProfile.Workspace == self)
+        WU = WorkspaceProfile.select().where(WorkspaceProfile.Profile ==
+                                             U and WorkspaceProfile.Workspace == self)
         if WU:
             if not WU[0].Active:
                 WU[0].Active = 1
@@ -203,7 +198,8 @@ class Workspace(DefaultModel):
         return AnswerForm(status=True, error=None, data=WU)
 
     def getWorkspaceProfile(self, U: Profile) -> AnswerForm[Union[None, WorkspaceProfile]]:
-        WU = WorkspaceProfile.select().where(WorkspaceProfile.Profile == U, WorkspaceProfile.Workspace == self)
+        WU = WorkspaceProfile.select().where(WorkspaceProfile.Profile ==
+                                             U, WorkspaceProfile.Workspace == self)
         if WU:
             return AnswerForm(status=True, error=None, data=WU[0])
         else:
@@ -262,7 +258,8 @@ class WorkspaceProfile(DefaultModel):
 
     @classmethod
     def create(cls, U, W) -> AnswerForm[WorkspaceProfile]:
-        WU = WorkspaceProfile.select().where(WorkspaceProfile.Profile == U, WorkspaceProfile.Workspace == W)
+        WU = WorkspaceProfile.select().where(WorkspaceProfile.Profile ==
+                                             U, WorkspaceProfile.Workspace == W)
         if WU and not WU[0].Active:
             WU[0].Active = True
             WU[0].save()
@@ -272,8 +269,9 @@ class WorkspaceProfile(DefaultModel):
             return AnswerForm(status=True, error=None, data=WU)
 
     @classmethod
-    def getWU(cls, U, W) -> AnswerForm[Union[None, WorkspaceProfile]]:
-        WU = WorkspaceProfile.select().where(WorkspaceProfile.Profile == U, WorkspaceProfile.Workspace == W)
+    def getWU(cls, U: Profile, W: Workspace) -> AnswerForm[Union[None, WorkspaceProfile]]:
+        WU = WorkspaceProfile.select().where(WorkspaceProfile.Profile ==
+                                             U, WorkspaceProfile.Workspace == W)
         if WU:
             return AnswerForm(status=True, error=None, data=WU[0])
         else:
@@ -289,12 +287,12 @@ class WorkspaceProfile(DefaultModel):
         else:
             return AnswerForm(status=False, error="empty_role")
 
-    def checkPermission(self, Perm: str) -> AnswerForm[None]:
+    def checkPermission(self, Perm: str) -> bool:
         PRs = self.getPermissions().data
         if PRs:
             if Perm in [i.Name for i in PRs]:
-                return AnswerForm(status=True, error=None)
-        return AnswerForm(status=False, error=None)
+                return True
+        return False
 
     def getLobbyInfo(self) -> list:
         WSettings = json.loads(self.WorkspaceSettings)
@@ -302,7 +300,8 @@ class WorkspaceProfile(DefaultModel):
             LobbyData = json.loads(self.Workspace.Lobby)
         else:
             LobbyData = json.loads(self.Customers)
-        CustomChecker = [C.ID for C in Custom.select().where(Custom.ID << LobbyData["Lobby"])]
+        CustomChecker = [C.ID for C in Custom.select().where(
+            Custom.ID << LobbyData["Lobby"])]
         if len(CustomChecker) != len(LobbyData["Lobby"]):
             self.updateLobbyInfo(CustomChecker)
         return CustomChecker
@@ -328,7 +327,8 @@ class WorkspaceProfile(DefaultModel):
     def addToLobby(self, C: Custom) -> AnswerForm[None]:
         CMass = self.getLobbyInfo()
         USettings = self.Profile.getUserSettings()
-        TeamPlayers = USettings["Amount"]["T"] + USettings["Amount"]["D"] + USettings["Amount"]["H"]
+        TeamPlayers = USettings["Amount"]["T"] + \
+            USettings["Amount"]["D"] + USettings["Amount"]["H"]
         if len(CMass) < TeamPlayers * 2 or USettings["ExtendedLobby"]:
             cacheToChange = -1
             for C_ID in CMass:
@@ -361,18 +361,15 @@ class WorkspaceProfile(DefaultModel):
         self.updateLobbyInfo([])
         return AnswerForm(status=True, error=None)
 
-    def getJson(self) -> dict:
-        return {
-            "ID": self.ID,
-            "Profile": self.Profile.getJson(),
-            "Role": self.Role.getJson()
-        }
+    def getJson(self) -> dataModels.WorkspaceProfile:
+        return dataModels.WorkspaceProfile(ID=self.ID, Profile=self.Profile.getJson(), Role=self.Role.getJson(), Workspace=self.Workspace.getJson(), Active=self.Active)
 
 
 class Player(DefaultModel):
     ID: int = PrimaryKeyField()
     Username: str = TextField(null=True)
-    Creator: WorkspaceProfile = ForeignKeyField(WorkspaceProfile, to_field="ID")
+    Creator: WorkspaceProfile = ForeignKeyField(
+        WorkspaceProfile, to_field="ID")
 
     @classmethod
     def create(cls, WU: WorkspaceProfile, Username: str) -> AnswerForm[Union[None, Player]]:
@@ -406,15 +403,14 @@ class Player(DefaultModel):
     #             "RolesPriority": priority,
     #             "isFlex": self.isFlex
     #         }
-    def getJson(self) -> dict:
-        return {"ID": self.ID,
-                "Creator": self.Creator.getJson(),
-                "Username": self.Username}
+    def getJson(self) -> dataModels.Player:
+        return dataModels.Player(ID=self.ID, Username=self.Username, Creator=self.Creator.getJson())
 
 
 class PlayerRoles(DefaultModel):
     ID: int = PrimaryKeyField()
-    Creator: WorkspaceProfile = ForeignKeyField(WorkspaceProfile, to_field="ID")
+    Creator: WorkspaceProfile = ForeignKeyField(
+        WorkspaceProfile, to_field="ID")
     Player: Player = ForeignKeyField(Player, to_field="ID")
     Roles: str = TextField(default="")
     isFlex: bool = BooleanField(default=False)
@@ -435,12 +431,13 @@ class PlayerRoles(DefaultModel):
         else:
             return AnswerForm(status=False, error="instance_not_exist")
 
-    def getJsonRoles(self) -> list:
+    def getJsonRoles(self) -> list[dataModels.PlayerRole]:
         if self.isFlex:
-            return [{"role": i, "active": True} for i in "TDH"]
+            return [dataModels.PlayerRole(active=True, role=i, sr=0) for i in "TDH"]
         else:
-            priority = [{"role": i, "active": True} for i in self.Roles] + \
-                       [{"role": i, "active": False} for i in "TDH" if i not in self.Roles]
+            priority = [dataModels.PlayerRole(active=True, role=i, sr=0) for i in self.Roles] + \
+                       [dataModels.PlayerRole(active=False, role=i, sr=0)
+                           for i in "TDH" if i not in self.Roles]
         return priority
 
     def setRoles(self, newRoles: str) -> AnswerForm[None]:
@@ -459,7 +456,8 @@ class PlayerRoles(DefaultModel):
 
 class Custom(DefaultModel):
     ID: int = PrimaryKeyField()
-    Creator: WorkspaceProfile = ForeignKeyField(WorkspaceProfile, to_field="ID")
+    Creator: WorkspaceProfile = ForeignKeyField(
+        WorkspaceProfile, to_field="ID")
     Player: Player = ForeignKeyField(Player, to_field="ID")
     TSR: int = IntegerField(default=0)
     DSR: int = IntegerField(default=0)
@@ -518,28 +516,29 @@ class Custom(DefaultModel):
     #          ],
     #     "CustomID": ID
     # }
-    def getJson(self, WU: WorkspaceProfile) -> dict:
+    def getJson(self, WU: WorkspaceProfile) -> dataModels.Custom:
         P = self.Player
-        PR = PlayerRoles.select().where(PlayerRoles.Player == P, PlayerRoles.Creator == WU)
+        PR: PlayerRoles = PlayerRoles.select().where(
+            PlayerRoles.Player == P, PlayerRoles.Creator == WU)
         if not PR.exists():
             PR = PlayerRoles.create(Creator=WU, Player=P)
         else:
             PR = PR[0]
-        data = {
-            "Player": P.getJson(),
-            "Roles": PR.getJsonRoles(),
-            "isFlex": PR.isFlex,
-            "ID": self.ID,
-            "Creator": self.Creator.getJson()}
+
+        roles = PR.getJsonRoles()
 
         for i in range(3):
-            if data["Roles"][i]["role"] == "T":
-                data["Roles"][i]["sr"] = self.TSR
-            elif data["Roles"][i]["role"] == "D":
-                data["Roles"][i]["sr"] = self.DSR
-            elif data["Roles"][i]["role"] == "H":
-                data["Roles"][i]["sr"] = self.HSR
-        return data
+            if roles[i].role == dataModels.GameRole.tank:
+                roles[i].sr = self.TSR
+            elif roles[i].role == dataModels.GameRole.damage:
+                roles[i].sr = self.DSR
+            elif roles[i].role == dataModels.GameRole.heal:
+                roles[i].sr = self.HSR
+        return dataModels.Custom(ID=self.ID,
+                                 Creator=self.Creator.getJson(),
+                                 Player=self.Player.getJson(),
+                                 isFlex=PR.isFlex,
+                                 Roles=roles)
 
 
 class Perms(DefaultModel):
