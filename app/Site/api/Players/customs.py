@@ -6,7 +6,7 @@ from typing import Annotated
 from app.DataBase.db import Player, WorkspaceProfile, Custom
 from app.Site.loginManager import manager
 from app.Site.utils import getWorkspaceProfile
-from app.DataBase.methods import Permissions
+from app.DataBase.permissions import Permissions
 
 import app.DataBase.dataModels as dataModels
 
@@ -50,7 +50,7 @@ async def changeRoleSr(customID: int, data: ChangeRoleSrRequest, workspaceProfil
             raise HTTPException(HTTP_403_FORBIDDEN, "Not enough permissions")
     else:
         raise HTTPException(HTTP_403_FORBIDDEN, "Not enough permissions")
-    custom.changeSR(str(data.role), data.sr)
+    custom.changeSR(data.role.value, data.sr)
     return {"message": "OK"}
 
 
@@ -73,4 +73,23 @@ async def changeRoleSr(data: CreateCustomRequest, workspaceProfile: WorkspacePro
     custom = Custom.create(workspaceProfile, player)
     if custom.data is None:
         return {"error": custom.error}
-    return custom.data.getJson()
+    return custom.data.getJson(workspaceProfile)
+
+@router.delete("/deleteCustom/{customID}")
+async def deleteCustom(customID: int, workspaceProfile: WorkspaceProfile | None = Depends(getWorkspaceProfile)):
+    if workspaceProfile is None:
+        raise HTTPException(HTTP_401_UNAUTHORIZED,
+                            "Not found workspace profile")
+    custom = Custom.getInstance(customID)
+    if custom is None:
+        raise HTTPException(HTTP_404_NOT_FOUND, "Not found")
+    if custom.Creator.Workspace != workspaceProfile.Workspace:
+        raise HTTPException(HTTP_404_NOT_FOUND, "Not found")
+    if custom.Creator == workspaceProfile:
+        if not workspaceProfile.checkPermission(Permissions.delete_your_custom) and not workspaceProfile.checkPermission(Permissions.delete_custom):
+            raise HTTPException(HTTP_403_FORBIDDEN, "Not enough permissions")
+    else:
+        if not workspaceProfile.checkPermission(Permissions.delete_custom):
+            raise HTTPException(HTTP_403_FORBIDDEN, "Not enough permissions")
+    custom.delete_instance()
+    return {"message": "OK"}

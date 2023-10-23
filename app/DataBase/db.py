@@ -8,7 +8,7 @@ from datetime import datetime as dt
 from app.Static.globalClasses import AnswerForm
 import secrets
 import app.DataBase.dataModels as dataModels
-
+from app.DataBase.permissions import Permissions
 
 defaultWorkspaceParams = '{"CustomSystem": true}'
 defaultLobbyData = '{"Lobby": []}'
@@ -287,10 +287,10 @@ class WorkspaceProfile(DefaultModel):
         else:
             return AnswerForm(status=False, error="empty_role")
 
-    def checkPermission(self, Perm: str) -> bool:
+    def checkPermission(self, Perm: Permissions) -> bool:
         PRs = self.getPermissions().data
         if PRs:
-            if Perm in [i.Name for i in PRs]:
+            if Perm.value in [i.Name for i in PRs]:
                 return True
         return False
 
@@ -456,8 +456,7 @@ class PlayerRoles(DefaultModel):
 
 class Custom(DefaultModel):
     ID: int = PrimaryKeyField()
-    Creator: WorkspaceProfile = ForeignKeyField(
-        WorkspaceProfile, to_field="ID")
+    Creator: WorkspaceProfile = ForeignKeyField(WorkspaceProfile, to_field="ID")
     Player: Player = ForeignKeyField(Player, to_field="ID")
     TSR: int = IntegerField(default=0)
     DSR: int = IntegerField(default=0)

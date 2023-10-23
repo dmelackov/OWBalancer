@@ -16,16 +16,17 @@ async def getInfo(user: Profile | None = Depends(manager.optional), workspacePro
     if user is None:
         return {"auth": False}
     if workspaceProfile is None:
-        return {"auth": True, "profile": {"username": user.Username}}
+        return {"auth": True, "profile": {"username": user.Username, "workspace": None, "role": None}}
     return {"auth": True,
             "profile": {
+                "ID": user.ID,
                 "username": user.Username,
                 "workspace": workspaceProfile.Workspace.getJson(),
                 "role": workspaceProfile.Role.Name
             }}
 
 
-@router.get("/getPermissions/")
+@router.get("/getPermissions")
 async def getPermissions(workspaceProfile: WorkspaceProfile | None = Depends(getWorkspaceProfile)):
     if workspaceProfile is None:
         raise HTTPException(HTTP_404_NOT_FOUND, "Invalid workspace/user")

@@ -14,7 +14,7 @@ router = APIRouter(
 )
 
 
-@router.post("/login/")
+@router.post("/login")
 def login(response: Response, username: Annotated[str, Form()], password: Annotated[str, Form()], remember_me: Annotated[bool, Form()],):
     profile = Profile.check(username, password).data
     if not profile:
@@ -31,7 +31,7 @@ def login(response: Response, username: Annotated[str, Form()], password: Annota
     return {"message": "OK"}
 
 
-@router.post("/registration/")
+@router.post("/registration")
 def registration(username: Annotated[str, Form()], password: Annotated[str, Form()], password_again: Annotated[str, Form()]):
     if password != password_again:
         raise HTTPException(HTTP_400_BAD_REQUEST, "Passwords don't match")
@@ -41,7 +41,7 @@ def registration(username: Annotated[str, Form()], password: Annotated[str, Form
     return {"message": "OK"}
 
 
-@router.post("/logout/")
+@router.post("/logout")
 def logout(response: Response, user: Profile = Depends(manager)):
     response.set_cookie("access-token", "", max_age=0, httponly=True)
     response.set_cookie("workspace", "", max_age=0)

@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from app.DataBase.db import Profile, WorkspaceProfile, Player, PlayerRoles
 from app.Site.loginManager import manager
 from app.Site.utils import getWorkspaceProfile
-from app.DataBase.methods import Permissions
+from app.DataBase.permissions import Permissions
 
 import app.DataBase.dataModels as dataModels
 
@@ -49,7 +49,7 @@ async def setRoles(playerID: int, roles: SetRolesRequest, workspaceProfile: Work
         raise HTTPException(HTTP_404_NOT_FOUND, "Not found")
     if player.Creator.Workspace != workspaceProfile.Workspace:
         raise HTTPException(HTTP_404_NOT_FOUND, "Not found")
-    if workspaceProfile.checkPermission(Permissions.change_player_roles):
+    if not workspaceProfile.checkPermission(Permissions.change_player_roles):
         raise HTTPException(HTTP_403_FORBIDDEN, "Not enough permissions")
     pr = PlayerRoles.getPR(workspaceProfile, player)
     if pr.data is None:
