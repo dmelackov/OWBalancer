@@ -1,15 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
-from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND, HTTP_403_FORBIDDEN, HTTP_500_INTERNAL_SERVER_ERROR
 from typing import Annotated
-from pydantic import BaseModel
 
-from app.DataBase.db import Profile, WorkspaceProfile, Player, PlayerRoles
-from app.Site.loginManager import manager
-from app.Site.utils import getWorkspaceProfile
-from app.DataBase.permissions import Permissions
+from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel
+from starlette.status import (HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN,
+                              HTTP_404_NOT_FOUND,
+                              HTTP_500_INTERNAL_SERVER_ERROR)
 
 import app.DataBase.dataModels as dataModels
-
+from app.DataBase.db import Player, PlayerRoles, Profile, WorkspaceProfile
+from app.DataBase.permissions import Permissions
+from app.Site.loginManager import manager
+from app.Site.utils import getWorkspaceProfile
 
 router = APIRouter(
     prefix="/players",
@@ -85,7 +86,7 @@ class CreatePlayerRequest(BaseModel):
     Username: str
 
 
-@router.post("/createPlayer/")
+@router.post("/createPlayer")
 async def createPlayer(player: CreatePlayerRequest, workspaceProfile: WorkspaceProfile | None = Depends(getWorkspaceProfile)):
     if workspaceProfile is None:
         raise HTTPException(HTTP_401_UNAUTHORIZED,
@@ -139,3 +140,4 @@ async def deletePlayer(playerID: int, req: ChangePlayerNicknameRequest, workspac
     player.Username = req.Username
     player.save()
     return {"message": "OK"}
+

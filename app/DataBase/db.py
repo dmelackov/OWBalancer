@@ -1,14 +1,18 @@
 from __future__ import annotations
-from typing import Union
-from peewee import *
-from app.params import DB_NAME, DB_TYPE, DB_HOST, DB_PORT, DB_USER_LOGIN, DB_USER_PASSWORD
-from werkzeug.security import check_password_hash, generate_password_hash
+
 import json
-from datetime import datetime as dt
-from app.Static.globalClasses import AnswerForm
 import secrets
+from datetime import datetime as dt
+from typing import Union
+
+from peewee import *
+from werkzeug.security import check_password_hash, generate_password_hash
+
 import app.DataBase.dataModels as dataModels
 from app.DataBase.permissions import Permissions
+from app.params import (DB_HOST, DB_NAME, DB_PORT, DB_TYPE, DB_USER_LOGIN,
+                        DB_USER_PASSWORD)
+from app.Static.globalClasses import AnswerForm
 
 defaultWorkspaceParams = '{"CustomSystem": true}'
 defaultLobbyData = '{"Lobby": []}'
@@ -60,8 +64,8 @@ class Roles(DefaultModel):
         return dataModels.Roles(ID=self.ID, Name=self.Name)
 
 
-defaultProfileData = '{"Amount": {"T": 2, "D": 2, "H": 2}, "TeamNames": {"1": "Team 1", "2": "Team 2"},' \
-    ' "AutoCustom": true, "ExtendedLobby": false, "Autoincrement": false, "BalanceLimit": 2500,' \
+defaultProfileData = '{"Amount": {"T": 1, "D": 2, "H": 2}, "TeamNames": {"1": "Team 1", "2": "Team 2"},' \
+    ' "AutoCustom": false, "ExtendedLobby": true, "Autoincrement": false, "BalanceLimit": 2500,' \
     '"fColor": "#1e90ff", "sColor": "#ff6347", "ExpandedResult": true, "Math":{"alpha": 3.0, ' \
     '"beta": 1.0, "gamma": 80.0, "p": 2.0, "q": 2.0, "tWeight": 1.1, "dWeight": 1.0, "hWeight": 0.9}}'
 
@@ -146,7 +150,7 @@ class Workspace(DefaultModel):
     Lobby: str = TextField(default=defaultLobbyData)
 
     @classmethod
-    def create(cls, U, Name: str, WorkspaceParams: str) -> AnswerForm[Workspace]:
+    def create(cls, U: Profile, Name: str, WorkspaceParams: str) -> AnswerForm[Workspace]:
         W = super().create(Creator=U, Name=Name, WorkspaceParams=WorkspaceParams)
         return AnswerForm(status=True, error=None, data=W)
 
@@ -173,11 +177,7 @@ class Workspace(DefaultModel):
         self.Description = Desc
         self.save()
 
-    def joinWorkspace(self, U: Profile, InviteKey: str) -> AnswerForm[Union[None, WorkspaceProfile]]:
-        KD = KeyData.select().where(KeyData.Key == InviteKey, KeyData.Workspace == self)
-        if not KD:
-            return AnswerForm(status=False, error="invalid_key")
-
+    def joinWorkspace(self, U: Profile, InviteKey: KeyData) -> AnswerForm[Union[None, WorkspaceProfile]]:
         WU = WorkspaceProfile.select().where(WorkspaceProfile.Profile ==
                                              U and WorkspaceProfile.Workspace == self)
         if WU:
@@ -188,10 +188,9 @@ class Workspace(DefaultModel):
             else:
                 return AnswerForm(status=False, error="already_in")
 
-        KD = KD[0]
-        if KD.UseLimit > 0:
-            KD.UseLimit -= 1
-        elif KD.UseLimit == 0:
+        if InviteKey.UseLimit > 0:
+            InviteKey.UseLimit -= 1
+        elif InviteKey.UseLimit == 0:
             return AnswerForm(status=False, error="use_limit")
 
         WU = WorkspaceProfile.create(U, self).data
@@ -207,6 +206,9 @@ class Workspace(DefaultModel):
 
     def getWorkspaceParams(self):
         return json.loads(self.WorkspaceParams)
+    
+    def getWorkspaceMembers(self) -> list[WorkspaceProfile]:
+        return WorkspaceProfile.select().where(WorkspaceProfile.Workspace == self)
 
 
 class KeyData(DefaultModel):
@@ -374,7 +376,7 @@ class Player(DefaultModel):
     @classmethod
     def create(cls, WU: WorkspaceProfile, Username: str) -> AnswerForm[Union[None, Player]]:
         if Username:
-            P = Player.select().where(Player.Username == Username)
+            P = Player.select().join(WorkspaceProfile).where(Player.Username == Username, WorkspaceProfile.Workspace == WU.Workspace)
             if not P.exists():
                 P = super().create(Username=Username, Creator=WU)
             else:
@@ -393,16 +395,6 @@ class Player(DefaultModel):
         else:
             return None
 
-    # return {
-    #             "id": self.ID,
-    #             "Username": self.Username,
-    #             "Creator": self.Creator.getJsonInfo(),
-    #             "Roles": {"Tank": ("T" in self.Roles or self.isFlex),
-    #                       "Damage": ("D" in self.Roles or self.isFlex),
-    #                       "Heal": ("H" in self.Roles or self.isFlex)},
-    #             "RolesPriority": priority,
-    #             "isFlex": self.isFlex
-    #         }
     def getJson(self) -> dataModels.Player:
         return dataModels.Player(ID=self.ID, Username=self.Username, Creator=self.Creator.getJson())
 
@@ -456,7 +448,8 @@ class PlayerRoles(DefaultModel):
 
 class Custom(DefaultModel):
     ID: int = PrimaryKeyField()
-    Creator: WorkspaceProfile = ForeignKeyField(WorkspaceProfile, to_field="ID")
+    Creator: WorkspaceProfile = ForeignKeyField(
+        WorkspaceProfile, to_field="ID")
     Player: Player = ForeignKeyField(Player, to_field="ID")
     TSR: int = IntegerField(default=0)
     DSR: int = IntegerField(default=0)
@@ -493,7 +486,7 @@ class Custom(DefaultModel):
             return AnswerForm(status=True, error=None, data=[C for C in CList])
         return AnswerForm(status=False, error="instance_not_exist")
 
-    def changeSR(self, Role: str, New_SR: int) -> AnswerForm[None]:
+    def changeSR(self, Role: str | int, New_SR: int) -> AnswerForm[None]:
         if Role == "T" or Role == 0:
             self.TSR = New_SR
             self.save()
@@ -571,20 +564,18 @@ class RolePerms(DefaultModel):
 
 class Games(DefaultModel):
     ID: int = PrimaryKeyField()
-    Creator: Profile = ForeignKeyField(Profile, to_field="ID")
+    Creator: WorkspaceProfile = ForeignKeyField(WorkspaceProfile, to_field="ID")
     Timestamp: dt = DateTimeField(null=True)
-    Winner: int = IntegerField(null=True)
+    FirstTeamPoints: int = IntegerField(null=True)
+    SecondTeamPoints: int = IntegerField(null=True)
     GameStatic: str = TextField()
     GameData: str = TextField()
     Active: bool = BooleanField()
 
     @classmethod
-    def create(cls, Profile_ID, GameData):
-        U = Profile.select().where(Profile.ID == Profile_ID)
-        if U.exists():
-            G = super().create(Creator=U[0], GameData=GameData, Active=False)
-            return G
-        return False
+    def create(cls, WU: WorkspaceProfile, GameData, GameStatic) -> "Games":
+        G = super().create(Creator=WU, GameData=GameData, GameStatic=GameStatic, Active=False)
+        return G
 
     def activate(self):
         self.Active = True
@@ -596,9 +587,10 @@ class Games(DefaultModel):
         self.save()
         return True
 
-    def finishGame(self, winner):
+    def finishGame(self, FirstTeamPoints: int, SecondTeamPoints: int):
         self.Timestamp = dt.now()
-        self.Winner = winner
+        self.FirstTeamPoints = FirstTeamPoints
+        self.SecondTeamPoints = SecondTeamPoints
         self.Active = False
         self.save()
         return True

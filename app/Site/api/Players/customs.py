@@ -1,14 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
-from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND, HTTP_403_FORBIDDEN
-from pydantic import BaseModel
 from typing import Annotated
 
-from app.DataBase.db import Player, WorkspaceProfile, Custom
-from app.Site.loginManager import manager
-from app.Site.utils import getWorkspaceProfile
-from app.DataBase.permissions import Permissions
+from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel
+from starlette.status import (HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN,
+                              HTTP_404_NOT_FOUND)
 
 import app.DataBase.dataModels as dataModels
+from app.DataBase.db import Custom, Player, WorkspaceProfile
+from app.DataBase.permissions import Permissions
+from app.Site.loginManager import manager
+from app.Site.utils import getWorkspaceProfile
 
 router = APIRouter(
     prefix="/customs",
@@ -59,7 +60,7 @@ class CreateCustomRequest(BaseModel):
 
 
 @router.post("/createCustom")
-async def changeRoleSr(data: CreateCustomRequest, workspaceProfile: WorkspaceProfile | None = Depends(getWorkspaceProfile)) -> dataModels.Custom:
+async def createCustom(data: CreateCustomRequest, workspaceProfile: WorkspaceProfile | None = Depends(getWorkspaceProfile)) -> dataModels.Custom:
     if workspaceProfile is None:
         raise HTTPException(HTTP_401_UNAUTHORIZED,
                             "Not found workspace profile")

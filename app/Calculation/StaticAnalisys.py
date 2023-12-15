@@ -1,4 +1,4 @@
-from app.Static.globalClasses import ClassPlayer, ClassGameBalance, ClassTeam
+from app.Static.globalClasses import ClassGameBalance, ClassPlayer, ClassTeam
 
 
 def checkTeamMask(TeamMask, PlayersOnline):

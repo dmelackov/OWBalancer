@@ -1,8 +1,9 @@
-from app.Static.globalClasses import ClassPlayer, ClassGameBalance, ClassTeam
+import datetime
 import itertools
 import random
+
 from app.DataBase.db import *
-import datetime
+from app.Static.globalClasses import ClassGameBalance, ClassPlayer, ClassTeam
 
 
 def generateMask(countPlayers, countTanks, countDps):
@@ -29,7 +30,7 @@ def formPlayersData(Lobby, Creator):
         for CustomIterator in C:
             P = CustomIterator.Player
             PlayersList.append(P)
-            M = ClassPlayer(CustomIterator.TSR, CustomIterator.DSR, CustomIterator.HSR, CustomIterator.Player.Username)
+            M = ClassPlayer(CustomIterator.ID, CustomIterator.TSR, CustomIterator.DSR, CustomIterator.HSR, CustomIterator.Player.Username)
             Members.append(M)
             accord[P] = M
     PR = PlayerRoles.select().where(PlayerRoles.Player << PlayersList, PlayerRoles.Creator == Creator)
@@ -78,15 +79,12 @@ def checkMask(tm, roleMask, Members, UserSettings):
     return mass, balanceError, maskError
 
 
-def createGame(WU):
-    UserSettings = WU.Profile.getUserSettings()
+def createGame(Settings, Lobby: list[int], WU: WorkspaceProfile):
+    UserSettings = Settings
     PlayersInTeam = UserSettings["Amount"]["T"] + UserSettings["Amount"]["D"] + UserSettings["Amount"]["H"]
     teamMask, roleMask = generateMask(PlayersInTeam, UserSettings["Amount"]["T"], UserSettings["Amount"]["D"])
 
-    Lobby = WU.getLobbyInfo()
-    Lobby = generateLobby(Lobby, PlayersInTeam)
-
-    if Lobby:
+    if len(Lobby) == PlayersInTeam * 2:
         Members = formPlayersData(Lobby, WU)
         PlayersDict = []
         for M in Members:

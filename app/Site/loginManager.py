@@ -1,8 +1,9 @@
-from fastapi_login import LoginManager
 import json
 
-from app.params import SECRET_KEY
+from fastapi_login import LoginManager
+
 from app.DataBase.db import Profile
+from app.params import SECRET_KEY
 from app.Site.exceptions import NotAuthenticatedException
 
 manager = LoginManager(SECRET_KEY, token_url='/api/auth/login',

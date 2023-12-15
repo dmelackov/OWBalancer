@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Form, Response, HTTPException, Depends
+import json
+from datetime import timedelta
+
+from fastapi import APIRouter, Depends, Form, HTTPException, Response
+from fastapi_login.exceptions import InvalidCredentialsException
 from starlette.status import HTTP_400_BAD_REQUEST
 from typing_extensions import Annotated
-from fastapi_login.exceptions import InvalidCredentialsException
-from datetime import timedelta
-import json
 
 from app.DataBase.db import Profile
 from app.Site.loginManager import manager

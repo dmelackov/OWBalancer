@@ -1,12 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
-from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND, HTTP_403_FORBIDDEN
-
-from app.DataBase.db import Custom, WorkspaceProfile
-from app.Site.loginManager import manager
-from app.Site.utils import getWorkspaceProfile
-from app.DataBase.permissions import Permissions
+from starlette.status import (HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN,
+                              HTTP_404_NOT_FOUND)
 
 import app.DataBase.dataModels as dataModels
+from app.DataBase.db import Custom, WorkspaceProfile
+from app.DataBase.permissions import Permissions
+from app.Site.loginManager import manager
+from app.Site.utils import getWorkspaceProfile
 
 router = APIRouter(
     prefix="/lobby",
@@ -60,7 +60,7 @@ async def deleteFromLobby(customID: int, workspaceProfile: WorkspaceProfile | No
         return {"message": answer.error}
     
 @router.delete("/clearLobby")
-async def getInfo(workspaceProfile: WorkspaceProfile | None = Depends(getWorkspaceProfile)) -> list[dataModels.Custom]:
+async def getInfo(workspaceProfile: WorkspaceProfile | None = Depends(getWorkspaceProfile)):
     if workspaceProfile is None:
         raise HTTPException(HTTP_401_UNAUTHORIZED,
                             "Not found workspace profile")

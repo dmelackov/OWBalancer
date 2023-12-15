@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Response
-from starlette.status import HTTP_404_NOT_FOUND
 from pydantic import BaseModel
+from starlette.status import HTTP_404_NOT_FOUND
 
-from app.DataBase.db import Profile, WorkspaceProfile, Workspace
+from app.DataBase.db import Profile, Workspace, WorkspaceProfile
 from app.Site.loginManager import manager
 
 
@@ -47,7 +47,7 @@ router = APIRouter(
 )
 
 
-@router.get("/getSettings/")
+@router.get("/getSettings")
 async def getSettings(user: Profile = Depends(manager)) -> Settings:
     settings = user.getUserSettings()
     settings["TeamNames"]['t1'] = settings["TeamNames"]["1"]
@@ -57,7 +57,7 @@ async def getSettings(user: Profile = Depends(manager)) -> Settings:
     return settings
 
 
-@router.post("/setSettings/")
+@router.post("/setSettings")
 async def setSettings(settings: Settings, user: Profile = Depends(manager)):
     settingsCopy = settings.model_dump()
     settingsCopy["TeamNames"]['1'] = settingsCopy["TeamNames"]["t1"]

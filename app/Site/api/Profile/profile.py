@@ -11,7 +11,7 @@ router = APIRouter(
 )
 
 
-@router.get("/getCurrentUserInfo/")
+@router.get("/getCurrentUserInfo")
 async def getInfo(user: Profile | None = Depends(manager.optional), workspaceProfile: WorkspaceProfile | None = Depends(getWorkspaceProfile)):
     if user is None:
         return {"auth": False}

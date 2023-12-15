@@ -1,5 +1,6 @@
+from typing import Generic, TypeVar, Union
+
 from app.Calculation.CalculationMethods import imbalanceFunc
-from typing import TypeVar, Generic, Union
 
 T = TypeVar('T')
 
@@ -29,8 +30,10 @@ class ClassPlayer:
     Roles = ""
     Username = ""
     Flex = False
+    id = 0
 
-    def __init__(self, TankSR, DpsSR, HealSR, Username):
+    def __init__(self, id, TankSR, DpsSR, HealSR, Username):
+        self.id = id
         self.Username = Username
         self.TankSR = ClassRole(TankSR, "T", 0)
         self.DpsSR = ClassRole(DpsSR, "D", 1)
@@ -38,6 +41,7 @@ class ClassPlayer:
 
     def dict(self):
         return {
+            'CustomID': self.id,
             'Username': self.Username,
             'TSR': self.TankSR.SR,
             'DSR': self.DpsSR.SR,

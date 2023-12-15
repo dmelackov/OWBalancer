@@ -1,6 +1,6 @@
-from typing import Any, List, Union
 from datetime import datetime
 from enum import Enum
+from typing import Any, List, Union
 
 from pydantic import BaseModel
 
