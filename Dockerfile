@@ -1,4 +1,4 @@
-FROM pypy:3.9-slim
+FROM python:3.11-slim
 
 EXPOSE 80
 
@@ -18,4 +18,4 @@ COPY . .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD [ "pypy3", "start.py"]
+CMD [ "python", "start.py"]
