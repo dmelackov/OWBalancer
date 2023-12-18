@@ -33,7 +33,7 @@ class DefaultModel(Model):
 
 class Roles(DefaultModel):
     ID: int = PrimaryKeyField()
-    Name: str = TextField(unique=True)
+    Name: str = CharField(unique=True)
 
     @classmethod
     def getInstance(cls, ID: int) -> Union[Roles, None]:
