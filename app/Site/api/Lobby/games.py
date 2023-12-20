@@ -64,13 +64,15 @@ async def getCustoms(game: GameResult, workspaceProfile: WorkspaceProfile | None
                 return
             if game.active.TeamMask[i] == "0":
                 role = int(game.active.fMask[fMaskIndex])
-                sr = [C.TSR, C.DSR, C.HSR][role]
-                C.changeSR(role, sr + diff)
+                if C.Creator == workspaceProfile and workspaceProfile.Profile.getUserSettings()["Autoincrement"]:
+                    sr = [C.TSR, C.DSR, C.HSR][role]
+                    C.changeSR(role, sr + diff)
                 fMaskIndex += 1
             else:
                 role = int(game.active.sMask[sMaskIndex])
-                sr = [C.TSR, C.DSR, C.HSR][role]
-                C.changeSR(role, sr - diff)
+                if C.Creator == workspaceProfile and workspaceProfile.Profile.getUserSettings()["Autoincrement"]:
+                    sr = [C.TSR, C.DSR, C.HSR][role]
+                    C.changeSR(role, sr - diff)
                 sMaskIndex += 1
 
     jsonModel = json.loads(to_json(game))

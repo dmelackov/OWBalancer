@@ -23,6 +23,8 @@ def getWorkspaceProfile(response: Response, user: Profile | None = Depends(manag
     if workspace is None:
         return None
     workspaceProfile = WorkspaceProfile.getWU(user, workspace).data
+    if not workspaceProfile.Active:
+        workspaceProfile = None
     if workspaceProfile is None:
         response.set_cookie("workspace",  "", max_age=0)
     return workspaceProfile
