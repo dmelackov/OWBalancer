@@ -25,7 +25,14 @@ def recalculateWorkspace(workspace_id: int):
     dates = []
     last_rating = {}
     
+    prev_gamedata = ""
+    prev_gamestatic = ""
+    prev_score = ""
     for game in Games.getByWorkspace(W):
+        
+        if prev_gamedata == game.GameData and prev_gamestatic == game.GameStatic and f"{game.FirstTeamPoints}, {game.SecondTeamPoints}" == prev_score:
+            continue
+        
         results.append([game.FirstTeamPoints, game.SecondTeamPoints])
         dates.append(game.Timestamp.timestamp()/(60*60*24))
         
@@ -55,7 +62,9 @@ def recalculateWorkspace(workspace_id: int):
                 last_rating[f"{C.Player.ID}-{role}"] = GameStatic[i][rating]
                 agents.append(f"{C.Player.ID}-{role}")
                 sMaskIndex += 1
-
+        prev_gamedata = game.GameData
+        prev_gamestatic = game.GameStatic
+        prev_score = f"{game.FirstTeamPoints}, {game.SecondTeamPoints}"
         tttMatches.append([team1, team2])
     
     gausian_instances: dict[str, GausianPlayer] = {}
