@@ -1,13 +1,15 @@
+import json
+
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from pydantic_core import to_json
 from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN
-import json
+from app.Calculation.TTT import recalculateWorkspace
 
 import app.DataBase.dataModels as dataModels
 from app.Calculation.GameBalance import createGame
 from app.Calculation.StaticAnalisys import recountModel
-from app.DataBase.db import Custom, Profile, WorkspaceProfile, Games
+from app.DataBase.db import Custom, Games, Profile, WorkspaceProfile
 from app.DataBase.permissions import Permissions
 from app.Site.loginManager import manager
 from app.Site.utils import getWorkspaceProfile
@@ -79,5 +81,6 @@ async def getCustoms(game: GameResult, workspaceProfile: WorkspaceProfile | None
     G = Games.create(workspaceProfile, json.dumps(jsonModel["active"]), json.dumps(jsonModel["static"]))
     G.finishGame(game.FirstTeamPoints, game.SecondTeamPoints)
     G.save()
+    recalculateWorkspace(workspaceProfile.Workspace.ID)
     return {"message": "OK"}
     

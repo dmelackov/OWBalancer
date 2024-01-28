@@ -74,7 +74,7 @@ def generate_roles():
 
 
 tables = ['custom', 'games', 'perms', 'player', 'playerroles', 'profile', 'roleperms', 'roles',
-          'workspace', 'workspaceprofile', 'keydata']
+          'workspace', 'workspaceprofile', 'keydata', "gausianplayer"]
 role_tabels = ['perms', 'roleperms', 'roles']
 
 
@@ -85,7 +85,7 @@ def createDB():
             db.create_tables([Perms, RolePerms, Roles])
             generate_roles()
         db.create_tables([Profile, Custom, Player, Games,
-                         PlayerRoles, Workspace, WorkspaceProfile, KeyData])
+                         PlayerRoles, Workspace, WorkspaceProfile, KeyData, GausianPlayer])
         return AnswerForm(status=True, error=None)
     return AnswerForm(status=False, error=None)
 

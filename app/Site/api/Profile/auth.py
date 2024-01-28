@@ -28,7 +28,7 @@ def login(response: Response, username: Annotated[str, Form()], password: Annota
         expires=timedelta(days=30) if remember_me else None
     )
     response.set_cookie("access-token", access_token, max_age=60 *
-                        60*24*30 if remember_me else None, httponly=True)
+                        60*24*30 if remember_me else 60*60*24, httponly=True)
     return {"message": "OK"}
 
 

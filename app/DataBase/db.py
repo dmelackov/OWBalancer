@@ -13,17 +13,19 @@ from app.DataBase.permissions import Permissions
 from app.params import (DB_HOST, DB_NAME, DB_PORT, DB_TYPE, DB_USER_LOGIN,
                         DB_USER_PASSWORD)
 from app.Static.globalClasses import AnswerForm
-
+from playhouse.pool import PooledMySQLDatabase, PooledSqliteDatabase
 defaultWorkspaceParams = '{"CustomSystem": true}'
 defaultLobbyData = '{"Lobby": []}'
 defaultWorkspaceSettings = '{"AutoIncrement": false, "generalLobby": false}'
 
 
 if DB_TYPE == "mysql":
-    db = MySQLDatabase(DB_NAME, host=DB_HOST, port=DB_PORT,
-                       user=DB_USER_LOGIN, password=DB_USER_PASSWORD)
+    db = PooledMySQLDatabase(DB_NAME, host=DB_HOST, port=DB_PORT,
+                       user=DB_USER_LOGIN, password=DB_USER_PASSWORD,max_connections=10,
+            stale_timeout=300)
 else:
-    db = SqliteDatabase(DB_NAME + ".db")
+    db = PooledSqliteDatabase(DB_NAME + ".db", max_connections=10,
+            stale_timeout=300,)
 
 
 class DefaultModel(Model):
@@ -486,6 +488,14 @@ class Custom(DefaultModel):
             return AnswerForm(status=True, error=None, data=[C for C in CList])
         return AnswerForm(status=False, error="instance_not_exist")
 
+    @classmethod
+    def get_byPlayerAndWorkspace(cls, player: Player, WP: WorkspaceProfile):
+        C =  Custom.select().where(Custom.Player == player, Custom.Creator == WP)
+        if C:
+            return C[0]
+        else:
+            return None
+    
     def changeSR(self, Role: str | int, New_SR: int) -> AnswerForm[None]:
         if Role == "T" or Role == 0:
             self.TSR = New_SR
@@ -577,6 +587,10 @@ class Games(DefaultModel):
         G = super().create(Creator=WU, GameData=GameData, GameStatic=GameStatic, Active=False)
         return G
 
+    @classmethod
+    def getByWorkspace(cls, W: Workspace) -> list[Games]:
+        return Games.select().join(WorkspaceProfile).where(WorkspaceProfile.Workspace == W)
+    
     def activate(self):
         self.Active = True
         self.save()
@@ -594,3 +608,21 @@ class Games(DefaultModel):
         self.Active = False
         self.save()
         return True
+
+
+class GausianPlayer(DefaultModel):
+    ID: int = PrimaryKeyField()
+    player: Player = ForeignKeyField(Player, to_field="ID")
+    role: str = TextField()
+    mu: float = FloatField(null=True)
+    sigma: float = FloatField(null=True)
+    beta: float = FloatField(null=True)
+    gamma: float = FloatField(null=True)
+    
+    @classmethod
+    def getInstance(cls, player: Player, role: str) -> Union[GausianPlayer, None]:
+        C = GausianPlayer.select().where(GausianPlayer.player == player, GausianPlayer.role == role)
+        if C:
+            return C[0]
+        else:
+            return None
