@@ -1,6 +1,4 @@
 from fastapi import Cookie, Depends, HTTPException, Response
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.DataBase.db import Profile, Workspace, WorkspaceProfile
 #from app.DataBase.db2 import async_session
 from app.Site.loginManager import manager
