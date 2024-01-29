@@ -1,4 +1,5 @@
 from __future__ import annotations
+from contextvars import ContextVar
 
 import json
 import secrets
@@ -6,6 +7,7 @@ from datetime import datetime as dt
 from typing import Union
 
 from peewee import *
+import peewee
 from werkzeug.security import check_password_hash, generate_password_hash
 
 import app.DataBase.dataModels as dataModels
@@ -18,6 +20,9 @@ defaultWorkspaceParams = '{"CustomSystem": true}'
 defaultLobbyData = '{"Lobby": []}'
 defaultWorkspaceSettings = '{"AutoIncrement": false, "generalLobby": false}'
 
+db_state_default = {"closed": None, "conn": None, "ctx": None, "transactions": None}
+db_state = ContextVar("db_state", default=db_state_default.copy())
+
 
 if DB_TYPE == "mysql":
     db = PooledMySQLDatabase(DB_NAME, host=DB_HOST, port=DB_PORT,
@@ -25,8 +30,21 @@ if DB_TYPE == "mysql":
             stale_timeout=300)
 else:
     db = PooledSqliteDatabase(DB_NAME + ".db", max_connections=10,
-            stale_timeout=300,)
+            stale_timeout=300, check_same_thread=False)
 
+class PeeweeConnectionState(peewee._ConnectionState):
+    def __init__(self, **kwargs):
+        super().__setattr__("_state", db_state)
+        super().__init__(**kwargs)
+
+    def __setattr__(self, name, value):
+        self._state.get()[name] = value
+
+    def __getattr__(self, name):
+        return self._state.get()[name]
+
+db._state = PeeweeConnectionState()
+db.close()
 
 class DefaultModel(Model):
     class Meta:

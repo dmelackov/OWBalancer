@@ -79,6 +79,7 @@ role_tabels = ['perms', 'roleperms', 'roles']
 
 
 def createDB():
+    db.connect()
     if any(table not in db.get_tables() for table in tables):
         if any(table not in db.get_tables() for table in role_tabels):
             db.drop_tables([Perms, RolePerms, Roles])
@@ -86,7 +87,9 @@ def createDB():
             generate_roles()
         db.create_tables([Profile, Custom, Player, Games,
                          PlayerRoles, Workspace, WorkspaceProfile, KeyData, GausianPlayer])
+        db.close()
         return AnswerForm(status=True, error=None)
+    db.close()
     return AnswerForm(status=False, error=None)
 
 
