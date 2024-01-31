@@ -75,11 +75,9 @@ def recalculateWorkspace(workspace_id: int):
         if GP is None:
             GP = GausianPlayer.create(player=P, role=agent.split("-")[1], mu=last_rating[agent] / 100, sigma=DEFAULT_SIGMA, beta=DEFAULT_BETA, gamma=DEFAULT_GAMMA)
             gausian_instances[agent] = GP
-            prior = TTTPlayer(Gaussian(last_rating[agent] / 100, DEFAULT_SIGMA), DEFAULT_BETA, DEFAULT_GAMMA)
         else:
             gausian_instances[agent] = GP
-            prior = TTTPlayer(Gaussian(GP.mu, GP.sigma), GP.beta, GP.gamma)
-        priors[agent] = prior
+        priors[agent] = TTTPlayer(Gaussian(last_rating[agent] / 100, DEFAULT_SIGMA), DEFAULT_BETA, DEFAULT_GAMMA)
     
     h = History(tttMatches, results=results, times=dates, priors=priors, p_draw=0.1)
     h.convergence(iterations=100)
