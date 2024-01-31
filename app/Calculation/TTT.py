@@ -83,6 +83,7 @@ def recalculateWorkspace(workspace_id: int):
     h.convergence(iterations=100)
     lc = h.learning_curves()
     
+    agent_customs: list[Custom] = []
     
     for k, v in lc.items():
         GP = gausian_instances[k]
@@ -90,8 +91,13 @@ def recalculateWorkspace(workspace_id: int):
         GP.sigma = v[-1][1].sigma
         GP.save()
         C = Custom.get_byPlayerAndWorkspace(GP.player, WP)
+    
+        
         if C is None:
             C = Custom.create(WP, GP.player).data
+        agent_customs.append(C)
+        
+        
         if GP.role == "tank":
             C.TSR = GP.mu * 100
         elif GP.role == "dps":
@@ -99,3 +105,36 @@ def recalculateWorkspace(workspace_id: int):
         else:
             C.HSR = GP.mu * 100
         C.save()
+    
+    for custom in agent_customs:
+        if custom.TSR != 0 and custom.DSR != 0 and custom.HSR != 0:
+            continue
+        customs = Custom.get_byPlayer(custom.Player.ID).data
+        TSR_count = 0
+        HSR_count = 0
+        DSR_count = 0
+        
+        TSR_sum = 0
+        HSR_sum = 0
+        DSR_sum = 0
+        
+        for i in customs:
+            if i.Creator == WP:
+                continue
+            if i.TSR != 0:
+                TSR_count += 1
+                TSR_sum += i.TSR
+            if i.DSR != 0:
+                DSR_count += 1
+                DSR_sum += i.DSR
+            if i.TSR != 0:
+                HSR_count += 1
+                HSR_sum += i.HSR
+        
+        if custom.TSR == 0 and TSR_count:
+            custom.TSR = TSR_sum / TSR_count
+        if custom.DSR == 0 and DSR_count:
+            custom.DSR = DSR_sum / DSR_count
+        if custom.HSR == 0 and HSR_count:
+            custom.HSR = HSR_sum / HSR_count
+        custom.save()
