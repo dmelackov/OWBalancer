@@ -51,7 +51,8 @@ def recalculateWorkspace(workspace_id: int):
                 rating = ["TSR", "DSR", "HSR"][role]
                 role = ["tank", "dps", "support"][role]
                 team1.append(f"{C.Player.ID}-{role}")
-                last_rating[f"{C.Player.ID}-{role}"] = GameStatic[i][rating]
+                if f"{C.Player.ID}-{role}" not in last_rating:
+                    last_rating[f"{C.Player.ID}-{role}"] = GameStatic[i][rating]
                 agents.append(f"{C.Player.ID}-{role}")
                 fMaskIndex += 1
             else:
@@ -59,7 +60,8 @@ def recalculateWorkspace(workspace_id: int):
                 rating = ["TSR", "DSR", "HSR"][role]
                 role = ["tank", "dps", "support"][role]
                 team2.append(f"{C.Player.ID}-{role}")
-                last_rating[f"{C.Player.ID}-{role}"] = GameStatic[i][rating]
+                if f"{C.Player.ID}-{role}" not in last_rating:
+                    last_rating[f"{C.Player.ID}-{role}"] = GameStatic[i][rating]
                 agents.append(f"{C.Player.ID}-{role}")
                 sMaskIndex += 1
         prev_gamedata = game.GameData
