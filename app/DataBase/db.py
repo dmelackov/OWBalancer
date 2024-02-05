@@ -609,6 +609,14 @@ class Games(DefaultModel):
     def getByWorkspace(cls, W: Workspace) -> list[Games]:
         return Games.select().join(WorkspaceProfile).where(WorkspaceProfile.Workspace == W)
     
+    @classmethod
+    def getInstance(cls, ID: int) -> Union[Games, None]:
+        G = Games.select().where(Games.ID == ID)
+        if G:
+            return G[0]
+        else:
+            return None
+    
     def activate(self):
         self.Active = True
         self.save()

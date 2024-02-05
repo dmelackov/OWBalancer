@@ -1,0 +1,256 @@
+{% macro BalancePlayer(player) -%}
+<div class="player">
+    <div class="activeRole">
+        <div class="iconContainer">
+            <img src="{{ player.RoleIco }}" alt="" class="selectedRole" />
+            <div class="roleWithRaiting">
+                <img src="{{ player.RankIco }}" alt="" class="rankIco" />
+                <p class="sr">{{ player.sr }}</p>
+            </div>
+        </div>
+    </div>
+    <p class="username">{{ player.Username }}</p>
+    <div class="roles">
+        {% for icon in player.SecondsRoleIcons %}
+            <img src="{{icon}}" alt="" class="secondRole" />    
+        {% endfor %}
+        <img src="{{ player.MainRoleIco }}" alt="" class="mainRole" />
+    </div>
+</div>
+{%- endmacro %}
+
+<svg id="svgBalance" xmlns="http://www.w3.org/2000/svg" width="1920">
+    <foreignObject class="node" x="0" y="0" width="1920px" height="100%">
+
+        <body xmlns="http://www.w3.org/1999/xhtml" width="100%">
+            <div id="balance">
+                <div class="balanceInfo">
+                    <p class="leftTeamName">Team 1</p>
+                    <div class="evaluation">
+                        <div class="stat">
+                            <p class="infoStat">Evaluation:</p>
+                            <p class="statValue">{{ gameActive.result }}</p>
+                        </div>
+                    </div>
+                    <p class="rightTeamName">Team 2</p>
+                </div>
+                <div class="players">
+                    <div class="playerColumnLeft">
+                        <div class="leftPlayers">
+                            {% for player in team1 %}
+                                {{ BalancePlayer(player) }}
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <p class="vs">VS</p>
+                    <div class="playerColumnRight">
+                        <div class="rightPlayers">
+                            {% for player in team2 %}
+                            {{ BalancePlayer(player) }}
+                        {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <style>
+                @font-face {
+                    font-family: "TeamFont";
+                    src: url("/TeamFont.ttf");
+                }
+                @font-face {
+                    font-family: "VSFont";
+                    src: url("/VSfont.otf");
+                }
+                
+                *  {
+                    margin: 0;
+                }
+
+                body {
+                    margin: 0;
+                    width: 1920px;
+                }
+
+                #balance {
+                    width: 1920px;
+                    background-color: #090c10;
+                    color: #ffffff;
+                    display: flex;
+                    flex-direction: column;
+                    box-sizing: border-box;
+                    border: solid transparent 16px;
+                }
+
+                .balanceInfo {
+                    display: flex;
+                    justify-content: space-between;
+                    justify-content: center;
+                }
+
+                .leftTeamName,
+                .rightTeamName {
+                    margin: 0;  
+                    font-size: 96px;
+                    font-family: TeamFont;
+                    width: 45%;
+                    white-space: nowrap;
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                }
+
+                .rightTeamName {
+                    text-align: right;
+                }
+
+                .evaluation {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    padding-bottom: 40px;
+                }
+
+                .players {
+                    flex-grow: 3;
+                    display: flex;
+                    justify-content: space-between;
+                    flex-wrap: nowrap;
+                    align-items: center;
+                    margin: 10px 5px 20px 5px;
+                }
+
+                .playerColumnRight,
+                .playerColumnLeft {
+                    width: 45%;
+                    height: max-content;
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .leftPlayers,
+                .rightPlayers {
+                    background-color: #161b22;
+                    width: 100%;
+                    padding: 10px;
+                    box-sizing: border-box;
+                }
+
+                .playerColumnRight {
+                    align-items: flex-start;
+                    
+                }
+                .leftPlayers > .player > .activeRole {
+                    background-color: #1e90ff;
+                }
+                .rightPlayers > .player > .activeRole {
+                    background-color: #ff6347;
+                }
+
+                .playerColumnLeft {
+                    align-items: flex-end;
+                    background-color: #ff6347;
+                }
+
+                .vs {
+                    font-size: 84px;
+                    font-family: VSFont;
+                }
+
+                .infoStat,
+                .statValue {
+                    font-size: 48px;
+                    font-family: TeamFont;
+                    color: #46494d;
+                }
+
+                .infoStat {
+                    margin-right: 8px;
+                }
+
+                .stat {
+                    display: flex;
+                }
+
+                .extendedInfo {
+                    margin-top: 40px;
+                    display: flex;
+                    gap: 250px;
+                }
+
+                .extStat {
+                    margin-top: -60px;
+                }
+
+                .player {
+                    background-color: #161b22;
+                    width: 100%;
+                    height: 144px;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: -2px;
+                }
+                
+                .username {
+                    font-family: TeamFont;
+                    font-size: 68px;
+                    flex-grow: 3;
+                    margin-left: 40px;
+                }
+                .activeRole {
+                    width: 110px;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .iconContainer {
+                    position: relative;
+                    height: 110px;
+                    width: 90px;
+                }
+                .selectedRole {
+                    width: 90px;
+                    opacity: 0.3;
+                    position: absolute;
+                    top: 0;
+                    filter: drop-shadow(1px 1px 0 black) drop-shadow(-1px -1px 0 black);
+                }
+                .rankIco {
+                    width: 80px;
+                }
+                .roleWithRaiting {
+                    position: absolute;
+                    width: 90px;
+                    top: 0;
+                    bottom: 0;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+                .sr {
+                    font-family: TeamFont;
+                    font-size: 32px;
+                    text-shadow: 1px 1px 1px #000;
+                    margin: 0px;
+                }
+                .mainRole {
+                    height: 60px;
+                    margin-right: 10px;
+                    opacity: 0.4;
+                }
+                .secondRole {
+                    height: 40px;
+                    opacity: 0.4;
+                }
+                .roles {
+                    height: max-content;
+                    display: flex;
+                    align-items: flex-end;
+                    gap: 3px;
+                }
+            </style>
+        </body>
+    </foreignObject>
+</svg>
