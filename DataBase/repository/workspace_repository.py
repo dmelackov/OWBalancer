@@ -1,4 +1,5 @@
 from typing import Optional
+
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -55,5 +56,6 @@ class WorkspaceRepository:
         return list((await self.session.scalars(stmt)).all())
 
     async def get_invites(self, workspace: Workspace) -> list[KeyData]:
-        stmt = select(KeyData).join(WorkspaceProfile).where(WorkspaceProfile.workspace_id == workspace.id, KeyData.use_limit > 0)
+        stmt = select(KeyData).join(WorkspaceProfile).where(
+            WorkspaceProfile.workspace_id == workspace.id, KeyData.use_limit > 0)
         return list((await self.session.scalars(stmt)).all())

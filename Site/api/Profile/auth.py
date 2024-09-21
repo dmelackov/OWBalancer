@@ -1,19 +1,15 @@
 import json
 from datetime import timedelta
 
-from fastapi import Depends, HTTPException, Response
-from fastapi_login.exceptions import InvalidCredentialsException
-from pydantic import BaseModel
-from starlette.status import HTTP_400_BAD_REQUEST
-
-from sqlalchemy.ext.asyncio import AsyncSession
-from DataBase.database import get_db_session
-
-from DataBase.models.profile import Profile
-from DataBase.repository.profile_repository import ProfileRepository
-from Site.loginManager import manager
-
+from fastapi import Depends, Response
 from fastapi_controllers import Controller, post
+from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from DataBase.database import get_db_session
+from DataBase.models.profile import Profile
+from Site.loginManager import manager
+from Site.service.profile_service import ProfileService
 
 
 class LoginRequest(BaseModel):
@@ -34,13 +30,12 @@ class AuthController(Controller):
 
     def __init__(self, session: AsyncSession = Depends(get_db_session)):
         self.session = session
-        self.profile_repository = ProfileRepository(session)
+        self.profile_service = ProfileService(session)
 
     @post("/login")
     async def login(self, response: Response, request: LoginRequest):
-        profile = await self.profile_repository.get_by_auth(request.username, request.password)
-        if profile is None:
-            raise InvalidCredentialsException
+        profile = await self.profile_service.login(request.username, request.password)
+
         user = {"ID": profile.id, "Secret": profile.secret}
         access_token = manager.create_access_token(
             data=dict(sub=json.dumps(user)),
@@ -53,16 +48,12 @@ class AuthController(Controller):
 
     @post("/registration")
     async def registration(self, request: RegistrationRequest):
-        if request.password != request.password_again:
-            raise HTTPException(HTTP_400_BAD_REQUEST, "Passwords don't match")
-        if await self.profile_repository.get_by_username(request.username) is not None:
-            raise HTTPException(HTTP_400_BAD_REQUEST, "User already exist")
-        await self.profile_repository.registration(request.username, request.password)
+        await self.profile_service.registration(request.username, request.password, request.password_again)
         await self.session.commit()
         return {"message": "OK"}
 
     @post("/logout")
-    def logout(self, response: Response, user: Profile = Depends(manager)):
+    def logout(self, response: Response, profile: Profile = Depends(manager)):
         response.set_cookie("access-token", "", max_age=0, httponly=True)
         response.set_cookie("workspace", "", max_age=0)
         return {"message": "OK"}

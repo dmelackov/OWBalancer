@@ -1,10 +1,10 @@
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from DataBase.database import Base
-
-from DataBase.models.role import Role
 from DataBase.models.perm import Perm
+from DataBase.models.role import Role
+
 
 class RolePerm(Base):
     __tablename__ = "role_perm"

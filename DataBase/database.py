@@ -1,9 +1,12 @@
-from typing import AsyncGenerator, Any, AsyncIterator
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, AsyncConnection, async_sessionmaker
-from sqlalchemy.orm import DeclarativeBase
 import contextlib
+from typing import Any, AsyncIterator
+
+from sqlalchemy.ext.asyncio import (AsyncConnection, AsyncSession,
+                                    async_sessionmaker, create_async_engine)
+from sqlalchemy.orm import DeclarativeBase
+
 from Static.params import (DB_HOST, DB_NAME, DB_PORT, DB_TYPE, DB_USER_LOGIN,
-                        DB_USER_PASSWORD)
+                           DB_USER_PASSWORD)
 
 connect_string = ""
 
@@ -17,6 +20,7 @@ if DB_TYPE == "mysql":
         DB_USER_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 else:
     connect_string = f"sqlite+aiosqlite:///./{DB_NAME}2.db"
+
 
 class DatabaseSessionManager:
     def __init__(self, host: str, engine_kwargs: dict[str, Any] = {}):

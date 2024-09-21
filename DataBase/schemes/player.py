@@ -10,6 +10,7 @@ class PlayerBaseScheme(BaseModel):
     class Config:
         orm_mode = True
 
+
 class PlayerScheme(BaseModel):
     id: int
     username: str
@@ -22,6 +23,7 @@ class PlayerScheme(BaseModel):
 class PlayerRoleScheme(BaseModel):
     active: bool
     role: str
+
 
 class PlayerWithRolesScheme(BaseModel):
     id: int

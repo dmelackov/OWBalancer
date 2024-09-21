@@ -1,10 +1,10 @@
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from DataBase.database import Base
-
 from DataBase.models.custom import Custom
 from DataBase.models.lobby import Lobby
+
 
 class LobbyPlayer(Base):
     __tablename__ = "lobby_player"

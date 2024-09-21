@@ -2,8 +2,8 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from DataBase.database import Base
-
 from DataBase.models.workspace_profile import WorkspaceProfile
+
 
 class KeyData(Base):
     __tablename__ = "key_data"

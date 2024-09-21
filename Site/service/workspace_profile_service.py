@@ -1,21 +1,19 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import HTTPException
-from starlette.status import (HTTP_403_FORBIDDEN,
-                              HTTP_404_NOT_FOUND,
-                              HTTP_500_INTERNAL_SERVER_ERROR,
-                              HTTP_400_BAD_REQUEST)
+from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.status import (HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND,
+                              HTTP_500_INTERNAL_SERVER_ERROR)
 
 from DataBase.models.key_data import KeyData
-from DataBase.repository.workspace_profile_repository import WorkspaceProfileRepository
-from DataBase.repository.workspace_repository import WorkspaceRepository
-from DataBase.repository.role_repository import RoleRepository
-
-from DataBase.models.workspace_profile import WorkspaceProfile
-from DataBase.models.workspace import Workspace
+from DataBase.models.perm import Perm
 from DataBase.models.profile import Profile
 from DataBase.models.role import Role
-
+from DataBase.models.workspace import Workspace
+from DataBase.models.workspace_profile import WorkspaceProfile
 from DataBase.permissions import Permissions
+from DataBase.repository.role_repository import RoleRepository
+from DataBase.repository.workspace_profile_repository import \
+    WorkspaceProfileRepository
+from DataBase.repository.workspace_repository import WorkspaceRepository
 
 
 class WorkspaceProfileService:
@@ -105,3 +103,7 @@ class WorkspaceProfileService:
             raise HTTPException(HTTP_500_INTERNAL_SERVER_ERROR,
                                 "Unable to create workspace profile")
         return workspace_profile
+
+    async def get_permissions(self, workspace_profile: WorkspaceProfile) -> list[str]:
+        perms = await self.role_repository.get_permissions(workspace_profile.role)
+        return list(map(lambda x: x.name, perms))

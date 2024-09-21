@@ -1,10 +1,10 @@
 
 from typing import Optional
 
-from sqlalchemy import and_, select
-from DataBase.models.profile import Profile
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from DataBase.models.profile import Profile
 from DataBase.models.role import Role
 from DataBase.models.workspace import Workspace
 from DataBase.models.workspace_profile import WorkspaceProfile

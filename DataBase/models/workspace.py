@@ -1,10 +1,11 @@
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 from typing import Optional
-from DataBase.database import Base
-from sqlalchemy import JSON, ForeignKey
 
-from DataBase.models.profile import Profile
+from sqlalchemy import JSON, ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from DataBase.database import Base
 from DataBase.models.lobby import Lobby
+from DataBase.models.profile import Profile
 
 DEFAULT_WORKSPACE_PARAMS = {"CustomSystem": True}
 

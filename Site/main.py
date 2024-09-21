@@ -1,14 +1,14 @@
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
 from starlette.status import HTTP_401_UNAUTHORIZED
-from contextlib import asynccontextmanager
 
 import Site.api.api as api
-from DataBase.database import create_db_and_tables
+from DataBase.database import create_db_and_tables, sessionmanager
 from Site.exceptions import NotAuthenticatedException
-from DataBase.database import sessionmanager
 
 
 @asynccontextmanager

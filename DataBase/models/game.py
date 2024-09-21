@@ -1,10 +1,12 @@
 import datetime
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey, JSON, func, DateTime
 from typing import Optional
-from DataBase.database import Base
 
+from sqlalchemy import JSON, DateTime, ForeignKey, func
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from DataBase.database import Base
 from DataBase.models.workspace_profile import WorkspaceProfile
+
 
 class Game(Base):
     __tablename__ = "game"

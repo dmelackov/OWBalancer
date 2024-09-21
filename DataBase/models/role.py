@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column
+
 from DataBase.database import Base
+
 
 class Role(Base):
     __tablename__ = "role"

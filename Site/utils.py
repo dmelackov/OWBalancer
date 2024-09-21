@@ -1,13 +1,14 @@
-from typing import Any
 from fastapi import Cookie, Depends, HTTPException, Response
+from starlette.status import HTTP_404_NOT_FOUND
+
 from DataBase.database import get_db_session
 from DataBase.models.profile import Profile
 from DataBase.models.workspace import Workspace
 from DataBase.models.workspace_profile import WorkspaceProfile
-from DataBase.repository.workspace_profile_repository import WorkspaceProfileRepository
+from DataBase.repository.workspace_profile_repository import \
+    WorkspaceProfileRepository
 from DataBase.repository.workspace_repository import WorkspaceRepository
 from Site.loginManager import manager
-from starlette.status import HTTP_404_NOT_FOUND
 
 
 async def get_workspace(response: Response,

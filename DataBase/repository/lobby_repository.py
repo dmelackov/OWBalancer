@@ -1,4 +1,5 @@
 from typing import Optional
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -19,5 +20,5 @@ class LobbyRepository:
         await self.session.flush()
         new_lobby = await self.get_by_id(lobby.id)
         if new_lobby is None:
-            raise 
+            raise
         return new_lobby

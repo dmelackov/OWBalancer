@@ -9,6 +9,7 @@ class TruncInviteInfo(BaseModel):
     class Config:
         orm_mode = True
 
+
 class InviteInfo(BaseModel):
     id: int
     use_limit: int

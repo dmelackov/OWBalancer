@@ -1,13 +1,11 @@
 import json
 
 from fastapi_login import LoginManager
-from fastapi import Depends
-from DataBase.models.profile import Profile
-from DataBase.database import get_db_session, sessionmanager
-from DataBase.repository.profile_repository import ProfileRepository
-from Static.params import SECRET_KEY
-from Site.exceptions import NotAuthenticatedException
 
+from DataBase.database import sessionmanager
+from DataBase.repository.profile_repository import ProfileRepository
+from Site.exceptions import NotAuthenticatedException
+from Static.params import SECRET_KEY
 
 manager = LoginManager(SECRET_KEY, token_url='/api/auth/login',
                        use_cookie=True, custom_exception=NotAuthenticatedException)

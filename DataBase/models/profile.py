@@ -1,7 +1,9 @@
-from sqlalchemy.orm import Mapped, mapped_column
 from typing import Optional
-from DataBase.database import Base
+
 from sqlalchemy import JSON
+from sqlalchemy.orm import Mapped, mapped_column
+
+from DataBase.database import Base
 
 DEFAULT_PROFILE_DATA = {
     "amount": {

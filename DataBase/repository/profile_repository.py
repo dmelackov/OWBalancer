@@ -2,9 +2,10 @@ import secrets
 from typing import Optional
 
 from sqlalchemy import select
-from DataBase.models.profile import Profile
 from sqlalchemy.ext.asyncio import AsyncSession
 from werkzeug.security import check_password_hash, generate_password_hash
+
+from DataBase.models.profile import Profile
 
 
 class ProfileRepository:
@@ -14,7 +15,7 @@ class ProfileRepository:
     async def get_by_id(self, id: int) -> Optional[Profile]:
         stmt = select(Profile).where(Profile.id == id).limit(1)
         return await self.session.scalar(stmt)
-    
+
     async def get_by_username(self, username: str) -> Optional[Profile]:
         stmt = select(Profile).where(Profile.username == username).limit(1)
         return await self.session.scalar(stmt)
@@ -39,8 +40,11 @@ class ProfileRepository:
         await self.session.flush()
 
     def compare_password(self, profile: Profile, password: str) -> bool:
-        return check_password_hash(profile.password, password)
-    
+        old_password = profile.password
+        if old_password is None:
+            old_password = ""
+        return check_password_hash(old_password, password)
+
     async def set_settings(self, profile: Profile, new_settings: dict) -> None:
         ses_profile = await self.get_by_id(profile.id)
         ses_profile.settings = new_settings

@@ -1,9 +1,6 @@
 from fastapi import HTTPException
-from starlette.status import (HTTP_403_FORBIDDEN,
-                              HTTP_404_NOT_FOUND,
-                              HTTP_500_INTERNAL_SERVER_ERROR,
-                              HTTP_400_BAD_REQUEST)
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette.status import HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 
 from DataBase.models.key_data import KeyData
 from DataBase.models.profile import Profile
