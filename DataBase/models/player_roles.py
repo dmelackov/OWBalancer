@@ -1,0 +1,19 @@
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey
+
+from DataBase.database import Base
+
+from DataBase.models.workspace_profile import WorkspaceProfile
+from DataBase.models.player import Player
+
+class PlayerRoles(Base):
+    __tablename__ = "player_roles"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    roles: Mapped[str] = mapped_column(default="")
+    is_flex: Mapped[bool] = mapped_column(default=False)
+    creator_id: Mapped[int] = mapped_column(ForeignKey("workspace_profile.id"))
+    player_id: Mapped[int] = mapped_column(ForeignKey("player.id"))
+
+    creator: Mapped[WorkspaceProfile] = relationship()
+    player: Mapped[Player] = relationship()
