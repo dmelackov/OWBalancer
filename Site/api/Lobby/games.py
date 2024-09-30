@@ -1,19 +1,18 @@
 import json
 
-from fastapi import APIRouter, Depends, HTTPException, Request
-from pydantic import BaseModel
-from pydantic_core import to_json
-from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND
-from app.Calculation.TTT import recalculateWorkspace
-from fastapi.templating import Jinja2Templates
-
 import app.DataBase.dataModels as dataModels
 from app.Calculation.GameBalance import createGame
 from app.Calculation.StaticAnalisys import recountModel
+from app.Calculation.TTT import recalculateWorkspace
 from app.DataBase.db import Custom, Games, Profile, WorkspaceProfile
 from app.DataBase.permissions import Permissions
 from app.Site.loginManager import manager
 from app.Site.utils import getWorkspaceProfile
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
+from pydantic_core import to_json
+from starlette.status import HTTP_401_UNAUTHORIZED, HTTP_404_NOT_FOUND
 
 router = APIRouter(
     prefix="/game",
@@ -21,6 +20,7 @@ router = APIRouter(
 )
 
 templates = Jinja2Templates(directory="templates")
+
 
 class Static(BaseModel):
     CustomID: int
@@ -31,6 +31,7 @@ class Static(BaseModel):
     Roles: str
     Username: str
 
+
 class Active(BaseModel):
     TeamMask: str
     fMask: str
@@ -40,11 +41,13 @@ class Active(BaseModel):
     teamRolePriority: float
     result: float
 
+
 class GameResult(BaseModel):
     FirstTeamPoints: int
     SecondTeamPoints: int
     active: Active
     static: list[Static]
+
 
 @router.post("/sendResult")
 async def sendResult(game: GameResult, workspaceProfile: WorkspaceProfile | None = Depends(getWorkspaceProfile)):
@@ -53,7 +56,6 @@ async def sendResult(game: GameResult, workspaceProfile: WorkspaceProfile | None
                             "Not found workspace profile")
     fMaskIndex = 0
     sMaskIndex = 0
-
 
     if game.SecondTeamPoints != game.FirstTeamPoints:
         if game.FirstTeamPoints > game.SecondTeamPoints:
@@ -80,11 +82,13 @@ async def sendResult(game: GameResult, workspaceProfile: WorkspaceProfile | None
                 sMaskIndex += 1
 
     jsonModel = json.loads(to_json(game))
-    G = Games.create(workspaceProfile, json.dumps(jsonModel["active"]), json.dumps(jsonModel["static"]))
+    G = Games.create(workspaceProfile, json.dumps(
+        jsonModel["active"]), json.dumps(jsonModel["static"]))
     G.finishGame(game.FirstTeamPoints, game.SecondTeamPoints)
     G.save()
     recalculateWorkspace(workspaceProfile.Workspace.ID)
     return {"message": "OK"}
+
 
 def getRankIco(sr):
     if sr < 1500:
@@ -100,7 +104,8 @@ def getRankIco(sr):
     if sr < 4000:
         return "/img/sr_icons/masters.png"
     return "/img/sr_icons/gm.png"
-    
+
+
 def getRoleIco(role):
     iconImages = {
         "T": "/img/role_icons/tank.svg",
@@ -111,6 +116,7 @@ def getRoleIco(role):
         "2": "/img/role_icons/support.svg",
     }
     return iconImages[role]
+
 
 def getSR(player, role):
     if role == "0":
@@ -126,16 +132,16 @@ def balance_image(request: Request, id: int):
     game = Games.getInstance(id)
     if game is None:
         raise HTTPException(HTTP_404_NOT_FOUND, "Game not found")
-    
+
     gameActive = json.loads(game.GameData)
     gameStatic = json.loads(game.GameStatic)
-    
+
     fMaskIndex = 0
     sMaskIndex = 0
-    
+
     team1 = []
     team2 = []
-    
+
     for i in range(len(gameActive["TeamMask"])):
         if gameActive["TeamMask"][i] == "0":
             role = gameActive["fMask"][fMaskIndex]
@@ -147,7 +153,7 @@ def balance_image(request: Request, id: int):
                           "RoleIco": getRoleIco(role),
                           "sr": getSR(plr, role),
                           "role": role})
-            
+
             fMaskIndex += 1
         else:
             role = gameActive["sMask"][sMaskIndex]
@@ -160,11 +166,11 @@ def balance_image(request: Request, id: int):
                           "sr": getSR(plr, role),
                           "role": role})
             sMaskIndex += 1
-    
+
     team1 = list(sorted(team1, key=lambda x: int(x["role"])))
     team2 = list(sorted(team2, key=lambda x: int(x["role"])))
-    
-    response =  templates.TemplateResponse(
+
+    response = templates.TemplateResponse(
         request=request, name="balance.html", context={"gameActive": gameActive, "gameStatic": gameStatic, "team1": team1, "team2": team2}
     )
     response.headers["Content-Type"] = "image/svg+xml"

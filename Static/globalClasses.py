@@ -130,8 +130,10 @@ class ClassGameBalance:
 
     def calcResult(self, USettings):
         self.fairness, self.rolesFairness, self.teamRolePriority, self.uniformity = \
-            imbalanceFunc(self.fTeamSR, self.sTeamSR, self.fMask, self.sMask, self.fTeam, self.sTeam, USettings)
-        self.result = self.fairness + self.rolesFairness + self.teamRolePriority + self.uniformity
+            imbalanceFunc(self.fTeamSR, self.sTeamSR, self.fMask,
+                          self.sMask, self.fTeam, self.sTeam, USettings)
+        self.result = self.fairness + self.rolesFairness + \
+            self.teamRolePriority + self.uniformity
 
     def dict(self):
         return {
@@ -147,7 +149,7 @@ class ClassGameBalance:
 
 
 class AnswerForm(Generic[T]):
-    def __init__(self, status: bool, error: Union[None, str], data: T=None):
+    def __init__(self, status: bool, error: Union[None, str], data: T = None):
         self.status: bool = status
         self.error: Union[None, str] = error
         self.data: T = data

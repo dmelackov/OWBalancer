@@ -1,13 +1,15 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from DataBase.models import Player, Workspace, WorkspaceProfile
-from DataBase.repository import PlayerRepository
-
 from DataBase.permissions import Permissions
+from DataBase.repository import PlayerRepository
+from domain.exceptions import (CantEditPlayerException,
+                               CantEditPlayerRolesException,
+                               PlayerAlreadyExistException,
+                               PlayerCreateException, PlayerNotFoundException)
 
 from .workspace_profile_service import WorkspaceProfileService
 
-from domain.exceptions import PlayerNotFoundException, PlayerAlreadyExistException, CantEditPlayerException, CantEditPlayerRolesException, PlayerCreateException
 
 class PlayerService:
     def __init__(self, session: AsyncSession) -> None:
@@ -33,12 +35,12 @@ class PlayerService:
     async def check_edit_player(self, workspace_profile: WorkspaceProfile, player: Player):
         if not self.can_edit_player(workspace_profile, player):
             raise CantEditPlayerException
-        
+
     async def can_edit_roles(self, workspace_profile: WorkspaceProfile, player: Player) -> bool:
         if not await self.is_same_workspace(workspace_profile, player):
             return False
         return await self.workspace_profile_service.has_permission(workspace_profile, Permissions.change_player_roles)
-    
+
     async def check_edit_roles(self, workspace_profile: WorkspaceProfile, player: Player):
         if not self.can_edit_roles(workspace_profile, player):
             raise CantEditPlayerRolesException
@@ -73,7 +75,7 @@ class PlayerService:
         if player is None:
             raise PlayerCreateException
         return player
-    
+
     async def delete(self, initiator: WorkspaceProfile, player: Player):
         await self.check_edit_player(initiator, player)
         await self.player_repository.delete(player)

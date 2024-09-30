@@ -4,7 +4,7 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from DataBase.models import Profile, Role, Workspace, WorkspaceProfile, Lobby
+from DataBase.models import Lobby, Profile, Role, Workspace, WorkspaceProfile
 
 
 class WorkspaceProfileRepository:

@@ -1,5 +1,7 @@
-from pydantic import BaseModel
 from enum import Enum
+
+from pydantic import BaseModel
+
 from .workspace_profile import WorkspaceProfileScheme
 
 
@@ -19,10 +21,12 @@ class PlayerScheme(BaseModel):
     class Config:
         from_attributes = True
 
+
 class Role(Enum):
     TANK = "t"
     DAMAGE = "d"
     SUPPORT = "s"
+
 
 class PlayerRoleScheme(BaseModel):
     active: bool

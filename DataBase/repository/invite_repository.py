@@ -5,6 +5,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from DataBase.models import KeyData, WorkspaceProfile
+
+
 class InviteRepository:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session

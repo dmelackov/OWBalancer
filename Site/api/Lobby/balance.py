@@ -20,6 +20,7 @@ class CalcBalanceRequest(BaseModel):
     static: list
     active: dict
 
+
 @router.post("/calcBalance")
 async def calcBalance(req: CalcBalanceRequest, workspaceProfile: WorkspaceProfile | None = Depends(get_workspace_profile)):
     if workspaceProfile is None:
@@ -29,8 +30,10 @@ async def calcBalance(req: CalcBalanceRequest, workspaceProfile: WorkspaceProfil
         raise HTTPException(HTTP_403_FORBIDDEN, "Not enough permissions")
     return recountModel(req.static, req.active, workspaceProfile.Profile)
 
+
 class GetBalancesRequest(BaseModel):
     customIDs: list[int]
+
 
 @router.post("/balance")
 async def getBalances(req: GetBalancesRequest, workspaceProfile: WorkspaceProfile | None = Depends(get_workspace_profile)):

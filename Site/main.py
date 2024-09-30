@@ -8,9 +8,10 @@ from starlette.status import HTTP_401_UNAUTHORIZED
 
 import Site.api as api
 from DataBase.database import create_db_and_tables, sessionmanager
-from Site.exceptions import NotAuthenticatedException
-from Site.exception_mapping import exception_handler
 from domain.exceptions import DomainException
+from Site.exception_mapping import exception_handler
+from Site.exceptions import NotAuthenticatedException
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

@@ -7,16 +7,17 @@ def checkTeamMask(TeamMask, PlayersOnline):
 
 def checkRoleMask(fTeamMask, sTeamMask, PlayersOnline):
     return (
-            fTeamMask.count("0") == sTeamMask.count("0") and
-            fTeamMask.count("1") == sTeamMask.count("1") and
-            fTeamMask.count("2") == sTeamMask.count("2") and
-            len(fTeamMask) + len(sTeamMask) == PlayersOnline
+        fTeamMask.count("0") == sTeamMask.count("0") and
+        fTeamMask.count("1") == sTeamMask.count("1") and
+        fTeamMask.count("2") == sTeamMask.count("2") and
+        len(fTeamMask) + len(sTeamMask) == PlayersOnline
     )
 
 
 def recountModel(static, active, U):
     UserSettings = U.getUserSettings()
-    Members = [ClassPlayer(i["TSR"], i["DSR"], i["HSR"], i["Username"]) for i in static]
+    Members = [ClassPlayer(i["TSR"], i["DSR"], i["HSR"],
+                           i["Username"]) for i in static]
     for i in range(len(Members)):
         Members[i].selectRoles(static[i]["Roles"], static[i]["Flex"])
     if checkTeamMask(active["TeamMask"], len(Members)) and \
@@ -24,7 +25,8 @@ def recountModel(static, active, U):
         fTeam = ClassTeam(Members, active["TeamMask"], 0)
         sTeam = ClassTeam(Members, active["TeamMask"], 1)
         # if fTeam.checkMask(active["fMask"]) and sTeam.checkMask(active["sMask"]):
-        Balance = ClassGameBalance(fTeam, sTeam, active["TeamMask"], active["fMask"], active["sMask"])
+        Balance = ClassGameBalance(
+            fTeam, sTeam, active["TeamMask"], active["fMask"], active["sMask"])
         Balance.calcResult(UserSettings)
         return Balance.dict()
     return False

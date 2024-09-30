@@ -1,11 +1,18 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from DataBase.models import Profile, Role, Workspace, WorkspaceProfile
-from DataBase.repository import RoleRepository, WorkspaceProfileRepository, LobbyRepository, WorkspaceRepository
-
 from DataBase.permissions import Permissions
+from DataBase.repository import (LobbyRepository, RoleRepository,
+                                 WorkspaceProfileRepository,
+                                 WorkspaceRepository)
+from domain.exceptions import (AlreadyParticipiantException,
+                               CantEditOtherWorkspaceProfileException,
+                               CantManipulateRoleException,
+                               DontHavePermissionException,
+                               NotParticipiantException,
+                               WorkspaceProfileCreateException,
+                               WorkspaceProfileNotFoundException)
 
-from domain.exceptions import AlreadyParticipiantException, NotParticipiantException, CantEditOtherWorkspaceProfileException, CantManipulateRoleException, DontHavePermissionException, WorkspaceProfileCreateException, WorkspaceProfileNotFoundException
 
 class WorkspaceProfileService:
     def __init__(self, session: AsyncSession) -> None:

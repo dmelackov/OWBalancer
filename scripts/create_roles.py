@@ -1,6 +1,7 @@
 from DataBase.database import sessionmanager
 from DataBase.repository import PermissionRepository, RoleRepository
 
+
 async def create_roles():
     async with sessionmanager.session() as session:
         role_repository = RoleRepository(session)
@@ -75,4 +76,3 @@ async def create_roles():
         await role_repository.add_permission(Administrator, moderate_workspace)
 
         await session.commit()
-

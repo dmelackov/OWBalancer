@@ -1,10 +1,12 @@
-from DataBase.models import DEFAULT_PROFILE_DATA, Profile
-from DataBase.repository import ProfileRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from DataBase.models import DEFAULT_PROFILE_DATA, Profile
+from DataBase.repository import ProfileRepository
 from DataBase.schemes import Settings
+from domain.exceptions import (InvalidCredentialsException,
+                               PasswordDontMatchException,
+                               ProfileAlreadyExists)
 
-from domain.exceptions import ProfileAlreadyExists, PasswordDontMatchException, InvalidCredentialsException
 
 class ProfileService:
     def __init__(self, session: AsyncSession) -> None:
@@ -17,7 +19,7 @@ class ProfileService:
         if profile is None:
             raise InvalidCredentialsException
         return profile
-    
+
     async def registration(self, login, password, repeat_password):
         if password != repeat_password:
             raise PasswordDontMatchException
@@ -27,9 +29,9 @@ class ProfileService:
 
     async def get_default_settings(self) -> Settings:
         return Settings.model_validate(DEFAULT_PROFILE_DATA)
-    
+
     async def get_settings(self, profile: Profile) -> Settings:
         return Settings.model_validate(profile.settings)
-    
+
     async def set_settings(self, profile: Profile, settings: Settings):
         await self.profile_repository.set_settings(profile, settings.model_dump())

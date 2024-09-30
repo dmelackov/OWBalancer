@@ -5,8 +5,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from DataBase.database import get_db_session
 from DataBase.models import Profile
 from DataBase.schemes import TruncInviteInfo
+from domain.services import (InviteService, WorkspaceProfileService,
+                             WorkspaceService)
 from Site.loginManager import manager
-from domain.services import InviteService, WorkspaceProfileService, WorkspaceService
 
 
 class InviteController(Controller):

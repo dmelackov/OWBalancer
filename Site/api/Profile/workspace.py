@@ -7,9 +7,10 @@ from DataBase.database import get_db_session
 from DataBase.models import Profile
 from DataBase.permissions import Permissions
 from DataBase.roles import Roles
-from DataBase.schemes import InviteInfo, RoleScheme, WorkspaceProfileScheme, WorkspaceScheme
-from Site.loginManager import manager
+from DataBase.schemes import (InviteInfo, RoleScheme, WorkspaceProfileScheme,
+                              WorkspaceScheme)
 from domain.services import WorkspaceProfileService, WorkspaceService
+from Site.loginManager import manager
 
 
 class CreateWorkspaceParams(BaseModel):

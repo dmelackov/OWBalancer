@@ -3,6 +3,7 @@ import itertools
 import random
 
 from app.DataBase.db import *
+
 from Static.globalClasses import ClassGameBalance, ClassPlayer, ClassTeam
 
 
@@ -30,13 +31,16 @@ def formPlayersData(Lobby, Creator):
         for CustomIterator in C:
             P = CustomIterator.Player
             PlayersList.append(P)
-            M = ClassPlayer(CustomIterator.ID, CustomIterator.TSR, CustomIterator.DSR, CustomIterator.HSR, CustomIterator.Player.Username)
+            M = ClassPlayer(CustomIterator.ID, CustomIterator.TSR, CustomIterator.DSR,
+                            CustomIterator.HSR, CustomIterator.Player.Username)
             Members.append(M)
             accord[P] = M
-    PR = PlayerRoles.select().where(PlayerRoles.Player << PlayersList, PlayerRoles.Creator == Creator)
+    PR = PlayerRoles.select().where(PlayerRoles.Player << PlayersList,
+                                    PlayerRoles.Creator == Creator)
     if PR.exists():
         for PRIterator in PR:
-            accord[PRIterator.Player].selectRoles(PRIterator.Roles, PRIterator.isFlex)
+            accord[PRIterator.Player].selectRoles(
+                PRIterator.Roles, PRIterator.isFlex)
     return Members
 
 
@@ -81,8 +85,10 @@ def checkMask(tm, roleMask, Members, UserSettings):
 
 def createGame(Settings, Lobby: list[int], WU: WorkspaceProfile):
     UserSettings = Settings
-    PlayersInTeam = UserSettings["Amount"]["T"] + UserSettings["Amount"]["D"] + UserSettings["Amount"]["H"]
-    teamMask, roleMask = generateMask(PlayersInTeam, UserSettings["Amount"]["T"], UserSettings["Amount"]["D"])
+    PlayersInTeam = UserSettings["Amount"]["T"] + \
+        UserSettings["Amount"]["D"] + UserSettings["Amount"]["H"]
+    teamMask, roleMask = generateMask(
+        PlayersInTeam, UserSettings["Amount"]["T"], UserSettings["Amount"]["D"])
 
     if len(Lobby) == PlayersInTeam * 2:
         Members = formPlayersData(Lobby, WU)
@@ -94,7 +100,8 @@ def createGame(Settings, Lobby: list[int], WU: WorkspaceProfile):
         maskError = True
 
         for tm in teamMask:
-            tempM, tempBalErr, tempMaskErr = checkMask(tm, roleMask, Members, UserSettings)
+            tempM, tempBalErr, tempMaskErr = checkMask(
+                tm, roleMask, Members, UserSettings)
             if not tempBalErr:
                 balanceError = False
             if not tempMaskErr:

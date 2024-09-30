@@ -4,7 +4,9 @@ from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from DataBase.models import KeyData, Profile, Workspace, WorkspaceProfile, Lobby
+from DataBase.models import (KeyData, Lobby, Profile, Workspace,
+                             WorkspaceProfile)
+
 
 class WorkspaceRepository:
     def __init__(self, session: AsyncSession) -> None:

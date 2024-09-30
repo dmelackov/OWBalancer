@@ -3,7 +3,8 @@ def dpFairness(X, Y, p):
     # count p-Fairness of the game,
     # where s - skillRatings; X, Y - players for each team
     return abs(
-        pow(sum(map(lambda x: x ** p, X)), 1 / p) - pow(sum(map(lambda y: y ** p, Y)), 1 / p)
+        pow(sum(map(lambda x: x ** p, X)), 1 / p) -
+        pow(sum(map(lambda y: y ** p, Y)), 1 / p)
     )
 
 
@@ -18,11 +19,11 @@ def rgRolesFairness(X, Y, fMask, sMask, g, tWeight, dWeight, hWeight):
     return abs(
         pow(
             (
-                    (
-                            (abs(fRoles[0] - sRoles[0]) * tWeight) ** g +
-                            (abs(fRoles[1] - sRoles[1]) * dWeight) ** g +
-                            (abs(fRoles[2] - sRoles[2]) * hWeight) ** g
-                    ) / 3
+                (
+                    (abs(fRoles[0] - sRoles[0]) * tWeight) ** g +
+                    (abs(fRoles[1] - sRoles[1]) * dWeight) ** g +
+                    (abs(fRoles[2] - sRoles[2]) * hWeight) ** g
+                ) / 3
             ),
             1 / g
         )
@@ -54,7 +55,8 @@ def teamRolePriority(fPlayers, sPlayers, fMask, sMask):
         sub = sPlayers[i].rolePriorityPoints(int(role))
         sTeamRoles -= sub
         Points -= sub
-    Points += 0.2 * (abs(fTeamRoles - sTeamRoles) if abs(fTeamRoles - sTeamRoles) > 1 else 0)
+    Points += 0.2 * (abs(fTeamRoles - sTeamRoles)
+                     if abs(fTeamRoles - sTeamRoles) > 1 else 0)
     return Points
 
 
@@ -71,8 +73,9 @@ def imbalanceFunc(X, Y, fMask, sMask, fPlayers, sPlayers, USettings):
     q = MathSettings["q"]
     return (
         alpha * dpFairness(X, Y, p),
-        beta * rgRolesFairness(X, Y, fMask, sMask, p, tWeight, dWeight, hWeight),
-        gamma * teamRolePriority(fPlayers.Players, sPlayers.Players, fMask, sMask),
+        beta * rgRolesFairness(X, Y, fMask, sMask, p,
+                               tWeight, dWeight, hWeight),
+        gamma * teamRolePriority(fPlayers.Players,
+                                 sPlayers.Players, fMask, sMask),
         vqUniformity(X, Y, q)
     )
-

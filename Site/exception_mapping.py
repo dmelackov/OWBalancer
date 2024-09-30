@@ -1,7 +1,10 @@
 from typing import Callable
-from domain.exceptions import *
+
 from fastapi import Request
 from fastapi.responses import JSONResponse
+
+from domain.exceptions import *
+
 
 class ExceptionMap():
     def __init__(self, status_code: int, msg: str | Callable) -> None:
@@ -14,6 +17,7 @@ class ExceptionMap():
         if isinstance(self.msg, Callable):
             return self.status_code, self.msg(exception)
         return 500, "Unkown exception message type"
+
 
 exception_mapping = {
     InviteNotFoundException.__name__: ExceptionMap(404, "Invite not found"),
@@ -37,7 +41,8 @@ exception_mapping = {
     NotParticipiantException.__name__: ExceptionMap(403, "You not participiant"),
     AlreadyParticipiantException.__name__: ExceptionMap(403, "You already participiant"),
     WorkspaceProfileNotFoundException.__name__: ExceptionMap(404, "Workspace Profile not found"),
-    WorkspaceProfileCreateException.__name__: ExceptionMap(500, "Unable to create Workspace Profile")
+    WorkspaceProfileCreateException.__name__: ExceptionMap(
+        500, "Unable to create Workspace Profile")
 }
 
 

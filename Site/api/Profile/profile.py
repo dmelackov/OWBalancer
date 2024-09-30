@@ -7,8 +7,8 @@ from pydantic import BaseModel
 from DataBase.database import get_db_session
 from DataBase.models import Profile, WorkspaceProfile
 from DataBase.schemes import ProfileScheme, WorkspaceProfileScheme
-from Site.loginManager import manager
 from domain.services import WorkspaceProfileService
+from Site.loginManager import manager
 from Site.utils import get_workspace_profile
 
 

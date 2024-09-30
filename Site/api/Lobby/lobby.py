@@ -1,18 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException
-from starlette.status import (HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN,
-                              HTTP_404_NOT_FOUND)
-
 import app.DataBase.dataModels as dataModels
 from app.DataBase.db import Custom, WorkspaceProfile
 from app.DataBase.permissions import Permissions
 from app.Site.loginManager import manager
 from app.Site.utils import getWorkspaceProfile
+from fastapi import APIRouter, Depends, HTTPException
+from starlette.status import (HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN,
+                              HTTP_404_NOT_FOUND)
 
 router = APIRouter(
     prefix="/lobby",
     tags=["lobby"]
 )
-
 
 
 @router.get("/getLobby")
@@ -22,6 +20,7 @@ async def getLobby(workspaceProfile: WorkspaceProfile | None = Depends(getWorksp
                             "Not found workspace profile")
     players = workspaceProfile.getLobbyInfo()
     return [Custom.getInstance(i).getJson(workspaceProfile) for i in players]
+
 
 @router.post("/addToLobby/{customID}")
 async def addToLobby(customID: int, workspaceProfile: WorkspaceProfile | None = Depends(getWorkspaceProfile)):
@@ -41,6 +40,7 @@ async def addToLobby(customID: int, workspaceProfile: WorkspaceProfile | None = 
     else:
         return {"message": answer.error}
 
+
 @router.delete("/deleteFromLobby/{customID}")
 async def deleteFromLobby(customID: int, workspaceProfile: WorkspaceProfile | None = Depends(getWorkspaceProfile)):
     if workspaceProfile is None:
@@ -58,7 +58,8 @@ async def deleteFromLobby(customID: int, workspaceProfile: WorkspaceProfile | No
         return {"message": "OK"}
     else:
         return {"message": answer.error}
-    
+
+
 @router.delete("/clearLobby")
 async def getInfo(workspaceProfile: WorkspaceProfile | None = Depends(getWorkspaceProfile)):
     if workspaceProfile is None:

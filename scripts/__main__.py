@@ -4,7 +4,6 @@ import sys
 from scripts.create_roles import create_roles
 from scripts.reset_settings import reset_settings
 
-
 SCRIPTS = [
     create_roles,
     reset_settings

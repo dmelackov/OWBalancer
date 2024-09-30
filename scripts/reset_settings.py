@@ -1,6 +1,6 @@
 from DataBase.database import sessionmanager
-from DataBase.repository import ProfileRepository
 from DataBase.models import DEFAULT_PROFILE_DATA
+from DataBase.repository import ProfileRepository
 
 
 async def reset_settings():
@@ -16,4 +16,3 @@ async def reset_settings():
             profile.settings = DEFAULT_PROFILE_DATA
             await session.flush()
             await session.commit()
-
