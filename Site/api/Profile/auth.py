@@ -7,9 +7,9 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from DataBase.database import get_db_session
-from DataBase.models.profile import Profile
+from DataBase.models import Profile
 from Site.loginManager import manager
-from Site.service.profile_service import ProfileService
+from domain.services import ProfileService
 
 
 class LoginRequest(BaseModel):

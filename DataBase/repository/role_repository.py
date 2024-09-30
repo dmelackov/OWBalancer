@@ -4,10 +4,8 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from DataBase.models.perm import Perm
-from DataBase.models.role import Role
-from DataBase.models.role_perm import RolePerm
-from DataBase.repository.permission_repository import PermissionRepository
+from DataBase.models import Perm, Role, RolePerm
+from .permission_repository import PermissionRepository
 
 
 class RoleRepository:

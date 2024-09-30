@@ -1,8 +1,8 @@
 from pydantic import BaseModel
 
-from DataBase.schemes.profile_scheme import ProfileScheme
-from DataBase.schemes.role_scheme import RoleScheme
-from DataBase.schemes.workspace_scheme import WorkspaceScheme
+from .profile_scheme import ProfileScheme
+from .role_scheme import RoleScheme
+from .workspace_scheme import WorkspaceScheme
 
 
 class WorkspaceProfileScheme(BaseModel):
@@ -13,4 +13,4 @@ class WorkspaceProfileScheme(BaseModel):
     active: bool
 
     class Config:
-        orm_mode = True
+        from_attributes = True

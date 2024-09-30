@@ -4,16 +4,12 @@ from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from DataBase.database import get_db_session
-from DataBase.models.profile import Profile
+from DataBase.models import Profile
 from DataBase.permissions import Permissions
 from DataBase.roles import Roles
-from DataBase.schemes.invite import InviteInfo
-from DataBase.schemes.role_scheme import RoleScheme
-from DataBase.schemes.workspace_profile import WorkspaceProfileScheme
-from DataBase.schemes.workspace_scheme import WorkspaceScheme
+from DataBase.schemes import InviteInfo, RoleScheme, WorkspaceProfileScheme, WorkspaceScheme
 from Site.loginManager import manager
-from Site.service.workspace_profile_service import WorkspaceProfileService
-from Site.service.workspace_service import WorkspaceService
+from domain.services import WorkspaceProfileService, WorkspaceService
 
 
 class CreateWorkspaceParams(BaseModel):
@@ -31,7 +27,7 @@ class ChangeWorkspaceUserRoleRequest(BaseModel):
 
 
 class InviteCreateRequest(BaseModel):
-    use_limit: int = Field(ge=0, le=11)
+    use_limit: int = Field(ge=1, le=10)
 
 
 class InviteCreated(BaseModel):
@@ -147,7 +143,7 @@ class WorkspaceController(Controller):
         workspace_profile = await self.workspace_profile_service.get_by_bind(self.profile, workspace)
         await self.workspace_profile_service.check_permission(workspace_profile, Permissions.moderate_workspace)
 
-        return self.workspace_service.get_invites(workspace)
+        return await self.workspace_service.get_invites(workspace)
 
     @post("/{workspace_id}/invite", response_model=InviteCreated)
     async def create_workspace_invite(self,

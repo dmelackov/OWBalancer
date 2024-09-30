@@ -3,11 +3,11 @@ from typing import Optional
 from sqlalchemy import JSON, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from DataBase.database import Base
-from DataBase.models.lobby import Lobby
-from DataBase.models.profile import Profile
-from DataBase.models.role import Role
-from DataBase.models.workspace import Workspace
+from .base import Base
+from .lobby import Lobby
+from .profile import Profile
+from .role import Role
+from .workspace import Workspace
 
 DEFAULT_WORKSPACE_SETTIGNS = {"AutoIncrement": False, "generalLobby": False}
 

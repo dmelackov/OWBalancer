@@ -1,11 +1,10 @@
-from fastapi import HTTPException
-from DataBase.models.profile import DEFAULT_PROFILE_DATA, Profile
-from DataBase.repository.profile_repository import ProfileRepository
+from DataBase.models import DEFAULT_PROFILE_DATA, Profile
+from DataBase.repository import ProfileRepository
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi_login.exceptions import InvalidCredentialsException
-from starlette.status import HTTP_400_BAD_REQUEST
 
-from DataBase.schemes.settings import Settings
+from DataBase.schemes import Settings
+
+from domain.exceptions import ProfileAlreadyExists, PasswordDontMatchException, InvalidCredentialsException
 
 class ProfileService:
     def __init__(self, session: AsyncSession) -> None:
@@ -21,9 +20,9 @@ class ProfileService:
     
     async def registration(self, login, password, repeat_password):
         if password != repeat_password:
-            raise HTTPException(HTTP_400_BAD_REQUEST, "Passwords don't match")
+            raise PasswordDontMatchException
         if await self.profile_repository.get_by_username(login) is not None:
-            raise HTTPException(HTTP_400_BAD_REQUEST, "User already exist")
+            raise ProfileAlreadyExists
         await self.profile_repository.registration(login, password)
 
     async def get_default_settings(self) -> Settings:

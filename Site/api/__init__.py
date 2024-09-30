@@ -1,11 +1,11 @@
 from fastapi import APIRouter
 
-from Site.api.Players.players import PlayerController
-from Site.api.Profile.auth import AuthController
-from Site.api.Profile.invite import InviteController
-from Site.api.Profile.profile import ProfileController
-from Site.api.Profile.settings import SettingsController
-from Site.api.Profile.workspace import WorkspaceController
+from .Players.players import PlayerController
+from .Profile.auth import AuthController
+from .Profile.invite import InviteController
+from .Profile.profile import ProfileController
+from .Profile.settings import SettingsController
+from .Profile.workspace import WorkspaceController
 
 router = APIRouter(
     prefix="/api",

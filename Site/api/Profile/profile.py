@@ -5,12 +5,10 @@ from fastapi_controllers import Controller, get
 from pydantic import BaseModel
 
 from DataBase.database import get_db_session
-from DataBase.models.profile import Profile
-from DataBase.models.workspace_profile import WorkspaceProfile
-from DataBase.schemes.profile_scheme import ProfileScheme
-from DataBase.schemes.workspace_profile import WorkspaceProfileScheme
+from DataBase.models import Profile, WorkspaceProfile
+from DataBase.schemes import ProfileScheme, WorkspaceProfileScheme
 from Site.loginManager import manager
-from Site.service.workspace_profile_service import WorkspaceProfileService
+from domain.services import WorkspaceProfileService
 from Site.utils import get_workspace_profile
 
 
@@ -20,7 +18,7 @@ class InfoResponse(BaseModel):
     workspace_profile: Optional[WorkspaceProfileScheme]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ProfileController(Controller):
@@ -44,4 +42,4 @@ class ProfileController(Controller):
     async def getPermissions(self,
                              workspace_profile: WorkspaceProfile = Depends(
                                  get_workspace_profile)):
-        return self.workspace_profile_service.get_permissions(workspace_profile)
+        return await self.workspace_profile_service.get_permissions(workspace_profile)

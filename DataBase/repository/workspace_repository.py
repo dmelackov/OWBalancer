@@ -4,12 +4,7 @@ from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from DataBase.models.key_data import KeyData
-from DataBase.models.profile import Profile
-from DataBase.models.workspace import Workspace
-from DataBase.models.workspace_profile import WorkspaceProfile
-from DataBase.repository.lobby_repository import LobbyRepository
-
+from DataBase.models import KeyData, Profile, Workspace, WorkspaceProfile, Lobby
 
 class WorkspaceRepository:
     def __init__(self, session: AsyncSession) -> None:
@@ -32,10 +27,7 @@ class WorkspaceRepository:
             workspaces.append(workspace_profile.workspace)
         return workspaces
 
-    async def create(self, creator: Profile, name: str, workspace_params: Optional[dict] = None) -> Optional[Workspace]:
-        lobby_repository = LobbyRepository(self.session)
-
-        lobby = await lobby_repository.create()
+    async def create(self, creator: Profile, name: str, lobby: Lobby, workspace_params: Optional[dict] = None) -> Optional[Workspace]:
         if workspace_params is None:
             workspace = Workspace(
                 lobby_id=lobby.id, creator_id=creator.id, name=name, description="")

@@ -1,9 +1,8 @@
 import contextlib
 from typing import Any, AsyncIterator
-
+from DataBase.models import Base
 from sqlalchemy.ext.asyncio import (AsyncConnection, AsyncSession,
                                     async_sessionmaker, create_async_engine)
-from sqlalchemy.orm import DeclarativeBase
 
 from Static.params import (DB_HOST, DB_NAME, DB_PORT, DB_TYPE, DB_USER_LOGIN,
                            DB_USER_PASSWORD)
@@ -11,8 +10,7 @@ from Static.params import (DB_HOST, DB_NAME, DB_PORT, DB_TYPE, DB_USER_LOGIN,
 connect_string = ""
 
 
-class Base(DeclarativeBase):
-    pass
+
 
 
 if DB_TYPE == "mysql":

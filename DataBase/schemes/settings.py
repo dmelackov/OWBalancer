@@ -1,23 +1,23 @@
 from pydantic import BaseModel
 
 
-class RoleAmount(BaseModel):
+class SettingsRoleAmount(BaseModel):
     tank: int
     damage: int
     support: int
 
 
-class Team(BaseModel):
+class SettingsTeam(BaseModel):
     name: str
     color: str
 
 
-class Teams(BaseModel):
-    first: Team
-    second: Team
+class SettingsTeams(BaseModel):
+    first: SettingsTeam
+    second: SettingsTeam
 
 
-class Math(BaseModel):
+class SettingsMath(BaseModel):
     balance_limit: int
     alpha: int | float
     beta: int | float
@@ -34,6 +34,6 @@ class Settings(BaseModel):
     auto_increment: bool
     extended_lobby: bool
     expanded_result: bool
-    amount: RoleAmount
-    team: Teams
-    math: Math
+    amount: SettingsRoleAmount
+    team: SettingsTeams
+    math: SettingsMath

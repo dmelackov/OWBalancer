@@ -4,11 +4,7 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from DataBase.models.profile import Profile
-from DataBase.models.role import Role
-from DataBase.models.workspace import Workspace
-from DataBase.models.workspace_profile import WorkspaceProfile
-from DataBase.repository.lobby_repository import LobbyRepository
+from DataBase.models import Profile, Role, Workspace, WorkspaceProfile, Lobby
 
 
 class WorkspaceProfileRepository:
@@ -31,10 +27,7 @@ class WorkspaceProfileRepository:
         workspace_profile.role_id = role.id
         await self.session.flush()
 
-    async def create(self, profile: Profile, workspace: Workspace, role: Role) -> Optional[WorkspaceProfile]:
-        lobby_repository = LobbyRepository(self.session)
-
-        lobby = await lobby_repository.create()
+    async def create(self, profile: Profile, workspace: Workspace, lobby: Lobby, role: Role) -> Optional[WorkspaceProfile]:
         workspace_profile = WorkspaceProfile(role_id=role.id,
                                              workspace_id=workspace.id,
                                              profile_id=profile.id,

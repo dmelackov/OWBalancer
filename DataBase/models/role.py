@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Mapped, mapped_column
 
-from DataBase.database import Base
+from .base import Base
 
 
 class Role(Base):

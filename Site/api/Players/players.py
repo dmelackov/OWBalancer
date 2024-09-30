@@ -6,9 +6,9 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from DataBase.database import get_db_session
-from DataBase.models.workspace_profile import WorkspaceProfile
-from DataBase.schemes.player import PlayerBaseScheme, PlayerScheme
-from Site.service.player_service import PlayerService
+from DataBase.models import WorkspaceProfile
+from DataBase.schemes import PlayerBaseScheme, PlayerScheme
+from domain.services import PlayerService
 from Site.utils import get_workspace_profile
 
 

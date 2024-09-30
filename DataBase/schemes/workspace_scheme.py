@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from DataBase.schemes.profile_scheme import ProfileScheme
+from .profile_scheme import ProfileScheme
 
 
 class WorkspaceScheme(BaseModel):
@@ -10,4 +10,4 @@ class WorkspaceScheme(BaseModel):
     creator: ProfileScheme
 
     class Config:
-        orm_mode = True
+        from_attributes = True

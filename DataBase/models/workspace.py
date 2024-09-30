@@ -3,9 +3,9 @@ from typing import Optional
 from sqlalchemy import JSON, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from DataBase.database import Base
-from DataBase.models.lobby import Lobby
-from DataBase.models.profile import Profile
+from .base import Base
+from .lobby import Lobby
+from .profile import Profile
 
 DEFAULT_WORKSPACE_PARAMS = {"CustomSystem": True}
 

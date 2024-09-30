@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy import JSON
 from sqlalchemy.orm import Mapped, mapped_column
 
-from DataBase.database import Base
+from .base import Base
 
 DEFAULT_PROFILE_DATA = {
     "amount": {

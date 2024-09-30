@@ -1,9 +1,9 @@
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from DataBase.database import Base
-from DataBase.models.custom import Custom
-from DataBase.models.lobby import Lobby
+from .base import Base
+from .custom import Custom
+from .lobby import Lobby
 
 
 class LobbyPlayer(Base):

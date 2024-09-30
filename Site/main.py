@@ -6,10 +6,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware import Middleware
 from starlette.status import HTTP_401_UNAUTHORIZED
 
-import Site.api.api as api
+import Site.api as api
 from DataBase.database import create_db_and_tables, sessionmanager
 from Site.exceptions import NotAuthenticatedException
-
+from Site.exception_mapping import exception_handler
+from domain.exceptions import DomainException
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -36,3 +37,6 @@ def auth_exception_handler(request: Request, exc: NotAuthenticatedException):
     res = Response("UNAUTHORIZED", HTTP_401_UNAUTHORIZED)
     res.set_cookie("access-token", "", max_age=0)
     return res
+
+
+app.add_exception_handler(DomainException, exception_handler)

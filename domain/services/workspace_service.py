@@ -1,19 +1,10 @@
-from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette.status import HTTP_404_NOT_FOUND, HTTP_500_INTERNAL_SERVER_ERROR
 
-from DataBase.models.key_data import KeyData
-from DataBase.models.profile import Profile
-from DataBase.models.role import Role
-from DataBase.models.workspace import Workspace
-from DataBase.models.workspace_profile import WorkspaceProfile
-from DataBase.repository.invite_repository import InviteRepository
-from DataBase.repository.role_repository import RoleRepository
-from DataBase.repository.workspace_profile_repository import \
-    WorkspaceProfileRepository
-from DataBase.repository.workspace_repository import WorkspaceRepository
+from DataBase.models import KeyData, Profile, Role, Workspace, WorkspaceProfile
+from DataBase.repository import InviteRepository, RoleRepository, WorkspaceProfileRepository, LobbyRepository, WorkspaceRepository
 from DataBase.roles import Roles
 
+from domain.exceptions import WorkspaceNotFoundException, WorkspaceCreateException, RoleNotFoundException, RoleNotGeneratedException, InviteCreateException
 
 class WorkspaceService:
     def __init__(self, session: AsyncSession) -> None:
@@ -23,18 +14,19 @@ class WorkspaceService:
         self.workspace_repository = WorkspaceRepository(session)
         self.workspace_profile_repository = WorkspaceProfileRepository(session)
         self.invite_repository = InviteRepository(session)
+        self.lobby_repostiory = LobbyRepository(session)
 
     async def get_by_id(self, id: int) -> Workspace:
         workspace = await self.workspace_repository.get_by_id(id)
         if workspace is None:
-            raise HTTPException(HTTP_404_NOT_FOUND, "Workspace not found")
+            raise WorkspaceNotFoundException
         return workspace
 
     async def create(self, creator: Profile, name: str, params: dict):
-        workspace = await self.workspace_repository.create(creator, name, params)
+        lobby = await self.lobby_repostiory.create()
+        workspace = await self.workspace_repository.create(creator, name, lobby, params)
         if workspace is None:
-            raise HTTPException(HTTP_500_INTERNAL_SERVER_ERROR,
-                                "Unable to create workspace")
+            raise WorkspaceCreateException
         return workspace
 
     async def get_by_profile(self, profile: Profile) -> list[Workspace]:
@@ -46,14 +38,13 @@ class WorkspaceService:
     async def get_role(self, role_enum: Roles) -> Role:
         role = await self.role_repository.get_by_name(role_enum.value)
         if role is None:
-            raise HTTPException(HTTP_500_INTERNAL_SERVER_ERROR,
-                                "Roles not generated. Contact site admin")
+            raise RoleNotGeneratedException
         return role
 
     async def get_role_by_id(self, id: int) -> Role:
         role = await self.role_repository.get_by_id(id)
         if role is None:
-            raise HTTPException(HTTP_404_NOT_FOUND, "Role not found")
+            raise RoleNotFoundException
         return role
 
     async def get_members(self, workspace: Workspace) -> list[WorkspaceProfile]:
@@ -65,6 +56,5 @@ class WorkspaceService:
     async def create_invite(self, initiator: WorkspaceProfile, use_limit: int) -> KeyData:
         keydata = await self.invite_repository.create(initiator, use_limit=use_limit)
         if keydata is None:
-            raise HTTPException(HTTP_500_INTERNAL_SERVER_ERROR,
-                                "Unable to create invite")
+            raise InviteCreateException
         return keydata

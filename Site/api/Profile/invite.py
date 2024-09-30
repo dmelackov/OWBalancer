@@ -3,12 +3,10 @@ from fastapi_controllers import Controller, delete, get, post
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from DataBase.database import get_db_session
-from DataBase.models.profile import Profile
-from DataBase.schemes.invite import TruncInviteInfo
+from DataBase.models import Profile
+from DataBase.schemes import TruncInviteInfo
 from Site.loginManager import manager
-from Site.service.invite_service import InviteService
-from Site.service.workspace_profile_service import WorkspaceProfileService
-from Site.service.workspace_service import WorkspaceService
+from domain.services import InviteService, WorkspaceProfileService, WorkspaceService
 
 
 class InviteController(Controller):

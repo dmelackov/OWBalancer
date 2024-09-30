@@ -4,10 +4,7 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from DataBase.models.key_data import KeyData
-from DataBase.models.workspace_profile import WorkspaceProfile
-
-
+from DataBase.models import KeyData, WorkspaceProfile
 class InviteRepository:
     def __init__(self, session: AsyncSession) -> None:
         self.session = session

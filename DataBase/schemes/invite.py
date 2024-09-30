@@ -1,13 +1,13 @@
 from pydantic import BaseModel
 
-from DataBase.schemes.workspace_profile import WorkspaceProfileScheme
+from .workspace_profile import WorkspaceProfileScheme
 
 
 class TruncInviteInfo(BaseModel):
     creator: WorkspaceProfileScheme
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class InviteInfo(BaseModel):
@@ -17,4 +17,4 @@ class InviteInfo(BaseModel):
     creator: WorkspaceProfileScheme
 
     class Config:
-        orm_mode = True
+        from_attributes = True

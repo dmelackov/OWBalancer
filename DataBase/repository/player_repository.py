@@ -3,10 +3,7 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from DataBase.models.player import Player
-from DataBase.models.player_roles import PlayerRoles
-from DataBase.models.workspace import Workspace
-from DataBase.models.workspace_profile import WorkspaceProfile
+from DataBase.models import Player, PlayerRoles, Workspace, WorkspaceProfile
 
 
 class PlayerRepository:

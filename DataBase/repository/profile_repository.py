@@ -5,7 +5,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from DataBase.models.profile import Profile
+from DataBase.models import Profile
 
 
 class ProfileRepository:
@@ -46,6 +46,5 @@ class ProfileRepository:
         return check_password_hash(old_password, password)
 
     async def set_settings(self, profile: Profile, new_settings: dict) -> None:
-        ses_profile = await self.get_by_id(profile.id)
-        ses_profile.settings = new_settings
+        profile.settings = new_settings
         await self.session.flush()

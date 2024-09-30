@@ -1,20 +1,11 @@
-from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from starlette.status import (HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND,
-                              HTTP_500_INTERNAL_SERVER_ERROR)
 
-from DataBase.models.key_data import KeyData
-from DataBase.models.perm import Perm
-from DataBase.models.profile import Profile
-from DataBase.models.role import Role
-from DataBase.models.workspace import Workspace
-from DataBase.models.workspace_profile import WorkspaceProfile
+from DataBase.models import Profile, Role, Workspace, WorkspaceProfile
+from DataBase.repository import RoleRepository, WorkspaceProfileRepository, LobbyRepository, WorkspaceRepository
+
 from DataBase.permissions import Permissions
-from DataBase.repository.role_repository import RoleRepository
-from DataBase.repository.workspace_profile_repository import \
-    WorkspaceProfileRepository
-from DataBase.repository.workspace_repository import WorkspaceRepository
 
+from domain.exceptions import AlreadyParticipiantException, NotParticipiantException, CantEditOtherWorkspaceProfileException, CantManipulateRoleException, DontHavePermissionException, WorkspaceProfileCreateException, WorkspaceProfileNotFoundException
 
 class WorkspaceProfileService:
     def __init__(self, session: AsyncSession) -> None:
@@ -23,6 +14,7 @@ class WorkspaceProfileService:
         self.role_repository = RoleRepository(session)
         self.workspace_repository = WorkspaceRepository(session)
         self.workspace_profile_repository = WorkspaceProfileRepository(session)
+        self.lobby_repostiory = LobbyRepository(session)
 
     async def has_permission(self, workspace_profile: WorkspaceProfile, permission: Permissions) -> bool:
         if workspace_profile.id == workspace_profile.workspace.creator.id:
@@ -30,8 +22,8 @@ class WorkspaceProfileService:
         return await self.role_repository.check_permission(workspace_profile.role, Permissions.moderate_workspace.value)
 
     async def check_permission(self, workspace_profile: WorkspaceProfile, permission: Permissions):
-        if self.has_permission(workspace_profile, permission):
-            raise HTTPException(HTTP_403_FORBIDDEN, "Not enough permissions")
+        if not await self.has_permission(workspace_profile, permission):
+            raise DontHavePermissionException(permission.value)
 
     async def can_manipulate_role(self, workspace_profile: WorkspaceProfile, role: Role) -> bool:
         if workspace_profile.id == workspace_profile.workspace.creator.id:
@@ -40,7 +32,7 @@ class WorkspaceProfileService:
 
     async def check_manipulate_role(self, workspace_profile: WorkspaceProfile, role: Role):
         if not await self.can_manipulate_role(workspace_profile, role):
-            raise HTTPException(HTTP_403_FORBIDDEN, "Not enough permissions")
+            raise CantManipulateRoleException
 
     async def is_participant(self, profile: Profile, workspace: Workspace) -> bool:
         workspace_profile = await self.workspace_profile_repository.get_by_bind(profile, workspace)
@@ -48,11 +40,11 @@ class WorkspaceProfileService:
 
     async def check_participant(self, profile: Profile, workspace: Workspace):
         if not await self.is_participant(profile, workspace):
-            raise HTTPException(HTTP_403_FORBIDDEN, "Not participant")
+            raise NotParticipiantException
 
     async def check_not_participant(self, profile: Profile, workspace: Workspace):
         if await self.is_participant(profile, workspace):
-            raise HTTPException(HTTP_403_FORBIDDEN, "Already participant")
+            raise AlreadyParticipiantException
 
     async def can_edit_other(self, initiator: WorkspaceProfile, target: WorkspaceProfile) -> bool:
         if target.workspace_id != initiator.workspace_id:
@@ -65,20 +57,18 @@ class WorkspaceProfileService:
 
     async def check_edit_other(self, initiator: WorkspaceProfile, target: WorkspaceProfile):
         if not self.can_edit_other(initiator, target):
-            raise HTTPException(HTTP_403_FORBIDDEN, "Not enough permissions")
+            raise CantEditOtherWorkspaceProfileException
 
     async def get_by_id(self, id: int) -> WorkspaceProfile:
         workspace_profile = await self.workspace_profile_repository.get_by_id(id)
         if workspace_profile is None:
-            raise HTTPException(HTTP_404_NOT_FOUND,
-                                "Workspace Profile not found")
+            raise WorkspaceProfileNotFoundException
         return workspace_profile
 
     async def get_by_bind(self, profile: Profile, workspace: Workspace) -> WorkspaceProfile:
         workspace_profile = await self.workspace_profile_repository.get_by_bind(profile, workspace)
         if workspace_profile is None:
-            raise HTTPException(HTTP_404_NOT_FOUND,
-                                "Workspace Profile not found")
+            raise WorkspaceProfileNotFoundException
         return workspace_profile
 
     async def change_role(self, initiator: WorkspaceProfile, target: WorkspaceProfile, role: Role):
@@ -98,10 +88,10 @@ class WorkspaceProfileService:
         if old_workspace_profile is not None:
             await self.workspace_profile_repository.activate(old_workspace_profile)
             return old_workspace_profile
-        workspace_profile = await self.workspace_profile_repository.create(profile, workspace, role)
+        lobby = await self.lobby_repostiory.create()
+        workspace_profile = await self.workspace_profile_repository.create(profile, workspace, lobby, role)
         if workspace_profile is None:
-            raise HTTPException(HTTP_500_INTERNAL_SERVER_ERROR,
-                                "Unable to create workspace profile")
+            raise WorkspaceProfileCreateException
         return workspace_profile
 
     async def get_permissions(self, workspace_profile: WorkspaceProfile) -> list[str]:

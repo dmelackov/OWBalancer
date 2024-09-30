@@ -3,10 +3,10 @@ from fastapi_controllers import Controller, get, post
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from DataBase.database import get_db_session
-from DataBase.models.profile import Profile
-from DataBase.schemes.settings import Settings
+from DataBase.models import Profile
+from DataBase.schemes import Settings
 from Site.loginManager import manager
-from Site.service.profile_service import ProfileService
+from domain.services import ProfileService
 
 
 class SettingsController(Controller):

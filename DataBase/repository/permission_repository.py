@@ -3,7 +3,7 @@ from typing import Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from DataBase.models.perm import Perm
+from DataBase.models import Perm
 
 
 class PermissionRepository:

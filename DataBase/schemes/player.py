@@ -1,6 +1,6 @@
 from pydantic import BaseModel
-
-from DataBase.schemes.workspace_profile import WorkspaceProfileScheme
+from enum import Enum
+from .workspace_profile import WorkspaceProfileScheme
 
 
 class PlayerBaseScheme(BaseModel):
@@ -8,7 +8,7 @@ class PlayerBaseScheme(BaseModel):
     username: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class PlayerScheme(BaseModel):
@@ -17,12 +17,16 @@ class PlayerScheme(BaseModel):
     creator: WorkspaceProfileScheme
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
+class Role(Enum):
+    TANK = "t"
+    DAMAGE = "d"
+    SUPPORT = "s"
 
 class PlayerRoleScheme(BaseModel):
     active: bool
-    role: str
+    role: Role
 
 
 class PlayerWithRolesScheme(BaseModel):
