@@ -12,10 +12,9 @@ connect_string = ""
 
 
 if DB_TYPE == "mysql":
-    connect_string = f"mysql+pymysql: //{DB_USER_LOGIN}: {
-        DB_USER_PASSWORD}@{DB_HOST}: {DB_PORT}/{DB_NAME}"
+    connect_string = f"mysql+pymysql://{DB_USER_LOGIN}:{DB_USER_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 else:
-    connect_string = f"sqlite+aiosqlite: ///./{DB_NAME}2.db"
+    connect_string = f"sqlite+aiosqlite:///./{DB_NAME}2.db"
 
 
 class DatabaseSessionManager:
