@@ -353,6 +353,21 @@ class WorkspaceController(Controller):
     async def create_workspace_invite(self,
                                       workspace_id: int,
                                       request: InviteCreateRequest):
+        """
+        This endpoint creates a new invite for the specified workspace.
+
+        Args:
+            workspace_id (int): The ID of the workspace.
+            request (InviteCreateRequest): A request object containing the use_limit for the invite.
+
+        Returns:
+            An InviteCreated object containing the created invite key.
+
+        Raises:
+            WorkspaceNotFoundException: If the workspace doesn't exist.
+            WorkspaceProfileNotFoundException: If the authenticated user's workspace profile is not found.
+            DontHavePermissionException: If the user doesn't have permission to create the invite.
+        """
         workspace = await self.workspace_service.get_by_id(workspace_id)
         workspace_profile = await self.workspace_profile_service.get_by_bind(self.profile, workspace)
         await self.workspace_profile_service.check_permission(workspace_profile, Permissions.moderate_workspace)
