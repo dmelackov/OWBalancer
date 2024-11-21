@@ -8,7 +8,7 @@ from Site.exceptions import NotAuthenticatedException
 from Static.params import SECRET_KEY
 
 manager = LoginManager(SECRET_KEY, token_url='/api/auth/login',
-                       use_cookie=True, custom_exception=NotAuthenticatedException)
+                       use_cookie=True, not_authenticated_exception=NotAuthenticatedException)
 
 
 @manager.user_loader()

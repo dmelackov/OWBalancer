@@ -11,6 +11,19 @@ from DataBase.repository.workspace_repository import WorkspaceRepository
 from Site.loginManager import manager
 
 
+def get_ok_response(description):
+    OK_RESPONSE = {
+        200: {
+            "description": description,
+            "content": {
+                "application/json": {
+                    "example": {"message": "OK"}
+                }
+            }
+        }}
+    return OK_RESPONSE
+
+
 async def get_workspace(response: Response,
                         workspace: str | None = Cookie(default=None),
                         session=Depends(get_db_session)) -> Workspace | None:

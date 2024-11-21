@@ -58,3 +58,37 @@ async def exception_handler(request: Request, exc: Exception):
         status_code=500,
         content={"detail": "Unknown error occurred"}
     )
+
+def generate_responses_for_endpoint(allowed_exceptions: list[Exception]):
+    responses = {}
+    grouped_by_status = {}
+
+    # Группируем исключения по статус-коду
+    for exception_name in map(lambda x: x.__name__, allowed_exceptions):
+        if exception_name in exception_mapping:
+            exception_map = exception_mapping[exception_name]
+            status_code = exception_map.status_code
+            description = exception_map.msg
+
+            if status_code not in grouped_by_status:
+                grouped_by_status[status_code] = []
+            grouped_by_status[status_code].append(description)
+
+    # Создаём описания для каждого статус-кода
+    for status_code, descriptions in grouped_by_status.items():
+        if len(descriptions) == 1:
+            # Если описание одно, просто указываем его
+            responses[status_code] = {"description": descriptions[0]}
+        else:
+            # Если описаний несколько, указываем примеры
+            responses[status_code] = {
+                "description": "Multiple possible errors.",
+                "content": {
+                    "application/json": {
+                        "examples": {f"error_{i+1}": {"summary": desc, "value": {"detail": desc}}
+                                     for i, desc in enumerate(descriptions)}
+                    }
+                },
+            }
+   
+    return responses
