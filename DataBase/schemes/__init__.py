@@ -7,3 +7,4 @@ from .settings import (Settings, SettingsMath, SettingsRoleAmount,
                        SettingsTeam, SettingsTeams)
 from .workspace_profile import WorkspaceProfileScheme
 from .workspace_scheme import WorkspaceScheme
+from .custom import CustomScheme

@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from DataBase.database import get_db_session
 from DataBase.models import WorkspaceProfile
-from DataBase.schemes import PlayerBaseScheme, PlayerScheme
+from DataBase.schemes import PlayerBaseScheme, PlayerScheme, CustomScheme
 from domain.services import PlayerService
 from Site.utils import get_workspace_profile
 
@@ -51,6 +51,10 @@ class PlayerController(Controller):
         player = await self.player_service.create(self.workspace_profile, request.username)
         await self.session.commit()
         return player
+    
+    @get("/{player_id}/customs", response_model=list[CustomScheme])
+    async def get_player_customs(self):
+        pass
 
     @patch("/{player_id}")
     async def patch_player(self,
