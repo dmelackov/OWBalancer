@@ -1,0 +1,25 @@
+{
+  "folders": [
+    {
+      "name": "OWBalancer",
+      "path": "../"
+    },
+    {
+      "name": "apps/api",
+      "path": "../apps/api"
+    },
+    {
+      "name": "apps/balance_service",
+      "path": "../apps/balance_service"
+    },
+    {
+      "name": "apps/migration",
+      "path": "../apps/migration"
+    },
+    {
+      "name": "libs/shared_models",
+      "path": "../libs/shared_models"
+    },
+  ],
+  "settings": {}
+}

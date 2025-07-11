@@ -1,6 +1,0 @@
-*.log
-*.db
-venv/
-.vscode/
-.github/
-__pycache__/

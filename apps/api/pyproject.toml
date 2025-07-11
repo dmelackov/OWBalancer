@@ -1,0 +1,27 @@
+[project]
+name = "api"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aiosqlite>=0.21.0",
+    "asyncpg>=0.30.0",
+    "bcrypt>=4.3.0",
+    "fastapi[all]>=0.115.12",
+    "redis>=6.2.0",
+    "shared-models",
+    "sqlalchemy>=2.0.41",
+    "uvicorn>=0.34.3",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = ["backend"]
+
+[tool.uv.sources]
+shared-models = { path = "../../libs/shared_models", editable = true }
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
